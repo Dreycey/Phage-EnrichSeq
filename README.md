@@ -13,7 +13,10 @@ We want to download RNA seq data and create a pipeline (pipeline = RNA-seq tools
 
 Here's another example: https://github.com/saketkc/rna-seq-snakemake
 
+Here's another example: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-018-2139-9 
+
 Here's a snakemake tutorial: https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html
+
 
 ### M.G. 2 - Create theoretical data yeilded from experiments.
 We will simulate DNA sequencing of phage genomes before and after differential genome amplification. What does this mean? This means we will download different phage genomes. We will then simulate reads for each genome using an illumina read simulator (ART, InSilicoSeq, or SimuScop).
