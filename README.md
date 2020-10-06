@@ -11,6 +11,10 @@ This repository contains information and code regarding pipeline for finding pha
 ### M.G. 1 - create a RNA-Seq pipeline. (another option would be creating tools from scratch)
 We want to download RNA seq data and create a pipeline (pipeline = RNA-seq tools combined to perform analysis in a specific order, so like DAG that uses the output of one tool as input for another). The pipeline will be written in the language Snakemake (https://snakemake.readthedocs.io/en/stable/). A good example of such a pipeline is here: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-020-3433-x.
 
+Here's another example: https://github.com/saketkc/rna-seq-snakemake
+
+Here's a snakemake tutorial: https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html
+
 ### M.G. 2 - Create theoretical data yeilded from experiments.
 We will simulate DNA sequencing of phage genomes before and after differential genome amplification. What does this mean? This means we will download different phage genomes. We will then simulate reads for each genome using an illumina read simulator (ART, InSilicoSeq, or SimuScop).
 
