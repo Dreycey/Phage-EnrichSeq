@@ -15,7 +15,9 @@ We want to download RNA seq data and create a pipeline (pipeline = RNA-seq tools
 We will simulate DNA sequencing of phage genomes before and after differential genome amplification. What does this mean? This means we will download different phage genomes. We will then simulate reads for each genome using an illumina read simulator (ART, InSilicoSeq, or SimuScop).
 
 InSilicoSeq: https://academic.oup.com/bioinformatics/article/35/3/521/5055123
+
 SimuScop: https://link.springer.com/article/10.1186/s12859-020-03665-5
+
 ART: https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
 ### M.G. 3 - Convert pipeline from MG 1 to handle theoretical input from MG 2
