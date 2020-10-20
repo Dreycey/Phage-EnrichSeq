@@ -6,7 +6,7 @@ Use the below tools and commands to download all of the phage genomes.
 Eventually aim on using this in a bash script.
 
 ## Tools Used
-Download the tool below and go throught the proper download instructions.
+Download the tool below and go through the proper download instructions.
 
 ```
 git clone https://github.com/kblin/ncbi-genome-download
