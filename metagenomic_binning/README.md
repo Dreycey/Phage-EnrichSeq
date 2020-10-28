@@ -17,7 +17,7 @@ This pipeline works as the following:
 ```
           input fasta (simulated or real)
                      |
-                     |----------------------------- Assembly 
+                     |------------------------ *Assembly module* 
                      |                                 |             
                      |                                / \  
                      |                      metaSPADES   MegaHIT
@@ -26,6 +26,7 @@ This pipeline works as the following:
                      |<_______________________________ |
                      |
                      |
+              *Abundance Module*
                     / \
                ____/   \_____                    
                |             |    
