@@ -16,7 +16,7 @@ Then have pip install everything..
 
 ```
 cd ncbi-genome-download;
-pip install .;
+pip3 install .;
 ```
 
 ## Command
