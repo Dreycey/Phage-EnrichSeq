@@ -14,7 +14,7 @@ git clone https://github.com/kblin/ncbi-genome-download
 
 ## Command
 ```
-ncbi-genome-download  --assembly-level complete --genus phage --fuzzy-genus viral --parallel 2
+ncbi-genome-download  --formats fasta --assembly-level complete --genera phage --fuzzy-genus viral --parallel 2
 ```
 
 
