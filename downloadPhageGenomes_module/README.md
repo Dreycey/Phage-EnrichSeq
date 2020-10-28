@@ -12,6 +12,13 @@ Download the tool below and go through the proper download instructions.
 git clone https://github.com/kblin/ncbi-genome-download
 ```
 
+Then have pip install everything..
+
+```
+cd ncbi-genome-download;
+pip install .;
+```
+
 ## Command
 ```
 ncbi-genome-download  --formats fasta --assembly-level complete --genera phage --fuzzy-genus viral --parallel 2
