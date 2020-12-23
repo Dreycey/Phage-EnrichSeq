@@ -17,11 +17,13 @@ Then have pip install everything..
 ```
 cd ncbi-genome-download;
 pip install .;
+=======
+pip3 install .;
 ```
 
 ## Command
 ```
-ncbi-genome-download  --assembly-level complete --genus phage --fuzzy-genus viral --parallel 2
+ncbi-genome-download  --formats fasta --assembly-level complete --genera phage --fuzzy-genus viral --parallel 2
 ```
 
 
