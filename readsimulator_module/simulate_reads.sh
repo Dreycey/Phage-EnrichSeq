@@ -25,6 +25,8 @@ function simulate_illumina {
         ART_CMD_ARGS="-ss MSv3 -sam -i ${ref_gen} -l 100 -f 30 -o ${out_name}_illumina";
         command ./art_bin_MountRainier/art_illumina $ART_CMD_ARGS;
         mv ${out_name}_illumina* ${out_directory};
+        # make fasta from fastq
+        paste - - - - < ${out_directory}/simulatedgenomes_illumina.fq | cut -f 1,2 | sed 's/^@/>/' | tr "\t" "\n" > ${out_directory}/simulatedgenomes_illumina.fa;
     fi
 }
 
@@ -48,6 +50,8 @@ function simulate_pacbio {
         # use these files to simulate the pacbio reads
         ./PaSS/PaSS -list ${out_directory}/percentage.txt -index ${out_directory}/index -m pacbio_RS  -c PaSS/sim.config -r 2000 -t ${THREADS} -o ${out_name}_pacbio -d; 
         mv ${out_name}_pacbio* ${out_directory};
+        # make fasta from fastq
+        paste - - - - < ${out_directory}/simulatedgenomes_pacbio.fq | cut -f 1,2 | sed 's/^@/>/' | tr "\t" "\n" > ${out_directory}/simulatedgenomes_pacbio.fa;
     fi
 }
 
