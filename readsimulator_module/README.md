@@ -3,7 +3,24 @@ Read simulation will take in a reference genome as input and simulate reads for
 Illumina, PacBio and Nanopore. 
 
 
-## Usage
+## Quick Usage
+
+* install simulators
+```
+bash install.sh mac
+```
+
+* usage
+```
+usage: simulate_reads.py [-h] [-v | -q] -i CONFIG -c COVERAGE -o OUTPUT -t THREADS
+```
+
+* example
+```
+python simulate_reads.py -i simulate_genomes.config  -c 30 -o simulatedgenomes -t 4
+```
+
+## Detailed Usage
 
 ### install dependencies
 
