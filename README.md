@@ -2,6 +2,55 @@
 Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
 
 
+
+
+# Dependency Installation Instructions
+
+1. Create environment for EnrichSeq 
+```
+conda create -n enrichseq
+```
+
+2. Activate channel
+```
+conda activate enrichseq
+```
+
+3. Install Metaphlan
+```
+conda install -c bioconda python=3.7 metaphlan
+```
+
+4. Install kraken2
+```
+conda install -c bioconda kraken2
+```
+
+5. Install bracken
+```
+conda install -c bioconda bracken
+```
+
+6. Install Spades
+```
+conda install -c bioconda spades
+```
+
+7. Install Megahit
+```
+conda install -c bioconda megahit
+```
+
+Or all together:
+```
+conda create -n enrichseq;
+conda activate enrichseq;
+conda install -c bioconda python=3.7 metaphlan;
+conda install -c bioconda kraken2 bracken spades megahit;
+```
+
+
+
 ## Description
 This repository contains information and code regarding pipeline for finding phages capable of infecting bacteria of interest.
 
