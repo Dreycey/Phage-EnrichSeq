@@ -18,7 +18,7 @@ def parseIntoDictionary(file_in):
         taxid = line[0]
         species_name = line[1]
         line_type  = line[3]
-        if "scientific" in line_type:
+        if "scientific" in line_type and "phage" in species_name:
             dict_tx_names[species_name] = taxid
     return dict_tx_names
 
