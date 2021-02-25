@@ -8,7 +8,7 @@ before and after enrichment.
 # USAGE
 
 ```
-
+nextflow run enrichseq.nf
 ```
 
 ## OUTLINE
