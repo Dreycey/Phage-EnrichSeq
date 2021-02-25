@@ -13,8 +13,8 @@ PREREQUISITE:
 * Must have run kraken2-build --download-taxonomy --db <DBNAME>. names.dmp file will be in DBNAME/taxonomy/
 
 USAGE:
-python kraken_db_format.py <NCBI names.dmp file> <DB FASTA file to be formatted> <output destination>
-e.g. python kraken_db_format.py krakenDB/taxonomy/names.dmp Actinobacteriophages-All.fasta phage_genomes/
+python kraken_db_format.py <NCBI names.dmp file> <DB FASTA file to be formatted> 
+e.g. python kraken_db_format.py krakenDB/taxonomy/names.dmp Actinobacteriophages-All.fasta
 """
 
 def parseIntoDictionary(dmp_file):
@@ -46,14 +46,14 @@ def findSpeciesId(tax_dict, name):
     return 0
 
 
-def addTaxIdToFile(tax_dict, fasta_file, output_path):
+def addTaxIdToFile(tax_dict, fasta_file):
     """ adds taxid to the phagesDB fasta file for kraken2 format """
     fasta_file_contents = open(fasta_file).readlines()
     #names_file_contents = open(names_file).readlines() #list
 
     # new DB file to add taxon id to
     filename = "phagesDB.fasta"
-    taxonfile = open(output_path + filename, "w")
+    taxonfile = open(filename, "w")
 
     for line in fasta_file_contents:
         line = line.strip("\n") # will this affect the final file format when using in kraken?
@@ -84,7 +84,6 @@ def main():
     ### SCRIPT INPUT
     dmp_file_path = sys.argv[1]
     db_file_path = sys.argv[2]
-    output_path = sys.argv[3]
 
     ### SCRIPT
     file_name = open(dmp_file_path).readlines()
@@ -101,7 +100,7 @@ def main():
 
     # MODIFY DB FILE (ADD TAXON ID)
     print('Creating kraken-compatible database file...')
-    f = addTaxIdToFile(tax_map, db_file_path, output_path)
+    f = addTaxIdToFile(tax_map, db_file_path)
     print(f'File created: {f}')
 
 
