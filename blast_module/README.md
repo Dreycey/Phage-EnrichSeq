@@ -71,3 +71,35 @@ BLASTN:
 blastn -db PHAGEGENOMES_renamed.fa -query ../readsimulator_module/sim_illumina.fa -out blast_out -outfmt "6 qseqid sseqid sblastnames score evalue pident length mismatch gap open gaps sseq"
 Output:
 ```
+
+### last nnotess on fixing the file
+
+1. Fixing files with spaces: get rid of spaces in file names
+```
+for f in phageDBgenomes/*; do mv "$f" ` echo $f | tr ' ' '_'`; done
+```
+
+2. make new file
+```
+for file in phageDBgenomes/*; do echo $
+file; cat $file >> PHAGEGENOMES.fa; done; for file1 in phage_genomes/*; do echo $file1; cat $file1 >> PHAGEGENOMES.fa; done
+```
+3. Fix blast names
+```
+python convertnames.py PHAGEGENOMES.fa 
+PHAGEGENOMES_renamed.fa
+```
+
+4. Make blast DB
+```
+makeblastdb -in PHAGEGENOMES_renamed.fa
+ -dbtype nucl
+```
+
+5. Test blast
+
+```
+blastn -db PHAGEGENOMES_renamed.fa -query ../readsimulator_module/sim_illumina.fa -out blast_out -outfmt "6 qseqid sseqid sblastnames score evalue pident length mismatch gap open gaps sseq"
+```
+
+6. Output works
