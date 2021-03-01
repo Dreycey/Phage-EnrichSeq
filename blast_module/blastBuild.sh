@@ -28,6 +28,38 @@ function createMultiFasta() {
   fi
 }
 
+
+#######################################                                         
+# createBlastDB()                                                      
+# creates a blast database from the multifasta file.                         
+# Globals:                                                                      
+#   None                                                                        
+# Arguments:                                                                    
+#   multifasta file path                            
+#   output blastDB name                                                    
+# Outputs:                                                                      
+#   Creates a balstDB using the input multifasta.                  
+#######################################
+function fixMultifastaNames() {
+
+}
+
+#######################################                                         
+# createBlastDB()                                                               
+# creates a blast database from the multifasta file.                            
+# Globals:                                                                      
+#   None                                                                        
+# Arguments:                                                                    
+#   multifasta file path                                                        
+#   output blastDB name                                                         
+# Outputs:                                                                      
+#   Creates a balstDB using the input multifasta.                               
+#######################################
+function addActinoToMultiFasta() {                                                 
+
+} 
+
+
 #######################################                                         
 # createBlastDB()                                                      
 # creates a blast database from the multifasta file.                         
