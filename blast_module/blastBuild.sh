@@ -30,33 +30,48 @@ function createMultiFasta() {
 
 
 #######################################                                         
-# createBlastDB()                                                      
-# creates a blast database from the multifasta file.                         
+# fixMultifastaNames()                                                     
+# The fixMultifastaNames() function makes sure no spaces are present in names                      
 # Globals:                                                                      
 #   None                                                                        
 # Arguments:                                                                    
-#   multifasta file path                            
-#   output blastDB name                                                    
+#   multifasta file path                                                   
 # Outputs:                                                                      
-#   Creates a balstDB using the input multifasta.                  
+#   Creates a new multifasta with corrected names
 #######################################
 function fixMultifastaNames() {
-
+  echo "Running fixMultifastaNames()";
+  # arguments
+  local inputMultiFasta=$1;
+  local outputMultiFasta=$2;
+  # run the script
+  if [[ ! -f ${outputMultiFasta} ]]; then 
+    python fixMultiFastaNames.py ${inputMultiFasta} ${outputMultiFasta}; 
+  fi
 }
 
 #######################################                                         
-# createBlastDB()                                                               
-# creates a blast database from the multifasta file.                            
+# addActinoToMultiFasta()                                                         
+# this function adds the actino database to the multiFasta
 # Globals:                                                                      
 #   None                                                                        
 # Arguments:                                                                    
-#   multifasta file path                                                        
-#   output blastDB name                                                         
+#   multifasta file path
+#   actinoDBfile 
 # Outputs:                                                                      
-#   Creates a balstDB using the input multifasta.                               
+#   Creates athe finalized multi fasta file
 #######################################
 function addActinoToMultiFasta() {                                                 
-
+  echo "Running addActinoToMultiFasta()";
+  # arguments
+  local inputMultiFasta=$1;
+  local inputActinoDB=$2;
+  local outputMultiFasta=$3;
+  # run the script
+  if [[ ! -f ${outputMultiFasta} ]]; then
+    cat ${inputMultiFasta} >> ${outputMultiFasta};
+    cat ${inputActinoDB} >> ${outputMultiFasta}; 
+  fi
 } 
 
 
@@ -94,11 +109,17 @@ function createBlastDB() {
 #######################################
 function main(){
     # input arguments
-    local outputMulti="outputMulti.fa";
-    local phagedbpath="/users/dreyceyalbin/desktop/phage-enrichseq_old/downloadphagegenomes_module/phagedbgenomes/";
+    local outputMulti_1="outputMulti1.fa";
+    local outputMulti_2="outputMulti2.fa";
+    local outputMulti_3="outputMulti3.fa";
+    local actinoFilePath="/Users/dreyceyalbin/Desktop/Phage-EnrichSeq_old/downloadPhageGenomes_module/Actinobacteriophages-All.fasta";
+    local phagedbpath="/users/dreyceyalbin/desktop/phage-enrichseq_old/downloadphagegenomes_module/phage_genomes/";
+    
     # running underlying methods
-    createMultiFasta ${phagedbpath} ${outputMulti};
-    createBlastDB ${outputMulti};
+    createMultiFasta ${phagedbpath} ${outputMulti_1};
+    addActinoToMultiFasta ${outputMulti_1} ${actinoFilePath} ${outputMulti_2};
+    fixMultifastaNames ${outputMulti_2} ${outputMulti_3};
+    createBlastDB ${outputMulti_3};
 }
 
 echo "Running the BLASTDB build script";
