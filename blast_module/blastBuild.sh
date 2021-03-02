@@ -3,6 +3,9 @@
 # Perform the build for the Blast database
 
 
+
+
+
 #######################################
 # createMultiFasta() 
 # creates a multifasta from a directory of fasta files.
@@ -15,16 +18,19 @@
 #   Creates multifasta file with the second input argument
 #######################################
 function createMultiFasta() {
-  echo "Running createMultiFasta()";
   # arguments
   local genomeDir=$1;
   local outputMultiFasta=$2;
   # iteratively add genomes to the multifasta
-  if [[ ! -f ${outputMultiFasta} ]]; then
+  if [[ ! -f blastdb/${outputMultiFasta} ]]; then
+    echo "Running createMultiFasta()";
     for file in ${genomeDir}/*; do 
       #echo ${file}; 
       cat ${file} >> ${outputMultiFasta}; 
     done; 
+  else
+    echo "NOT running createMultiFasta()- already done!";
+    echo "    Delete the blastdb/ folder if you'd like to rerun";
   fi
 }
 
@@ -40,15 +46,19 @@ function createMultiFasta() {
 #   Creates a new multifasta with corrected names
 #######################################
 function fixMultifastaNames() {
-  echo "Running fixMultifastaNames()";
   # arguments
   local inputMultiFasta=$1;
   local outputMultiFasta=$2;
   # run the script
-  if [[ ! -f ${outputMultiFasta} ]]; then 
+  if [[ ! -f blastdb/${outputMultiFasta} ]]; then 
+    echo "Running fixMultifastaNames()";
     python fixMultiFastaNames.py ${inputMultiFasta} ${outputMultiFasta}; 
+  else
+    echo "NOT running fixMultifastaNames()- already done!";
+    echo "    Delete the blastdb/ folder if you'd like to rerun";
   fi
 }
+
 
 #######################################                                         
 # addActinoToMultiFasta()                                                         
@@ -62,17 +72,54 @@ function fixMultifastaNames() {
 #   Creates athe finalized multi fasta file
 #######################################
 function addActinoToMultiFasta() {                                                 
-  echo "Running addActinoToMultiFasta()";
   # arguments
   local inputMultiFasta=$1;
   local inputActinoDB=$2;
   local outputMultiFasta=$3;
   # run the script
-  if [[ ! -f ${outputMultiFasta} ]]; then
+  if [[ ! -f blastdb/${outputMultiFasta} ]]; then
+    echo "Running addActinoToMultiFasta()";
     cat ${inputMultiFasta} >> ${outputMultiFasta};
     cat ${inputActinoDB} >> ${outputMultiFasta}; 
+  else
+    echo "NOT running addActinoToMultiFasta()- already done!";
+    echo "    Delete the blastdb/ folder if you'd like to rerun";
   fi
 } 
+
+
+#######################################                                         
+# addBlastTaxdb()                                           
+# downloads and adds the taxd to the directory so BLASTN can run properly
+# Globals:                                                                      
+#   None                                                                        
+# Arguments:                                                                           
+#   URL for the NCBI taxdb
+# Outputs:                                                                      
+#   Retrieves the blast taxdb, untars, and adds to blastdb/
+#######################################   
+function addBlastTaxdb() {
+  #  arguments
+  local blastTaxURL=$1;
+  # get the database, add to directory.
+  if [[ ! -f "" || ! -f "" ]]; then
+    echo "Running addBlastTaxdb()";
+    # wget, untar, and rm tar.gz
+    wget ${blastTaxURL};
+    tar -zxf taxdb.tar.gz;
+    rm taxdb.tar.gz;
+    # add to blastdb directory, if exists
+    if [[ ! -d "blastdb/" ]]; then                                              
+      mkdir blastdb/;                                                           
+      mv taxdb.bti blastdb/;                                          
+    else                                                                        
+      mv taxdb.btd blastdb/;
+    fi  
+  else
+    echo "NOT running addBlastTaxdb()- already done!";                          
+    echo "    Delete the blastdb/ folder if you'd like to rerun";  
+  fi
+}
 
 
 #######################################                                         
@@ -87,16 +134,28 @@ function addActinoToMultiFasta() {
 #   Creates a balstDB using the input multifasta.                  
 #######################################
 function createBlastDB() { 
-  echo "Running createBlastDB()";
-  # iniput arguments
+  # input arguments
   local inputMultiFasta=$1;
   # make the blast database
-  if [[ ! -f ${inputMultiFasta}.nhr || \
-        ! -f ${inputMultiFasta}.nin || \
-        ! -f ${inputMultiFasta}.nsq ]]; then
-    makeblastdb -in ${inputMultiFasta} -dbtype nucl 
+  if [[ ! -f blastdb/${inputMultiFasta}.nhr || \
+        ! -f blastdb/${inputMultiFasta}.nin || \
+        ! -f blastdb/${inputMultiFasta}.nsq ]]; then
+    echo "Running createBlastDB()";
+    # make the blast database.
+    makeblastdb -in ${inputMultiFasta} -dbtype nucl;
+    # move the files to the correct location.
+    if [[ ! -d "blastdb/" ]]; then
+      mkdir blastdb/;
+      mv ${inputMultiFasta}* blastdb/;
+    else
+      mv ${inputMultiFasta}* blastdb/;
+    fi 
+  else
+    echo "NOT running createBlastDB()- already done!";
+    echo "    Delete the blastdb/ folder if you'd like to rerun";
   fi
 }
+
 
 #######################################
 # Main function runs all of the other methods for the build
@@ -109,16 +168,13 @@ function createBlastDB() {
 #######################################
 function main(){
     # input arguments
-    local outputMulti_1="outputMulti1.fa";
-    local outputMulti_2="outputMulti2.fa";
-    local outputMulti_3="outputMulti3.fa";
-    local actinoFilePath="/Users/dreyceyalbin/Desktop/Phage-EnrichSeq_old/downloadPhageGenomes_module/Actinobacteriophages-All.fasta";
-    local phagedbpath="/users/dreyceyalbin/desktop/phage-enrichseq_old/downloadphagegenomes_module/phage_genomes/";
+    source blast_module.config;
     
     # running underlying methods
     createMultiFasta ${phagedbpath} ${outputMulti_1};
     addActinoToMultiFasta ${outputMulti_1} ${actinoFilePath} ${outputMulti_2};
     fixMultifastaNames ${outputMulti_2} ${outputMulti_3};
+    addBlastTaxdb ${blasttaxdbURL};
     createBlastDB ${outputMulti_3};
 }
 
