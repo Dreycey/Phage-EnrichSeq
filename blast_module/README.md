@@ -1,8 +1,8 @@
-##Creating BlastDB
+# BlastN module
 
-# Usage
+## Usage
 
-## Build the blast database
+### Build the blast database
 
 * update the paths in the `blast_module.config` file before running the following:
 
@@ -10,7 +10,7 @@
 bash blastBuild.sh;
 ```
 
-## Query using blastN
+### Query using blastN
 
 * pass the correct, requiired, args to the run script
 ```                                                                             
