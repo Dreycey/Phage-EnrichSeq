@@ -1,4 +1,61 @@
+#!/bin/bash
+#
+# Run blastN
 
+
+usage() {
+    echo; echo "Usage: bash $0 --blastdb=blastdb/outputMulti3.fa --queryfasta=blast_testfiles/simulatedgenomes_illumina.fa --out=blastout.txt"
+    echo "  --blastdb   Path to the blastn databased created using the config and blastBuild.sh"
+    echo "  --queryfasta     Path to the in fasta file"
+    echo "  --out       Path to blastN output"
+    echo "  -h, --help  Print this help message out"; echo;
+    exit 1;
+}
+
+# check that all the required arguments are used
+if [ $# -gt 3 ] || [ $# -lt 3 ]
+then
+    usage
+fi
+
+# parse the commands
+while true
+do
+    case $1 in
+    --help|-h)
+        usage
+        exit;;
+    --blastdb=?*)
+        blastDB=${1#*=};;
+    --blastdb|blastdb=)
+        echo "$0: missing argument for '$1' option"
+        usage
+        exit 1;;
+    --queryfasta=?*)
+        echo ${1#*=};
+        inFasta=${1#*=};;
+    --queryfasta|queryfasta=)
+        echo "$0: missing argument for '$1' option"
+        usage
+        exit 1;;
+    --out=?*)
+        blastOut=${1#*=};;
+    --out|out=)
+        echo "$0: missing argument for '$1' option"
+        usage
+        exit 1;;
+    --)
+        shift
+        break;;
+    -?*)
+        echo "$0: invalid option: $1"
+        usage
+        exit 1;;
+    *)
+        break
+    esac
+    shift
+done
 
 
 #######################################  
@@ -37,9 +94,18 @@ function  runBlastN(){
 #######################################
 function main(){
     # input arguments
-    local blastDB="outputMulti3.fa";
-    local inFasta="simulatedgenomes_illumina.fa";
-    local blastOut="blastOut.txt";
+   # local blastDB="blastdb/outputMulti3.fa";
+   # local inFasta="blast_testfiles/simulatedgenomes_illumina.fa";
+   # local blastOut="blastOut.txt";
+
+    echo $blastDB;
+    echo $inFasta;
+    echo $blastOut;
+
+    # set blastdb path if not already set    
+    if [[ -z ${BLASTDB} ]]; then
+      export BLASTDB=$BLASTDB:"blastdb/"
+    fi
 
     # running underlying methods
     runBlastN ${blastDB} ${inFasta} ${blastOut};

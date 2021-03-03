@@ -111,9 +111,9 @@ function addBlastTaxdb() {
     # add to blastdb directory, if exists
     if [[ ! -d "blastdb/" ]]; then                                              
       mkdir blastdb/;                                                           
-      mv taxdb.bti blastdb/;                                          
-    else                                                                        
-      mv taxdb.btd blastdb/;
+      mv taxdb* blastdb/;                                          
+    else
+      mv taxdb* blastdb/;
     fi  
   else
     echo "NOT running addBlastTaxdb()- already done!";                          
@@ -146,9 +146,9 @@ function createBlastDB() {
     # move the files to the correct location.
     if [[ ! -d "blastdb/" ]]; then
       mkdir blastdb/;
-      mv ${inputMultiFasta}* blastdb/;
+      mv ${inputMultiFasta:0:${#inputMultiFasta}-4}* blastdb/;
     else
-      mv ${inputMultiFasta}* blastdb/;
+      mv ${inputMultiFasta:0:${#inputMultiFasta}-4}* blastdb/;
     fi 
   else
     echo "NOT running createBlastDB()- already done!";
