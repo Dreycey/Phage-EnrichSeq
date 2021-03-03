@@ -4,7 +4,7 @@
 
 ## Build the blast database
 
-* update the paths in the bash script (TODO: allow for input)
+* update the paths in the `blast_module.config` file before running the following:
 
 ```
 bash blastBuild.sh;
@@ -12,7 +12,7 @@ bash blastBuild.sh;
 
 ## Query using blastN
 
-* update the paths in the bash script (TODO: allow for input)
+* pass the correct, requiired, args to the run script
 ```                                                                             
  bash blastRun.sh --blastdb=blastdb/<db file name> --queryfasta=<fasta input> --out=<outfile name>
 ```
