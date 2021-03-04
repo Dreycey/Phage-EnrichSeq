@@ -73,9 +73,8 @@ function buildKrakenDb() {
 }
 
 function main() {
-  local genomeDir="ref_genomes"; 
-  local dbDir="krakenDB";
-  local actinoOutFile="actinoReformatted.fa";
+  # input arguments
+  source kraken_module.config;
 
   downloadRequiredFiles;
   reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};
