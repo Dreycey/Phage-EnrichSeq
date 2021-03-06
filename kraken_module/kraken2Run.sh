@@ -2,7 +2,7 @@ usage() {
     echo; echo "Usage: bash $0 --krakendb=krakenDB/ --queryfasta=inputfasta/simulatedgenomes_illumina.fa --report=kraken.report.txt --out=krakenout.kraken"
     echo "  --krakendb   Path to the kraken2 database created using the config and kraken2Build.sh"
     echo "  --queryfasta     Path to the in fasta file"
-    echo "  --report    Report file for kraken results
+    echo "  --report    Report file for kraken results"
     echo "  --out       File name for .kraken output"
     echo "  -h, --help  Print this help message out"; echo;
     exit 1;
@@ -63,26 +63,28 @@ done
 function runKraken2() {
   echo "Running runKraken2()";
   # arguments
-  #local dbDir=$1;
-  #local inFasta=$2;
-  #local reportFile=$3;
-  #local krakenOutFile=$4;
+  local dbDir=$1;
+  local inFasta=$2;
+  local reportFile=$3;
+  local krakenOutFile=$4;
   
-  echo $dbDir;
-  echo $inFasta;
-  echo $reportFile;
-  echo $krakenOutFile;
 
   kraken2 --use-names --threads 4 --db ${dbDir} --report ${reportFile} ${inFasta} > ${krakenOutFile}
 }
 
 
 function main() {
+
+  echo $dbDir;
+  echo $inFasta;
+  echo $reportFile;
+  echo $krakenOutFile;
+
   # input arguments
-  local dbDir="krakenDB";
-  local inFasta="simgenomes1_illumina.fa";
-  local reportFile="krakenOut.txt";
-  local krakenOutFile="krakenOut.kraken";
+  # local dbDir="krakenDB";
+  # local inFasta="simgenomes1_illumina.fa";
+  # local reportFile="krakenOut.txt";
+  # local krakenOutFile="krakenOut.kraken";
 
   runKraken2 ${dbDir} ${inFasta} ${reportFile} ${krakenOutFile};
 }

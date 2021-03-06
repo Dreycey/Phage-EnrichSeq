@@ -86,5 +86,3 @@ function main() {
 echo "Running the kraken2 DB build script";
 main;
 
-# TODO: -o for output directory to store all .fa/fna/fasta files
-# TODO: -n desired DB name or default name if none provided
