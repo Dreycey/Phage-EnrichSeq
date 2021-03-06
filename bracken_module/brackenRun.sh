@@ -1,9 +1,9 @@
 #!/bin/bash
 
 usage() {
-    echo; echo "Usage: bash $0 --krakendb=krakenDB/ --input=krakenout.kraken --out=bracken_run1.bracken --read 100"
+    echo; echo "Usage: bash $0 --krakendb=krakenDB/ --input=krakenout.report --out=bracken_run1.bracken --read 100"
     echo "  --krakendb   Path to the kraken2 database created after running the kraken module"
-    echo "  --input     Path to the .kraken file generated from the kraken module"
+    echo "  --input     Path to the kraken report file generated from the kraken module"
     echo "  --out       Output prefix for the .bracken file name"
     echo "  --read      Read length"
     echo "  -h, --help  Print this help message out"; echo;
