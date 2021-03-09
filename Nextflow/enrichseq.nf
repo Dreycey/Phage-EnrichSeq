@@ -67,7 +67,7 @@ process Create_Working_Directories {
     if [ -d $krakenDir ]; then rm -rf $krakenDir; fi;
     if [ -d $brackenDir ]; then rm -rf $brackenDir; fi;
 
-    mkdir $megahitDir
+    #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
     """
@@ -104,11 +104,10 @@ process Run_Megahit {
     }
   */
     """
-    echo $params.megahitpath
     bash $params.megahitpath/megahitRun.sh --read=$params.read \
         		  --input=${fastafile} \
     			  --threads=${THREADS} \
-    			  --outp=megahit_out
+    			  --out=${megahitDir}
     """
 }
 
