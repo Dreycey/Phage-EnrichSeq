@@ -1,11 +1,11 @@
 #!/bin/bash
 
 usage() {
-    echo; echo "Usage: bash $0 --read=single --input=inputfasta/simgenomes.fa --threads=4 --outp=megahit_20210307"
+    echo; echo "Usage: bash $0 --read=single --input=inputfasta/simgenomes.fa --threads=4 --out=megahit_20210307"
     echo "  --read      Read type of fasta files [single, paired, long]"
     echo "  --input     Input fasta file"
     echo "  --threads   Number of threads"
-    echo "  --outp      Output prefix for metaphlan resultse"
+    echo "  --out       Output directory for metaphlan results"
     echo "  -h, --help  Print this help message out"; echo;
     exit 1;
 }
@@ -42,9 +42,9 @@ do
         echo "$0: missing argument for '$1' option"
         usage
         exit 1;;
-    --outp=?*)
-        outprefix=${1#*=};;
-    --outp|outp=)
+    --out=?*)
+        outdir=${1#*=};;
+    --out|out=)
         echo "$0: missing argument for '$1' option"
         usage
         exit 1;;
@@ -68,10 +68,10 @@ function runMegahit() {
   local readType=$1;
   local inFasta=$2;
   local threads=$3;
-  local outprefix=$4;
+  local outdir=$4;
 
   if [[ ${readType} == "single" ]]; then
-    megahit -r ${inFasta} -t ${threads} -m 1e9 -o ./megahit_out --out-prefix ${outprefix}
+    megahit -r ${inFasta} -t ${threads} -m 1e9 -o ${outdir} --out-prefix megahit_out
   fi
 
 }
@@ -80,9 +80,9 @@ function main() {
   echo ${readType};
   echo ${inFasta};
   echo ${threads};
-  echo ${outprefix};
+  echo ${outdir};
 
-  runMegahit ${readType} ${inFasta} ${threads} ${outprefix};
+  runMegahit ${readType} ${inFasta} ${threads} ${outdir};
 }
 
 echo "Running the megahit run script";
