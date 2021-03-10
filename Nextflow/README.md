@@ -15,5 +15,7 @@ Before running, needs to know:
 ## TODO
 1. Add database location as option in krakenBuild script
 2. Add paired end options for megahitRun script
+3. Add paired end options for Nextflow 
+4. Conda environment
 
 
