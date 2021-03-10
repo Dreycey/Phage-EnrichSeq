@@ -70,6 +70,7 @@ process Create_Working_Directories {
     #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
+
     """
 }
 
@@ -92,6 +93,7 @@ process Run_Megahit {
     val init from init
 
     output:
+    //path(megahit_out) into megahit
     stdout megahit
 
     if ( Executor == 'local' ) {
@@ -103,6 +105,8 @@ process Run_Megahit {
        executor "slurm"
     }
   */
+    script:
+    //megahit_out = "$megahitDir/*.contigs.fa"
     """
     bash $params.megahitpath/megahitRun.sh --read=$params.read \
         		  --input=${fastafile} \
@@ -112,17 +116,64 @@ process Run_Megahit {
 }
 
 /*
+process Prep_Databases {
+	input:
+	val init from init
+
+	output:
+	stdout databases
+
+	script:
+	"""
+	if [ ! -f $databasesDir/taxo.k2d ]; then
+		bash $params.krakenpath/kraken2Build.sh
+	else
+		echo "Kraken DB already exists" | tee -a $logfile
+	fi
+
+	"""
+}
+*/
+
+
 process Run_Kraken {
+	input:
+	//path assembled_fasta from megahit
+	val megaout from megahit
 
-} */
+	output:
+	stdout kraken
 
-/*
+	script:
+	"""
+	bash $params.krakenpath/kraken2Run.sh --krakendb=${databasesDir} \
+				--queryfasta=$megahitDir/*.contigs.fa \
+				--report=$krakenDir/kraken.report \
+				--out=$krakenDir/kraken.log
+	"""
+}
+
+
 process Run_Bracken {
+	input:
+	val krakenout from kraken
 
-} */
+	output:
+	stdout bracken
+
+	script:
+	"""
+	bash $params.brackenpath/brackenBuild.sh
+	bash $params.brackenpath/brackenRun.sh --krakendb=${databasesDir} \
+				--input=$krakenDir/krakenout.report \
+				--out=bracken_run1 \
+				--read=$params.readlength
+	"""
+}
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
 megahit.subscribe { print "$it" }
-//rapsearch2.subscribe { print "$it" }
-//pfam_hmm.subscribe { print "$it" }
+//databases.subscribe { print "$it"}
+kraken.subscribe { print "$it" }
+bracken.subscribe { print "$it" }
