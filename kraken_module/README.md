@@ -5,7 +5,9 @@
 ## Update kraken_module.config file
 
 local genomeDir="ref_genomes"; (where do you want to keep the downloaded reference genomes?)
+
 local dbDir="krakenDB"; (name of the database directory you want created)
+
 local actinoOutFile="actinoReformatted.fa"; (new Actinobacteriophage)
 
 ## Build the kraken2 database
