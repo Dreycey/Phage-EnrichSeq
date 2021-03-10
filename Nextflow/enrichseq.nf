@@ -39,12 +39,8 @@ logfile = file(params.log)
 fastafile = file(params.fasta)
 workingDir = file(params.workdir)
 databasesDir = file(params.dbdir)
-// pfamDir = file("$workingDir/seqmapper/pfam_hmm")
-// create_pfam = params.hmmscan
 
 BASE = fastafile.getName()
-MODULES =  "$workflow.projectDir/../modules"
-SCRIPTS =  "$workflow.projectDir/../scripts"
 THREADS = params.threads
 WORKFLOW = "enrichseq"
 
@@ -99,12 +95,7 @@ process Run_Megahit {
     if ( Executor == 'local' ) {
        executor "local"
     }
-  /*
-    else if ( Executor == 'slurm' ) {
-       clusterOptions "--ntasks-per-node $THREADS"
-       executor "slurm"
-    }
-  */
+
     script:
     //megahit_out = "$megahitDir/*.contigs.fa"
     """
@@ -165,8 +156,8 @@ process Run_Bracken {
 	"""
 	bash $params.brackenpath/brackenBuild.sh
 	bash $params.brackenpath/brackenRun.sh --krakendb=${databasesDir} \
-				--input=$krakenDir/krakenout.report \
-				--out=bracken_run1 \
+				--input=${krakenDir}/kraken.report \
+				--out=${brackenDir}/bracken_run1 \
 				--read=$params.readlength
 	"""
 }
