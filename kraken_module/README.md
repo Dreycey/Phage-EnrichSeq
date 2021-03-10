@@ -2,9 +2,13 @@
 
 # Usage
 
-## Build the kraken2 database
+## Update kraken_module.config file
 
-* update the paths in the bash script (TODO: allow for input)
+local genomeDir="ref_genomes"; (where do you want to keep the downloaded reference genomes?)
+local dbDir="krakenDB"; (name of the database directory you want created)
+local actinoOutFile="actinoReformatted.fa"; (new Actinobacteriophage)
+
+## Build the kraken2 database
 
 ```
 bash kraken2Build.sh;
@@ -12,19 +16,14 @@ bash kraken2Build.sh;
 
 ## Run kraken2
 
-* update the paths in the bash script (TODO: allow for input)
+Syntax
+```
+bash kraken2Run.sh --krakendb=<path to kraken DB> --queryfasta=< input fasta file> --report=< kraken report file output > --out=< kraken output log >;
+```
 
+Example
 ```
-bash kraken2Run.sh;
+bash kraken2Run.sh --krakendb=krakenDB/ --queryfasta=inputfasta/simulatedgenomes_illumina.fa --report=kraken.report.txt --out=krakenout.kraken;
 ```
 
-Currently this runs a test on a simulated reads file with the following 
-parameters:
-
-```
-# <genome path> <relative abundance>
-../genomes/Blessica.fasta, 0.25   
-../genomes/D29_genome.fa, 0.25
-../genomes/perseus_genome.fa, 0.5
-```
 
