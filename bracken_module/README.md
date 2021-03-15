@@ -12,13 +12,13 @@ bash brackenBuild.sh;
 ## Run bracken for relative abundance
 
 ```                                                                             
- bash brackenRun.sh --krakendb=kraken_module/<db directory> --input=<.kraken outfile> --out=<outfile prefix> --read=<read length>
+ bash brackenRun.sh --krakendb=kraken_module/<db directory> --input=<report file from kraken> --out=<outfile prefix> --read=<read length>
 ```
 
 ## Example Run
 * for example:
 ```
- bash brackenRun.sh --krakendb=kraken_module/krakenDB --input=kraken_module/kraken_out_20210303_1615.kraken --out=bracken_out_01 --read=100
+ bash brackenRun.sh --krakendb=kraken_module/krakenDB --input=kraken_module/kraken_out_20210303_1615.report --out=bracken_out_01 --read=100
 ```
 
 Currently this runs a test on a simulated reads file with the following 
