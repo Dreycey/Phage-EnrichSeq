@@ -46,7 +46,7 @@ Or all together:
 conda create -n enrichseq;
 conda activate enrichseq;
 conda install -c bioconda python=3.7 metaphlan;
-conda install -c bioconda kraken2 bracken spades megahit;
+conda install -c bioconda kraken2 bracken spades megahit nextflow;
 ```
 
 
