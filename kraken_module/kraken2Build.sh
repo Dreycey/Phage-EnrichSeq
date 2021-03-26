@@ -4,20 +4,31 @@
 function downloadRequiredFiles() {
   echo "Running downloadRequiredFiles()";
  
+  #arguments
+  local dbDir=$1;
+
   # download NCBI phage genomes
   if [[ ! -d refseq/viral ]]; then
-    ncbi-genome-download  --formats fasta --assembly-level complete --genera phage --fuzzy-genus viral --parallel 4;
+    echo "Downloading NCBI phage genomes..."
+    ncbi-genome-download  --formats fasta --assembly-level complete --genera phage --fuzzy-genus viral --parallel 4
   fi
 
   # Download phagesDB all phages database
   if [[ ! -f Actinobacteriophages-All.fasta ]]; then
-    wget https://phagesdb.org/media/Actinobacteriophages-All.fasta;
+    echo "Downloading Actinobacteriophage genomes..."
+    wget https://phagesdb.org/media/Actinobacteriophages-All.fasta
   fi
   
   # Download NCBI taxonomy
-  wget https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz;
+  if [[ ! -f ${dbDir}/taxonomy/names.dmp && ! -f new_taxdump.tar.gz ]]; then 
+    echo "Downloading NCBI taxonomy..."
+    wget https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+  fi
 
-  wget https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz;
+  if [[ ! -f ${dbDir}/taxonomy/nucl_wgs.accession2taxid && ! -f nucl_wgs.accession2taxid.gz ]]; then
+    echo "Downloading accession to taxon ID conversion..."
+    wget https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz
+  fi
 }
 
 
@@ -34,17 +45,28 @@ function reorganizeFiles() {
   mkdir ${dbDir}/taxonomy;
 
   # Move all .fna.gz files into the container genomes folder then unzip all
-  for file in refseq/viral/*/*fna*; do
-    mv ${file} ${genomeDir};
-  done;
+  #for file in refseq/viral/*/*fna*; do
+   # mv ${file} ${genomeDir};
+  #done;
+  mv refseq/viral/*/*fna* ${genomeDir};
+
   gzip -d ${genomeDir}/*;
   rm -rf refseq
 
   # organize taxdump files into the appropriate location
-  tar -xf new_taxdump.tar.gz --directory ${dbDir}/taxonomy;
-  rm new_taxdump.tar.gz;
-  gzip -d nucl_wgs.accession2taxid.gz;
-  mv nucl_wgs.accession2taxid ${dbDir}/taxonomy;
+  if [[ -f new_taxdump.tar.gz ]]; then
+    tar -xf new_taxdump.tar.gz --directory ${dbDir}/taxonomy;
+    rm new_taxdump.tar.gz
+  fi
+
+  if [[ -f nucl_wgs.accession2taxid.gz ]]; then
+    gzip -d nucl_wgs.accession2taxid.gz;
+    mv nucl_wgs.accession2taxid ${dbDir}/taxonomy;
+  fi
+
+  if [[ -f nucl_wgs.accession2taxid ]]; then 
+    mv nucl_wgs.accession2taxid ${dbDir}/taxonomy
+  fi
 
   # Reformat Action file to be compatible with kraken
   python kraken_db_format.py ${dbDir}/taxonomy/names.dmp Actinobacteriophages-All.fasta ${actinoOutFile};
@@ -76,7 +98,7 @@ function main() {
   # input arguments
   source kraken_module.config;
 
-  downloadRequiredFiles;
+  downloadRequiredFiles ${dbDir};
   reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};
   addGenomesToDb ${genomeDir} ${dbDir};
   buildKrakenDb ${dbDir};

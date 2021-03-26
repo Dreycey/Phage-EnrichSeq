@@ -106,7 +106,7 @@ process Run_Megahit {
     """
 }
 
-/*
+
 process Prep_Databases {
 	input:
 	val init from init
@@ -116,7 +116,7 @@ process Prep_Databases {
 
 	script:
 	"""
-	if [ ! -f $databasesDir/taxo.k2d ]; then
+	if [[ ! -f $databasesDir/taxo.k2d ]]; then
 		bash $params.krakenpath/kraken2Build.sh
 	else
 		echo "Kraken DB already exists" | tee -a $logfile
@@ -124,7 +124,7 @@ process Prep_Databases {
 
 	"""
 }
-*/
+
 
 
 process Run_Kraken {
