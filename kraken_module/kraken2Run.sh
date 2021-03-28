@@ -68,8 +68,11 @@ function runKraken2() {
   local reportFile=$3;
   local krakenOutFile=$4;
   
-
-  kraken2 --use-names --threads 4 --db ${dbDir} --report ${reportFile} ${inFasta} > ${krakenOutFile}
+  if [[ -f ${dbDir}/taxo.k2d ]]; then 
+    kraken2 --use-names --threads 4 --db ${dbDir} --report ${reportFile} ${inFasta} > ${krakenOutFile}
+  else
+    echo "Kraken database must be built first"
+  fi
 }
 
 
