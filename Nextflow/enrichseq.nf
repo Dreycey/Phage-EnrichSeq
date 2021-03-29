@@ -152,6 +152,7 @@ process Run_Kraken {
 process Run_Bracken {
 	input:
 	val krakenout from kraken
+	val krakendb from databases
 
 	output:
 	stdout bracken
@@ -164,14 +165,10 @@ process Run_Bracken {
 				--input=${krakenDir}/kraken_orig.report \
 				--out=${brackenDir}/bracken_run_orig \
 				--read=${params.readlength}
-	bash ${params.brackenpath}/brackenRun.sh --krakendb=${databasesDir} \
-				--input=${krakenDir}/kraken_assembled.report \
-				--out=${brackenDir}/bracken_run_assembled \
-				--read=${params.readlength}
 	"""
 }
 
-/*
+
 process Run_BLAST {
         input:
         val blastdb from databases
@@ -192,7 +189,7 @@ process Run_BLAST {
 				 --out=blastout_postassembly.txt
         """
 }
-*/
+
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
