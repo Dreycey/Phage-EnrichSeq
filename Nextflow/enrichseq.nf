@@ -162,7 +162,11 @@ process Run_Bracken {
 	bash ${params.brackenpath}/brackenBuild.sh
 	bash ${params.brackenpath}/brackenRun.sh --krakendb=${databasesDir} \
 				--input=${krakenDir}/kraken_orig.report \
-				--out=${brackenDir}/bracken_run_orig.bracken \
+				--out=${brackenDir}/bracken_run_orig \
+				--read=${params.readlength}
+	bash ${params.brackenpath}/brackenRun.sh --krakendb=${databasesDir} \
+				--input=${krakenDir}/kraken_assembled.report \
+				--out=${brackenDir}/bracken_run_assembled \
 				--read=${params.readlength}
 	"""
 }
@@ -196,4 +200,4 @@ megahit.subscribe { print "$it" }
 //databases.subscribe { print "$it"}
 kraken.subscribe { print "$it" }
 bracken.subscribe { print "$it" }
-blast.subscribe { print "$it" }
+//blast.subscribe { print "$it" }
