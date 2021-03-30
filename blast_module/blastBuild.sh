@@ -1,8 +1,7 @@
 #!/bin/bash
 #
 # Perform the build for the Blast database
-
-
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
 
@@ -22,7 +21,7 @@ function createMultiFasta() {
   local genomeDir=$1;
   local outputMultiFasta=$2;
   # iteratively add genomes to the multifasta
-  if [[ ! -f blastdb/${outputMultiFasta} ]]; then
+  if [[ ! -f ${DIR}/blastdb/${outputMultiFasta##*/} ]]; then
     echo "Running createMultiFasta()";
     for file in ${genomeDir}/*; do 
       #echo ${file}; 
@@ -50,9 +49,9 @@ function fixMultifastaNames() {
   local inputMultiFasta=$1;
   local outputMultiFasta=$2;
   # run the script
-  if [[ ! -f blastdb/${outputMultiFasta} ]]; then 
+  if [[ ! -f ${DIR}/blastdb/${outputMultiFasta##*/} ]]; then 
     echo "Running fixMultifastaNames()";
-    python fixMultiFastaNames.py ${inputMultiFasta} ${outputMultiFasta}; 
+    python ${DIR}/fixMultiFastaNames.py ${inputMultiFasta} ${outputMultiFasta}; 
   else
     echo "NOT running fixMultifastaNames()- already done!";
     echo "    Delete the blastdb/ folder if you'd like to rerun";
@@ -77,7 +76,7 @@ function addActinoToMultiFasta() {
   local inputActinoDB=$2;
   local outputMultiFasta=$3;
   # run the script
-  if [[ ! -f blastdb/${outputMultiFasta} ]]; then
+  if [[ ! -f ${DIR}/blastdb/${outputMultiFasta##*/} ]]; then
     echo "Running addActinoToMultiFasta()";
     cat ${inputMultiFasta} >> ${outputMultiFasta};
     cat ${inputActinoDB} >> ${outputMultiFasta}; 
@@ -102,18 +101,18 @@ function addBlastTaxdb() {
   #  arguments
   local blastTaxURL=$1;
   # get the database, add to directory.
-  if [[ ! -f "" || ! -f "" ]]; then
+  if [[ ! -f "${DIR}/blastdb/taxdb.btd" ]]; then
     echo "Running addBlastTaxdb()";
     # wget, untar, and rm tar.gz
     wget ${blastTaxURL};
     tar -zxf taxdb.tar.gz;
     rm taxdb.tar.gz;
     # add to blastdb directory, if exists
-    if [[ ! -d "blastdb/" ]]; then                                              
-      mkdir blastdb/;                                                           
-      mv taxdb* blastdb/;                                          
+    if [[ ! -d "${DIR}/blastdb/" ]]; then                                              
+      mkdir ${DIR}/blastdb/;                                                           
+      mv taxdb* ${DIR}/blastdb/;                                          
     else
-      mv taxdb* blastdb/;
+      mv taxdb* ${DIR}/blastdb/;
     fi  
   else
     echo "NOT running addBlastTaxdb()- already done!";                          
@@ -137,18 +136,18 @@ function createBlastDB() {
   # input arguments
   local inputMultiFasta=$1;
   # make the blast database
-  if [[ ! -f blastdb/${inputMultiFasta}.nhr || \
-        ! -f blastdb/${inputMultiFasta}.nin || \
-        ! -f blastdb/${inputMultiFasta}.nsq ]]; then
+  if [[ ! -f ${DIR}/blastdb/${inputMultiFasta##*/}.nhr || \
+        ! -f ${DIR}/blastdb/${inputMultiFasta##*/}.nin || \
+        ! -f ${DIR}/blastdb/${inputMultiFasta##*/}.nsq ]]; then
     echo "Running createBlastDB()";
     # make the blast database.
     makeblastdb -in ${inputMultiFasta} -dbtype nucl;
     # move the files to the correct location.
-    if [[ ! -d "blastdb/" ]]; then
-      mkdir blastdb/;
-      mv ${inputMultiFasta:0:${#inputMultiFasta}-4}* blastdb/;
+    if [[ ! -d "${DIR}/blastdb/" ]]; then
+      mkdir ${DIR}/blastdb/;
+      mv ${inputMultiFasta:0:${#inputMultiFasta}-4}* ${DIR}/blastdb/;
     else
-      mv ${inputMultiFasta:0:${#inputMultiFasta}-4}* blastdb/;
+      mv ${inputMultiFasta:0:${#inputMultiFasta}-4}* ${DIR}/blastdb/;
     fi 
   else
     echo "NOT running createBlastDB()- already done!";
@@ -168,7 +167,7 @@ function createBlastDB() {
 #######################################
 function main(){
     # input arguments
-    source blast_module.config;
+    source ${DIR}/blast_module.config;
     
     # running underlying methods
     createMultiFasta ${phagedbpath} ${outputMulti_1};

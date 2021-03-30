@@ -168,7 +168,6 @@ process Run_Bracken {
 	"""
 }
 
-/*
 process Run_BLAST {
         input:
         val blastdb from databases
@@ -185,16 +184,16 @@ process Run_BLAST {
                 echo "Blast DB already exists" > ${blastWorkingDir}/log.txt
         fi
         bash ${params.toolpath}/blast_module/blastRun.sh --blastdb=${params.toolpath}/blast_module/blastdb/outputMulti3.fa \
-				 --queryfasta=--queryfasta=${fastafile} \
+				 --queryfasta=${fastafile} \
 				 --out=blastout_postassembly.txt
         """
 }
-*/
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
 megahit.subscribe { print "$it" }
 //databases.subscribe { print "$it"}
 kraken.subscribe { print "$it" }
+
 bracken.subscribe { print "$it" }
-//blast.subscribe { print "$it" }
+blast.subscribe { print "$it" }
