@@ -7,7 +7,7 @@ if  [[ $os_type == "" ]]; then
     echo "USAGE:";
     echo "bash install mac";
     echo "or";
-    echo "bash install mac"; echo; echo;
+    echo "bash install linux"; echo; echo;
     exit;
 fi
 
@@ -57,10 +57,22 @@ function download_pass {
     fi
 } 
 
+# download minimap2 for read mapping
+function download_minimap2 {
+    echo "Downloading Minimap2 read simulation testing..";
+    if [ ! -d "minimap2" ]
+    then
+        git clone https://github.com/lh3/minimap2;
+        cd minimap2;
+        python setup.py install;
+        cd ../;
+    fi
+}
 
 function main {
     download_art;
     download_nanosim;
     download_pass;
+    download_minimap2;
 }
 main;
