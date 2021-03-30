@@ -51,6 +51,7 @@ brackenDir = file("$workingDir/$WORKFLOW/bracken")
 translatedFile = "${workingDir}/initialize/six_frame_translation/${BASE}.translated.fasta"
 
 
+
 process Create_Working_Directories {
     output:
     stdout create
@@ -66,7 +67,6 @@ process Create_Working_Directories {
     #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
-
     """
 }
 
@@ -124,8 +124,6 @@ process Prep_Databases {
 
 	"""
 }
-
-
 
 process Run_Kraken {
 	input:

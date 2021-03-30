@@ -17,5 +17,3 @@ Before running, needs to know:
 2. Add paired end options for megahitRun script
 3. Add paired end options for Nextflow 
 4. Conda environment
-
-
