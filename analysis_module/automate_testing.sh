@@ -24,6 +24,8 @@ function generateSimulations() {
 		echo "Not running generateSimulations(). Config directory doesn't exist.";
 	elif [[ ! -f ${simScriptPath} ]]; then
 		echo "Not running generateSimulations(). Simulation script doesn't exist.";
+
+	# run script
 	else
 		echo "Running generateSimulations()";
 		if [[ ! -d ${simOutDir} ]]; then
@@ -53,9 +55,26 @@ function generateSimulations() {
 # Outputs:
 #   creates working directories containing output files of all modules in enrichseq
 #######################################
-# function runEnrichSeq() {
-#
-# }
+function runEnrichSeq() {
+	#  arguments
+	local enrichseqPath=$1;
+	local simOutDir=$2;
+	local krakenDbPath=$3;
+
+	# input validation
+	if [[ ! -f ${enrichseqPath} ]]; then
+		echo "Not running runEnrichSeq(). Enrichseq script or path does not exist.";
+	else
+		echo "Running runEnrichSeq()";
+		for simfile in ${simOutDir}/*_illumina.fa
+		do
+			# extract filename sans extension
+			filename=$(basename -s .fa ${simfile})
+			# run enrichseq.nf for each simulation FASTA file
+			nextflow ${enrichseqPath} --read single --fasta ${simfile} --workdir ${filename} --dbdir ${krakenDbPath} --threads 4
+		done
+	fi
+}
 
 # 3. save enrichseq results to CSV
 #######################################
@@ -85,10 +104,12 @@ function main(){
 	local simScriptPath="/Users/latifa/GitHub/Phage-EnrichSeq/readsimulator_module/simulate_reads.py"
 	local configDir="/Users/latifa/Genomics/simulation_experiments_march28/sim_configs"
 	local simOutDir="/Users/latifa/GitHub/Phage-EnrichSeq/analysis_module/simulations"
+	local enrichseqPath="/Users/latifa/GitHub/Phage-EnrichSeq/Nextflow/enrichseq.nf"
+	local krakenDbPath="/Users/latifa/GitHub/Phage-EnrichSeq/kraken_module/krakenDB"
 
 	# running underlying methods
-	generateSimulations ${simScriptPath} ${configDir} ${simOutDir};
-
+	#generateSimulations ${simScriptPath} ${configDir} ${simOutDir};
+	runEnrichSeq ${enrichseqPath} ${simOutDir} ${krakenDbPath}
 }
 
 echo "Running the BLASTDB build script";
