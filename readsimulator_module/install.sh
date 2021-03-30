@@ -2,6 +2,15 @@
 # setting up global vars
 os_type=$1;
 
+if  [[ $os_type == "" ]]; then
+    echo; echo;
+    echo "USAGE:";
+    echo "bash install mac";
+    echo "or";
+    echo "bash install mac"; echo; echo;
+    exit;
+fi
+
 # downlaod ART - for Illumina
 function download_art {
     echo "Downloading ART for short read simulation..";
