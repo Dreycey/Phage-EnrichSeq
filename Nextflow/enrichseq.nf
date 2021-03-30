@@ -100,7 +100,7 @@ process Run_Megahit {
     script:
     //megahit_out = "$megahitDir/*.contigs.fa"
     """
-    bash $params.megahitpath/megahitRun.sh --read=$params.read \
+    bash ${params.toolpath}/megahit_module/megahitRun.sh --read=${params.read} \
         		  --input=${fastafile} \
     			  --threads=${THREADS} \
     			  --out=${megahitDir}
@@ -117,8 +117,8 @@ process Prep_Databases {
 
 	script:
 	"""
-	if [[ ! -f $databasesDir/taxo.k2d ]]; then
-		bash $params.krakenpath/kraken2Build.sh
+	if [[ ! -f ${databasesDir}/taxo.k2d ]]; then
+		bash ${params.toolpath}/kraken_module/kraken2Build.sh
 	else
 		echo "Kraken DB already exists" | tee -a $logfile
 	fi
@@ -131,17 +131,18 @@ process Run_Kraken {
 	input:
 	//path assembled_fasta from megahit
 	val megaout from megahit
+	val krakendb from databases
 
 	output:
 	stdout kraken
-
+	
 	script:
 	"""
-	bash ${params.krakenpath}/kraken2Run.sh --krakendb=${databasesDir} \
+	bash ${params.toolpath}/kraken_module/kraken2Run.sh --krakendb=${databasesDir} \
 				--queryfasta=${megahitDir}/*.contigs.fa \
 				--report=${krakenDir}/kraken_assembled.report \
 				--out=${krakenDir}/kraken1.log
-	bash ${params.krakenpath}/kraken2Run.sh --krakendb=${databasesDir} \
+	bash ${params.toolpath}/kraken_module/kraken2Run.sh --krakendb=${databasesDir} \
 				--queryfasta=${fastafile} \
 				--report=${krakenDir}/kraken_orig.report \
 				--out=${krakenDir}/kraken2.log
@@ -152,7 +153,6 @@ process Run_Kraken {
 process Run_Bracken {
 	input:
 	val krakenout from kraken
-	val krakendb from databases
 
 	output:
 	stdout bracken
@@ -160,8 +160,8 @@ process Run_Bracken {
 	script:
 	"""
 	echo "Running Run_Bracken" > ${brackenDir}/log.txt
-	bash ${params.brackenpath}/brackenBuild.sh
-	bash ${params.brackenpath}/brackenRun.sh --krakendb=${databasesDir} \
+	bash ${params.toolpath}/bracken_module/brackenBuild.sh
+	bash ${params.toolpath}/bracken_module/brackenRun.sh --krakendb=${databasesDir} \
 				--input=${krakenDir}/kraken_orig.report \
 				--out=${brackenDir}/bracken_run_orig \
 				--read=${params.readlength}
@@ -179,12 +179,12 @@ process Run_BLAST {
 
         script:
         """
-        if [[ ! -f ${params.blastpath}/blastdb/outputMulti3.fa ]]; then
-                bash ${params.blastpath}/blastBuild.sh
+        if [[ ! -f ${params.toolpath}/blast_module/blastdb/outputMulti3.fa ]]; then
+                bash ${params.toolpath}/blast_module/blastBuild.sh
         else
                 echo "Blast DB already exists" > ${blastWorkingDir}/log.txt
         fi
-        bash ${params.blastpath}/blastRun.sh --blastdb=${params.blastpath}/blastdb/outputMulti3.fa \
+        bash ${params.toolpath}/blast_module/blastRun.sh --blastdb=${params.toolpath}/blast_module/blastdb/outputMulti3.fa \
 				 --queryfasta=--queryfasta=${fastafile} \
 				 --out=blastout_postassembly.txt
         """
