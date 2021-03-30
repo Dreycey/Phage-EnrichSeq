@@ -168,7 +168,7 @@ process Run_Bracken {
 	"""
 }
 
-
+/*
 process Run_BLAST {
         input:
         val blastdb from databases
@@ -189,7 +189,7 @@ process Run_BLAST {
 				 --out=blastout_postassembly.txt
         """
 }
-
+*/
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
