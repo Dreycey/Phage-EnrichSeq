@@ -11,3 +11,9 @@ Process 6: binning comparison/consolidation
 Before running, needs to know:
 - location of the simulated fasta files or those done in lab -can be passed as a parameter for nextflow command
 - location of databases --> should there be a process to build databases?
+
+## TODO
+1. Add database location as option in krakenBuild script
+2. Add paired end options for megahitRun script
+3. Add paired end options for Nextflow 
+4. Conda environment
