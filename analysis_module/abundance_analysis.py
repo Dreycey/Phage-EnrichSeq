@@ -1,7 +1,7 @@
 # This script has 3 main jobs:
 # 1) parses output files from abundance estimation tools
 # 2) analyzes the data from those files
-# 3) displays relevant information in a readable manner
+# 3) displays relevant information in a readable format
 import sys
 import csv
 from re import search
@@ -45,7 +45,7 @@ def saveInfoToFile(outfile):
     # save names, taxid and abundances of dict contents to file
     if '.csv' in outfile:
         with open(outfile, mode='w') as csv_file:
-            fieldnames = ['phage_name', 'bracken_abundance', 'blast_abundance']
+            fieldnames = ['phage_name', 'bracken_abundance', 'blast_abundance', 'average']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
