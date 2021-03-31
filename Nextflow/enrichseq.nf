@@ -90,7 +90,6 @@ process Run_Megahit {
     val init from init
 
     output:
-    //path(megahit_out) into megahit
     stdout megahit
 
     if ( Executor == 'local' ) {
@@ -98,7 +97,6 @@ process Run_Megahit {
     }
 
     script:
-    //megahit_out = "$megahitDir/*.contigs.fa"
     """
     bash ${params.toolpath}/megahit_module/megahitRun.sh --read=${params.read} \
         		  --input=${fastafile} \
@@ -120,7 +118,7 @@ process Prep_Databases {
 	if [[ ! -f ${databasesDir}/taxo.k2d ]]; then
 		bash ${params.toolpath}/kraken_module/kraken2Build.sh
 	else
-		echo "Kraken DB already exists" | tee -a $logfile
+		echo "Kraken DB already exists" > ${krakenDir}/kraken.log
 	fi
 
 	"""
@@ -129,7 +127,6 @@ process Prep_Databases {
 
 process Run_Kraken {
 	input:
-	//path assembled_fasta from megahit
 	val megaout from megahit
 	val krakendb from databases
 
@@ -159,7 +156,7 @@ process Run_Bracken {
 
 	script:
 	"""
-	echo "Running Run_Bracken" > ${brackenDir}/log.txt
+	echo "Running Run_Bracken" > ${brackenDir}/bracken.log
 	bash ${params.toolpath}/bracken_module/brackenBuild.sh
 	bash ${params.toolpath}/bracken_module/brackenRun.sh --krakendb=${databasesDir} \
 				--input=${krakenDir}/kraken_orig.report \
@@ -181,11 +178,11 @@ process Run_BLAST {
         if [[ ! -f ${params.toolpath}/blast_module/blastdb/outputMulti3.fa ]]; then
                 bash ${params.toolpath}/blast_module/blastBuild.sh
         else
-                echo "Blast DB already exists" > ${blastWorkingDir}/log.txt
+                echo "Blast DB already exists" > ${blastWorkingDir}/blast.log
         fi
         bash ${params.toolpath}/blast_module/blastRun.sh --blastdb=${params.toolpath}/blast_module/blastdb/outputMulti3.fa \
 				 --queryfasta=${fastafile} \
-				 --out=blastout_postassembly.txt
+				 --out=${blastWorkingDir}/blastout.txt
         """
 }
 
