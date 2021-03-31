@@ -10,6 +10,11 @@ import ntpath
 import pandas as pd
 
 
+abspath = os.path.abspath(sys.argv[0])
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
+
 ABOUT = (
 """
 Description:
