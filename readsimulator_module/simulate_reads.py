@@ -41,7 +41,6 @@ LOGO = (
 | \____/( (/ /| | | | |_| | | | ( (/ / _____) )| |_| | | |
  \_____/ \____)_| |_|\___/|_|_|_|\____|______(_____)_|_|_|
 """)
-print(LOGO)
 
 
 ####
@@ -137,7 +136,7 @@ def create_simulated_fasta(seqtype, args, simulated_read_path, config_array, out
     
     print(simulated_read_path, config_array)
     #total_nucleotides = args.coverage * 
-    total_reads = 100000
+    total_reads = 10000
     # get output file ready
     filenameout = f"{output_fasta}_{seqtype}.fa"
     if os.path.exists(filenameout):
@@ -161,6 +160,7 @@ def create_simulated_fasta(seqtype, args, simulated_read_path, config_array, out
 ###
 if __name__ == "__main__":
 
+    print(LOGO)
     # get the arguments ready 
     argslist = sys.argv[1:] # init argv in case not testing
     args = parseArgs(argslist)
@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
     # create new fasta with simulated genomes
     create_simulated_fasta("illumina", args, simulated_reads, config_array, args.output)
-    create_simulated_fasta("nanopore", args, simulated_reads, config_array, args.output)
+    #create_simulated_fasta("nanopore", args, simulated_reads, config_array, args.output)
     create_simulated_fasta("pacbio", args, simulated_reads, config_array, args.output)
 
 #    if args.quiet:
