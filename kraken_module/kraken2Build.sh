@@ -94,15 +94,18 @@ function buildKrakenDb() {
   kraken2-build --build --db ${dbDir};
 }
 
-function main() {
-  # input arguments
-  source kraken_module.config;
-
-  downloadRequiredFiles ${dbDir};
-  reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};
-  addGenomesToDb ${genomeDir} ${dbDir};
-  buildKrakenDb ${dbDir};
+function main() {                                                               
+  # input arguments                                                             
+  source kraken_module.config;                                                  
+  if [[ ! -f ${dbDir}/taxo.k2d ]]; then                                         
+    downloadRequiredFiles;                                                      
+    reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};                     
+    addGenomesToDb ${genomeDir} ${dbDir};                                       
+    buildKrakenDb ${dbDir};                                                     
+  fi                                                                            
 }
+
+
 
 
 echo "Running the kraken2 DB build script";

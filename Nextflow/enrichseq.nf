@@ -51,6 +51,7 @@ brackenDir = file("$workingDir/$WORKFLOW/bracken")
 translatedFile = "${workingDir}/initialize/six_frame_translation/${BASE}.translated.fasta"
 
 
+
 process Create_Working_Directories {
     output:
     stdout create
@@ -66,7 +67,6 @@ process Create_Working_Directories {
     #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
-
     """
 }
 
@@ -89,7 +89,6 @@ process Run_Megahit {
     val init from init
 
     output:
-    //path(megahit_out) into megahit
     stdout megahit
 
     if ( Executor == 'local' ) {
@@ -97,9 +96,8 @@ process Run_Megahit {
     }
 
     script:
-    //megahit_out = "$megahitDir/*.contigs.fa"
     """
-    bash $params.megahitpath/megahitRun.sh --read=$params.read \
+    bash ${params.toolpath}/megahit_module/megahitRun.sh --read=${params.read} \
         		  --input=${fastafile} \
     			  --threads=${THREADS} \
     			  --out=${megahitDir}
@@ -116,31 +114,33 @@ process Prep_Databases {
 
 	script:
 	"""
-	if [[ ! -f $databasesDir/taxo.k2d ]]; then
-		bash $params.krakenpath/kraken2Build.sh
+	if [[ ! -f ${databasesDir}/taxo.k2d ]]; then
+		bash ${params.toolpath}/kraken_module/kraken2Build.sh
 	else
-		echo "Kraken DB already exists" | tee -a $logfile
+		echo "Kraken DB already exists" > ${krakenDir}/kraken.log
 	fi
 
 	"""
 }
 
-
-
 process Run_Kraken {
 	input:
-	//path assembled_fasta from megahit
 	val megaout from megahit
+	val krakendb from databases
 
 	output:
 	stdout kraken
-
+	
 	script:
 	"""
-	bash $params.krakenpath/kraken2Run.sh --krakendb=${databasesDir} \
-				--queryfasta=$megahitDir/*.contigs.fa \
-				--report=$krakenDir/kraken.report \
-				--out=$krakenDir/kraken.log
+	bash ${params.toolpath}/kraken_module/kraken2Run.sh --krakendb=${databasesDir} \
+				--queryfasta=${megahitDir}/*.contigs.fa \
+				--report=${krakenDir}/kraken_assembled.report \
+				--out=${krakenDir}/kraken1.log
+	bash ${params.toolpath}/kraken_module/kraken2Run.sh --krakendb=${databasesDir} \
+				--queryfasta=${fastafile} \
+				--report=${krakenDir}/kraken_orig.report \
+				--out=${krakenDir}/kraken2.log
 	"""
 }
 
@@ -154,17 +154,43 @@ process Run_Bracken {
 
 	script:
 	"""
-	bash $params.brackenpath/brackenBuild.sh
-	bash $params.brackenpath/brackenRun.sh --krakendb=${databasesDir} \
-				--input=${krakenDir}/kraken.report \
-				--out=${brackenDir}/bracken_run1 \
-				--read=$params.readlength
+
+	echo "Running Run_Bracken" > ${brackenDir}/bracken.log
+	bash ${params.toolpath}/bracken_module/brackenBuild.sh
+	bash ${params.toolpath}/bracken_module/brackenRun.sh --krakendb=${databasesDir} \
+				--input=${krakenDir}/kraken_orig.report \
+				--out=${brackenDir}/bracken_run_orig \
+				--read=${params.readlength}
 	"""
 }
+
+process Run_BLAST {
+        input:
+        val blastdb from databases
+	val megaout from megahit         
+
+        output:
+        stdout blast
+
+        script:
+        """
+        if [[ ! -f ${params.toolpath}/blast_module/blastdb/outputMulti3.fa ]]; then
+                bash ${params.toolpath}/blast_module/blastBuild.sh
+        else
+                echo "Blast DB already exists" > ${blastWorkingDir}/blast.log
+        fi
+        bash ${params.toolpath}/blast_module/blastRun.sh --blastdb=${params.toolpath}/blast_module/blastdb/outputMulti3.fa \
+				 --queryfasta=${fastafile} \
+				 --out=${blastWorkingDir}/blastout.txt
+        """
+}
+
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
 megahit.subscribe { print "$it" }
 //databases.subscribe { print "$it"}
 kraken.subscribe { print "$it" }
+
 bracken.subscribe { print "$it" }
+blast.subscribe { print "$it" }

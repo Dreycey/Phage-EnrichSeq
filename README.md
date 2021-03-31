@@ -1,7 +1,10 @@
 # Phage-EnrichSeq
 Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
 
-
+# Activate enrichseq conda environment with pre-installed dependencies
+```
+conda env create -f environment.yml
+```
 
 
 # Dependency Installation Instructions
