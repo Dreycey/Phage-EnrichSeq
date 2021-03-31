@@ -151,7 +151,7 @@ function saveResults() {
 		else
 			# run simulation analysis python script to save to CSV file
 			python ${ANALYSIS_PATH}/simulation_analysis.py ${phageNamesFile} ${config} \
-					${SIM_BENCHMARK_PATH}/${filename}_illumina/enrichseq/bracken/bracken_run_orig.bracken \
+					${SIM_BENCHMARK_PATH}/${filename}_illumina/enrichseq/bracken/*.bracken \
 					${resultsDir}/${filename}_analysis.csv
 		fi
 	done
