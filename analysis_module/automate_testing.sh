@@ -1,4 +1,5 @@
-### NOTE: Currently needs to be run in the same directory as the simulate_reads.py script
+
+
 ### because of some dependencies (i.e. cd to readSimulatorModule then run ../analysis_module/automate_testing.sh)
 
 ANALYSIS_PATH="/Users/latifa/GitHub/Phage-EnrichSeq/analysis_module"
@@ -9,6 +10,7 @@ if [[ -d ${SIM_BENCHMARK_PATH} ]]; then
 fi
 
 mkdir ${SIM_BENCHMARK_PATH}
+
 
 # 1. automate simulations
 #######################################
@@ -28,6 +30,7 @@ function generateSimulations() {
  	local configDir=$2;
 	local simOutDir=$3;
 	local threads=$4;
+
 
 	# some input validation
 	if [[ ! -d ${configDir} ]]; then
@@ -54,6 +57,7 @@ function generateSimulations() {
 	echo "Simulation files generated in ${simOutDir}:"
 	ls ${simOutDir}
 
+
 }
 
 # 2. automate nextflow runs
@@ -68,6 +72,7 @@ function generateSimulations() {
 # Outputs:
 #   creates working directories containing output files of all modules in enrichseq
 #######################################
+
 function runEnrichSeqIllumina() {
 	#  arguments
 	local enrichseqPath=$1;
@@ -75,19 +80,20 @@ function runEnrichSeqIllumina() {
 	local krakenDbPath=$3;
 	local threads=$4;
 
+
 	# input validation
 	if [[ ! -f ${enrichseqPath} ]]; then
 		echo "Not running runEnrichSeq(). Enrichseq script or path does not exist.";
 		exit 3
 	fi
-	# TODO: add validation for krakenDbPath
+
 
 	if [[ -z ${krakenDbPath} ]]; then
 		echo "Not running runEnrichSeq(). Database path not provided.";
 		exit 4
 	fi
 
-	echo "Running runEnrichSeq()";
+	echo "Running runEnrichSeqIllumina()";
 	for simfile in ${simOutDir}/*_illumina.fa
 	do
 		# extract filename sans extension
@@ -112,6 +118,7 @@ function runEnrichSeqIllumina() {
 # Outputs:
 #
 #######################################
+
 function saveResults() {
 	# arguments
 	local phageNamesFile=$1; # a file containing the names of all phages simulated
@@ -156,7 +163,7 @@ function saveResults() {
 		fi
 	done
 	echo "CSV files for simulations stored in ${resultsDir}."
-}
+
 
 #######################################
 # Main function runs all of the other methods for the testing
@@ -169,6 +176,7 @@ function saveResults() {
 #######################################
 function main(){
 	# input arguments
+
 	local simScriptPath="${ENRICHSEQ_PATH}/readsimulator_module/simulate_reads.py"
 	local configDir="/Users/latifa/Genomics/simulation_experiments_march28/sim_configs"
 	local simOutDir="${SIM_BENCHMARK_PATH}/simulations"
