@@ -20,7 +20,6 @@ if (params.help) {
     usage()
 }
 
-
 if (!params.fasta) {
 	log.error "Missing argument for --fasta option"
 	usage()
@@ -48,7 +47,9 @@ WORKFLOW = "enrichseq"
 megahitDir = file("$workingDir/$WORKFLOW/megahit")
 krakenDir = file("$workingDir/$WORKFLOW/kraken")
 brackenDir = file("$workingDir/$WORKFLOW/bracken")
-blastWorkingDir = file("$workingDir/$WORKFLOW/blast")
+
+translatedFile = "${workingDir}/initialize/six_frame_translation/${BASE}.translated.fasta"
+
 
 
 process Create_Working_Directories {
@@ -62,12 +63,10 @@ process Create_Working_Directories {
     if [ -d $megahitDir ]; then rm -rf $megahitDir; fi;
     if [ -d $krakenDir ]; then rm -rf $krakenDir; fi;
     if [ -d $brackenDir ]; then rm -rf $brackenDir; fi;
-    if [ -d $blastWorkingDir ]; then rm -rf $blastWorkingDir; fi;
 
     #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
-    mkdir $blastWorkingDir
     """
 }
 
@@ -124,7 +123,6 @@ process Prep_Databases {
 	"""
 }
 
-
 process Run_Kraken {
 	input:
 	val megaout from megahit
@@ -156,6 +154,7 @@ process Run_Bracken {
 
 	script:
 	"""
+
 	echo "Running Run_Bracken" > ${brackenDir}/bracken.log
 	bash ${params.toolpath}/bracken_module/brackenBuild.sh
 	bash ${params.toolpath}/bracken_module/brackenRun.sh --krakendb=${databasesDir} \
@@ -185,6 +184,7 @@ process Run_BLAST {
 				 --out=${blastWorkingDir}/blastout.txt
         """
 }
+
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
