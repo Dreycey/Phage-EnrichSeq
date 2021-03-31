@@ -19,11 +19,12 @@ function buildBracken() {
 function main() {
   source bracken_module.config;
 
-  #local krakenPath=$(which kraken);
+  #local krakenPath=$(which kraken2);
 
   #if [[ -z "${krakenPath}" ]]; then 
-    buildBracken ${dbDir} ${threads} ${kmer} ${rlength} ${krakenPath}
-  #else echo "kraken tool not found"
+#	echo "kraken2 not found"
+ # else 
+	buildBracken ${dbDir} ${threads} ${kmer} ${rlength} ${krakenPath}
   #fi
 }
 
