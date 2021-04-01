@@ -2,6 +2,7 @@
 #
 # Run blastN
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"                         
 
 usage() {
     echo; echo "Usage: bash $0 --blastdb=blastdb/outputMulti3.fa --queryfasta=blast_testfiles/simulatedgenomes_illumina.fa --out=blastout.txt"
