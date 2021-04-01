@@ -44,8 +44,8 @@ def parseBrackenFile(bracken_file):
 
 def calculateError():
     for key in data_dict:
-        sim_abundance = float(data_dict[key][0])
-        reported_abundance = float(data_dict[key][1])
+        sim_abundance = float(data_dict[key][0])*100
+        reported_abundance = float(data_dict[key][1])*100
         error = round(abs(sim_abundance - reported_abundance)/sim_abundance, 5)
         data_dict[key].append(error)
 
