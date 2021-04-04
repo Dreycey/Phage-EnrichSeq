@@ -1,15 +1,14 @@
-
-
+### NOTE: Currently needs to be run in the same directory as the simulate_reads.py script
 ### because of some dependencies (i.e. cd to readSimulatorModule then run ../analysis_module/automate_testing.sh)
 
 ANALYSIS_PATH="/Users/latifa/GitHub/Phage-EnrichSeq/analysis_module"
-ENRICHSEQ_PATH="/Users/latifa/GitHub/Phage-EnrichSeq/"
+ENRICHSEQ_PATH="/Users/latifa/GitHub/Phage-EnrichSeq"
 SIM_BENCHMARK_PATH="${ENRICHSEQ_PATH}/benchmarking"
 if [[ -d ${SIM_BENCHMARK_PATH} ]]; then
-	rm -rf ${SIM_BENCHMARK_PATH}
+	echo "${SIM_BENCHMARK_PATH} already exists. Remove or rename to regenerate new simulations."
+else
+	mkdir ${SIM_BENCHMARK_PATH}
 fi
-
-mkdir ${SIM_BENCHMARK_PATH}
 
 
 # 1. automate simulations
@@ -31,7 +30,6 @@ function generateSimulations() {
 	local simOutDir=$3;
 	local threads=$4;
 
-
 	# some input validation
 	if [[ ! -d ${configDir} ]]; then
 		echo "Not running generateSimulations(). Config directory doesn't exist.";
@@ -51,12 +49,14 @@ function generateSimulations() {
 	do
 		# extract filename sans extension
 		filename=$(basename -s .config ${config})
-		# run simulator script for each config file
-		python ${simScriptPath} --quiet -i ${config} -c 30 -o ${simOutDir}/${filename} -t ${threads}
+		# if a simulation with that name DOESN'T already exists, run the simulator
+		if [[ ! -f ${simOutDir}/${filename}*.fa ]]; then
+			# run simulator script for each config file
+			python ${simScriptPath} --quiet -i ${config} -c 30 -o ${simOutDir}/${filename} -t ${threads}
+		fi
 	done
 	echo "Simulation files generated in ${simOutDir}:"
 	ls ${simOutDir}
-
 
 }
 
@@ -72,7 +72,6 @@ function generateSimulations() {
 # Outputs:
 #   creates working directories containing output files of all modules in enrichseq
 #######################################
-
 function runEnrichSeqIllumina() {
 	#  arguments
 	local enrichseqPath=$1;
@@ -80,16 +79,15 @@ function runEnrichSeqIllumina() {
 	local krakenDbPath=$3;
 	local threads=$4;
 
-
 	# input validation
 	if [[ ! -f ${enrichseqPath} ]]; then
-		echo "Not running runEnrichSeq(). Enrichseq script or path does not exist.";
+		echo "Not running runEnrichSeqIllumina(). Enrichseq script or path does not exist.";
 		exit 3
 	fi
-
+	# TODO: add validation for krakenDbPath
 
 	if [[ -z ${krakenDbPath} ]]; then
-		echo "Not running runEnrichSeq(). Database path not provided.";
+		echo "Not running runEnrichSeqIllumina(). Database path not provided.";
 		exit 4
 	fi
 
@@ -97,10 +95,16 @@ function runEnrichSeqIllumina() {
 	for simfile in ${simOutDir}/*_illumina.fa
 	do
 		# extract filename sans extension
-		filename=$(basename -s .fa ${simfile})
-		# run enrichseq.nf for each simulation FASTA file
-		nextflow ${enrichseqPath} --read single --fasta ${simfile} \
-				--workdir ${SIM_BENCHMARK_PATH}/${filename} --dbdir ${krakenDbPath} --threads ${threads}
+		filename=$(basename -s .fa ${simfile});
+
+		# if a bracken output under a nextflow directory with that name DOESN'T already exists, run enrichseq.nf
+		if [[ ! -f ${SIM_BENCHMARK_PATH}/${filename}_illumina/enrichseq/bracken/*.bracken ]]; then
+			# run enrichseq.nf for each simulation FASTA file
+			nextflow ${enrichseqPath} --read single --fasta ${simfile} \
+					--workdir ${SIM_BENCHMARK_PATH}/${filename} --dbdir ${krakenDbPath} \
+					--toolpath ${PWD} --threads ${threads};
+		fi
+
 	done
 	echo "EnrichSeq output directories located in ${SIM_BENCHMARK_PATH}"
 
@@ -118,7 +122,6 @@ function runEnrichSeqIllumina() {
 # Outputs:
 #
 #######################################
-
 function saveResults() {
 	# arguments
 	local phageNamesFile=$1; # a file containing the names of all phages simulated
@@ -153,6 +156,7 @@ function saveResults() {
 			echo "${filename}_illumina directory does not exist."
 			exit 7
 		elif [[ ! -f ${SIM_BENCHMARK_PATH}/${filename}_illumina/enrichseq/bracken/bracken_run_orig.bracken ]]; then
+			#ls ${SIM_BENCHMARK_PATH}/${filename}_illumina/enrichseq/bracken
 			echo "Bracken output does not exist."
 			exit 8
 		else
@@ -163,7 +167,7 @@ function saveResults() {
 		fi
 	done
 	echo "CSV files for simulations stored in ${resultsDir}."
-
+}
 
 #######################################
 # Main function runs all of the other methods for the testing
@@ -176,7 +180,6 @@ function saveResults() {
 #######################################
 function main(){
 	# input arguments
-
 	local simScriptPath="${ENRICHSEQ_PATH}/readsimulator_module/simulate_reads.py"
 	local configDir="/Users/latifa/Genomics/simulation_experiments_march28/sim_configs"
 	local simOutDir="${SIM_BENCHMARK_PATH}/simulations"
@@ -187,8 +190,11 @@ function main(){
 	local threads=4
 
 	# running underlying methods
-	generateSimulations ${simScriptPath} ${configDir} ${simOutDir} ${threads}
-	runEnrichSeqIllumina ${enrichseqPath} ${simOutDir} ${krakenDbPath} ${threads}
+	if [[ ! "$(ls -A ${SIM_BENCHMARK_PATH})" ]]; then
+		generateSimulations ${simScriptPath} ${configDir} ${simOutDir} ${threads}
+		runEnrichSeqIllumina ${enrichseqPath} ${simOutDir} ${krakenDbPath} ${threads}
+	fi
+
 	saveResults ${phageNamesFile} ${configDir} ${resultsDir}
 }
 

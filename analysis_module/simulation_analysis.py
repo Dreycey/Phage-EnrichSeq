@@ -33,7 +33,7 @@ def parseBrackenFile(bracken_file):
     bracken_contents = open(bracken_file).readlines()[1:]
     for line in bracken_contents:
         line = line.strip("\n").split()
-
+        print(line[8])
         species_name = line[2].lower()
         bracken_abundance = line[8]
 
@@ -44,8 +44,8 @@ def parseBrackenFile(bracken_file):
 
 def calculateError():
     for key in data_dict:
-        sim_abundance = float(data_dict[key][0])*100
-        reported_abundance = float(data_dict[key][1])*100
+        sim_abundance = float(data_dict[key][0])
+        reported_abundance = float(data_dict[key][1])
         error = round(abs(sim_abundance - reported_abundance)/sim_abundance, 5)
         data_dict[key].append(error)
 
