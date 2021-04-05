@@ -33,7 +33,7 @@ def parseBrackenFile(bracken_file):
     bracken_contents = open(bracken_file).readlines()[1:]
     for line in bracken_contents:
         line = line.strip("\n").split()
-
+        print(line[8])
         species_name = line[2].lower()
         bracken_abundance = line[8]
 
