@@ -7,8 +7,6 @@ import csv
 import re
 
 
-data_dict = {}
-
 """
 Extracts phage names from kraken report (only at species level)
 
@@ -20,31 +18,18 @@ Output:
 """
 def parseKrakenFile(kraken_file):
     kraken_reports = open(kraken_file).readlines()
-    phages = []
+    phages = {}
 
     for line in kraken_reports:
         genome_level = line.strip("\n").split('\t')[3]
         full_name = line.strip("\n").split('\t')[5]
         if genome_level == 'S': ## species have 3 names (e.g. Mycobacterium phage D29)
-            phages.append(full_name)
-            print(full_name)
+            taxid = line.strip("\n").split()[4]
+            phages[taxid] = full_name
+            print(f'{taxid} {full_name}')
 
     return phages
 
-
-"""
-Cross-references phage names from kraken report with multi-fasta reference genomes
-
-Input:
-    (full) phage name from kraken report
-    multifasta file path
-
-Output: 
-    ?
-"""
-
-# def __validatePhageNames(phage_list, multifasta_file):
-#
 
 
 """
@@ -57,17 +42,16 @@ Input:
 Output: 
     none (writes to file)
 """
-def saveInfoToFile(outfile, kraken_phages):
+def saveTaxidToFile(outfile, kraken_phages):
     # save only phage names specified output file
     output_file = open(outfile, "w")
-    for phage in kraken_phages:
-        output_file.write(phage + "\n")
+    for taxid in kraken_phages:
+        output_file.write(taxid + "\n")
     output_file.close()
 
 def main():
     """ controls the script """
-    kraken_phages = []
-
+    kraken_phages = {}
 
     ### SCRIPT INPUT
     kraken_file = sys.argv[1]
@@ -76,15 +60,7 @@ def main():
 
     # TEST
     kraken_phages = parseKrakenFile(kraken_file)
-    saveInfoToFile(outfile, kraken_phages)
-    # parseConfigFile(config_file)
-    # parseBrackenFile(bracken_file)
-    # calculateError()
-    # saveInfoToFile(outfile)
-
-    # for key in data_dict:
-    #     print(f'phage: {key} | config abundance: {data_dict[key][0]} | '
-    #           f'bracken abundance: {data_dict[key][1]} | error: {data_dict[key][2]}')
+    saveTaxidToFile(outfile, kraken_phages)
 
 
 if __name__ == "__main__":
