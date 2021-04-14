@@ -70,6 +70,7 @@ def parseArgs(argv=None):
     parser.add_argument("-c", "--coverage", help="coverage for output", required=True)
     parser.add_argument("-o", "--output", help="the output file prefix", required=True)
     parser.add_argument("-t", "--threads", help="number of threads", required=True)
+    parser.add_argument("-rn", "--readnum", help="number of reads to simulate", required=True)
 
     return parser.parse_args(argv)
 
@@ -142,7 +143,7 @@ def create_simulated_fasta(seqtype, args, simulated_read_path, config_array, out
     
     print(simulated_read_path, config_array)
     #total_nucleotides = args.coverage * 
-    total_reads = 100000
+    total_reads = args.readnumber
     # get output file ready
     filenameout = f"{output_fasta}_{seqtype}.fa"
     if os.path.exists(filenameout):
