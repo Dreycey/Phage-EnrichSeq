@@ -58,7 +58,7 @@ function simulate_pacbio {
 # main function for controlling the workflow
 function main {
     simulate_illumina;
-    #simulate_nanopore;
-    #simulate_pacbio;
+    simulate_nanopore;
+    simulate_pacbio;
 }
 main;
