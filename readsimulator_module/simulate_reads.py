@@ -143,7 +143,7 @@ def create_simulated_fasta(seqtype, args, simulated_read_path, config_array, out
     
     print(simulated_read_path, config_array)
     #total_nucleotides = args.coverage * 
-    total_reads = args.readnumber
+    total_reads = args.readnum
     # get output file ready
     filenameout = f"{output_fasta}_{seqtype}.fa"
     if os.path.exists(filenameout):
@@ -156,7 +156,7 @@ def create_simulated_fasta(seqtype, args, simulated_read_path, config_array, out
         data = simulated_read_path[index] + type_dict[seqtype]
         seqs_dataframe = parseFastaToDB(data)
         # take percent_reads and add to output file
-        percent_reads = total_reads * float(genome[1])
+        percent_reads = float(total_reads) * float(genome[1])
         seqs_dataframe = seqs_dataframe.sample(frac = 1)
         addDBtoFile(seqs_dataframe.head(int(percent_reads)), file_out)
         # increment
