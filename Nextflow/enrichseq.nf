@@ -165,6 +165,7 @@ process Run_Bracken {
 	"""
 }
 
+/*
 process Run_BLAST {
         input:
         val blastdb from databases
@@ -185,6 +186,7 @@ process Run_BLAST {
 				 --out=${blastWorkingDir}/blastout.txt
         """
 }
+*/
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
@@ -193,4 +195,4 @@ megahit.subscribe { print "$it" }
 kraken.subscribe { print "$it" }
 
 bracken.subscribe { print "$it" }
-blast.subscribe { print "$it" }
+//blast.subscribe { print "$it" }
