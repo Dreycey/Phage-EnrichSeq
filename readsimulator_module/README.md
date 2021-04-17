@@ -66,7 +66,11 @@ bash install.sh linux;
 ```
 
 ### simulating reads from input reference genome
-
+**NOTE**
+When specifying different number of reads in the options, make sure to delete all \*\_simulatedreads directories:
+```
+rm -rf *simulatedreads
+```
 USAGE
 ```
 bash simulate_reads.sh <reference genome PATH> <Outfile name> <Outfile path> <Threads>
