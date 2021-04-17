@@ -12,8 +12,8 @@ Extracts phage names from kraken report (only at species level)
 
 Input:
     kraken report file
-    
-Output: 
+
+Output:
     returns list of phages
 """
 def parseKrakenFile(kraken_file):
@@ -39,32 +39,38 @@ Input:
     output file to open and write to
     list to store phage names
 
-Output: 
+Output:
     none (writes to file)
 """
 def saveTaxidToFile(outfile, kraken_phages):
-    # save only phage names specified output file
+    # save only phage taxids specified output file
     output_file = open(outfile, "w")
     for taxid in kraken_phages:
         output_file.write(taxid + "\n")
     output_file.close()
 
+
+def saveNameToFile(outfile, kraken_phages):
+	# save only phage taxids specified output file
+    output_file = open(outfile, "w")
+    for taxid in kraken_phages:
+        output_file.write(kraken_phages[taxid].strip() + "\n")
+    output_file.close()
+
 def main():
-    """ controls the script """
-    kraken_phages = {}
+	""" controls the script """
+	kraken_phages = {}
 
-    ### SCRIPT INPUT
-    kraken_file = sys.argv[1]
-    outfile = sys.argv[2]
+	### SCRIPT INPUT
+	kraken_file = sys.argv[1]
+	outfile_taxid = sys.argv[2]
+	outfile_names = sys.argv[3]
 
-
-    # TEST
-    kraken_phages = parseKrakenFile(kraken_file)
-    saveTaxidToFile(outfile, kraken_phages)
+	# TEST
+	kraken_phages = parseKrakenFile(kraken_file)
+	saveTaxidToFile(outfile_taxid, kraken_phages)
+	saveNameToFile(outfile_names, kraken_phages)
 
 
 if __name__ == "__main__":
     main()
-
-
-
