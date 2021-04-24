@@ -17,10 +17,10 @@ This wrapper impliments using minimap2 to measure abundance compared to
 a config file used for simulations.
 
 USAGE:
-python minimap2wrapper.py config_file simulated_read_file outputprefix
+python minimap2_module/minimap2wrapper.py <multi fasta with genomes> <genomes to look at> <input sequence reads> <out path name>
 
 EXAMPLE:
-python minimap2_module/minimap2wrapper.py simulate_genomes.config simulatedgenomes_illumina.fa run_1
+python minimap2_module/minimap2wrapper.py phageMulti.fa genomes_to_view.txt simulatedgenomes_illumina.fasta outname
 
 OUTPUT 1: (CSV)
 genome_name,abundance
@@ -32,7 +32,6 @@ This script also outputs a png file.
 ###
 # Stand alone methods
 ###
-
 def parse_config(configfile):
     """
     This file parses the input config file
@@ -54,13 +53,14 @@ class GenomeTestSet:
     This class is used to test the a folder of simulated sequences
     """
 
-    def __init__(self, configFile):
+    def __init__(self, configFile, genomes_to_view):
         """ initialize all params """
         self.configFilePath = configFile
         self.genomes = {} # this directory will hold all of the genomes
         self.genomeMap = {} # this dictionary hold minmap indexes
         self.simAbundance = {} # this dictionary hold simulated abundance amounts
         self.minimap_out = {} # this holds info yeilded from minimap2
+        self.genomes_to_view = self.parseGenomeList(genomes_to_view) # this will hold the genome names parse
 
         # add genomes
         self.config_info = self.__parseConfig()
@@ -72,6 +72,18 @@ class GenomeTestSet:
     def __parseConfig(self):
         """ parse the contents of the config file """
         return parse_config(self.configFilePath)
+
+    def parseGenomeList(self, input_file=None):
+        """ parses names seperate by line """
+        if (input_file != None):
+            genomes_to_view = []
+            file_lines = open(input_file).readlines()
+            for line in file_lines:
+                line = line.strip("\n")
+                if len(line) > 0:
+                    genomes_to_view.append(line)
+            return genomes_to_view
+        return self.genomes_to_view
 
     def __addGenomes(self):
         """ add genomes to to genomes attr """
@@ -90,8 +102,6 @@ class GenomeTestSet:
             self.genomeMap[genome_name] = mp.Aligner(file_path, best_n=1)
             # simulated amounts
             self.simAbundance[genome_name] = amount
-
-
         """
         #  parse multifasta  (ASSUMES A GIANT MULTIFASTA FILE)
         print("Creating indexes for minimap2")
@@ -99,12 +109,12 @@ class GenomeTestSet:
         for indx in tqdm(range(len(genomeName_list))):
             genome = genome_list[indx]
             genomeName = genomeName_list[indx]
-            kracken_out_list = ["Ryadel", "Blessica", "D29", "Paphu", "Perseus"]
+            kracken_out_list = self.genomes_to_view #self.parseGenomeList() # can add path to line seperated file
             for name in kracken_out_list:
                 if  name in genomeName: #in ["Ryadel", "Blessica", "D29", "Paphu", "Perseus"]:
                     print(f"genome name: {genomeName}")
                     # reformat
-                    genome_name = genomeName #.strip("\n").split(",")[0]
+                    genome_name = genomeName.strip("\n") #.split(",")[0]
                     genome = genome.strip("\n")
                     # add to the genomes dict
                     self.genomes[genome_name] = genome
@@ -114,6 +124,7 @@ class GenomeTestSet:
                     tempfile.write("\n")
                     tempfile.write(genome)
                     # create minimap object
+                    #self.minimap_out[genomeName] = {}
                     self.genomeMap[genome_name] = mp.Aligner(genome_name+".fa", best_n=1)
                     # delete the temp file
                     tempfile.close()
@@ -121,98 +132,13 @@ class GenomeTestSet:
 
     def print_minimap2output(self):
         """ prints output in minimap_out datastructure """
-        for genomeName in self.genomes:
+        for genomeName in self.minimap_out.keys():
             print(genomeName)
             avg_mapq = np.average(self.minimap_out[genomeName]["mapq"])
             print(f"average map quality: {avg_mapq}")
+            print(self.minimap_out.keys())
             readcount = self.minimap_out[genomeName]["readcount"]
             print(f"read count: {readcount}")
-            #plt.hist(self.minimap_out[genomeName]["mapq"])
-            #plt.show()
-            overlappMerge = self.overlapMerge(genomeName)
-            percenOverlap = self.calcGenomePercetage(genomeName, overlappMerge)
-            print(f"percent overlap: {percenOverlap}")
-
-    def calcGenomePercetage(self, genome_name, merged_set):
-        """
-        This method calculate the percentage of the genome
-        covered by the overlapping intervals after merging.
-
-        input
-            overlap merge set
-        output
-            percentage of overlap for the mergedset
-        """
-        # initialize
-        overall_map_length = 0
-        genome_length = len(self.genomes[genome_name])
-        # calculate # of bases with mapped reads
-        for interval in merged_set:
-            interval_size = abs(interval[0] - interval[1])
-            overall_map_length += interval_size
-        # calculate % of genome with mapped reads
-        print(f"overlapp length: {overall_map_length}")
-        overlap_percent = overall_map_length / genome_length
-
-        return overlap_percent
-
-    def overlapMerge(self, genome_name):
-        """ extend reads to assess % genome covered
-
-        Algorithm:
-            Example:
-                1. input
-                (50,150), (0,100), (200,300), (149,249)
-                2. sort by starting reference index
-                (0,100), (50,150), (149,249), (200,300)
-                3. merge
-                    iteration one:
-                        p1 = (0,100)
-                        p2 = (50, 150)
-                        if p1[1] >= p2[0]:
-                            merge
-                            p1 = merged
-                            p2 = move forward
-                        else:
-                            p1 = p2
-                            p2 = move forward
-
-        INPUT:
-            self.minimap_out[genomeName]["readmaps"] (set object)
-        OUTPUT:
-            return
-                1. merged set
-                2. % of genome with reads mapped
-        """
-        mergedSet = set()
-        #for genome_name in self.genomes.keys():
-        # run some type sorting algorithm
-
-        #1. input
-        mapped_reads = self.minimap_out[genome_name]["readmaps"] #[(50,120),(110,220),(150,200)]
-        print(f"before merge overlap: {len(mapped_reads)}")
-        #2. sort the reads by starting index
-        sorted_mapped_reads = sorted(mapped_reads, key=lambda x: x[0])
-
-        #3. merge overlapping regions
-        p1 = 0 # pointer 1
-        p2 = 1 # pointer 2
-        p1_start, p1_end = sorted_mapped_reads[p1]
-        while p2 < len(sorted_mapped_reads):
-            p2_start, p2_end = sorted_mapped_reads[p2]
-            if p1_end >= p2_start:  # if overlap,  then merge
-                if p1_end <= p2_end:
-                    p1_end = p2_end
-            else:                   # if no overlap, set p1=p2 and p2++
-                mergedSet.add((p1_start, p1_end))
-                p1_start, p1_end = sorted_mapped_reads[p2] #notice: using p2
-
-            p2 += 1
-        # add last interval to to the merged set
-        mergedSet.add((p1_start, p1_end))
-
-        print(f"after merge overlap: {len(mergedSet)}")
-        return mergedSet
 
     def mapper_1(self, genomeName, read):
         """
@@ -253,17 +179,20 @@ class GenomeTestSet:
             which genome
             if no genome matching OR more than one, output null
         """
-        genome_from = []
+        genome_from = ""
         # find genome that read is in
         for genome_name, genome_seq in self.genomes.items():
+           # print(f"genome: {genome_name}")
             if (self.mapper_1(genome_name, input_seq)):
-                genome_from.append(genome_name)
+                if (genome_from == ""):
+                    genome_from = genome_name
+                else:
+                    return "UNK"
             else:
                 continue
-
         # if nothing, return UNK
-        if (len(genome_from) == 0):
-            return ["UNK"]
+        if genome_from == "":
+            return "UNK"
         else:
             return genome_from
 
@@ -321,12 +250,11 @@ class GenomeTestSet:
         # loop through fasta seqs
         print("Mapping reads")
         for sequence in tqdm(seqs):
-            genome_list = self.__findSeq(sequence)
-            for genome in genome_list:
-                if genome in genome_count.keys():
-                    genome_count[genome] += 1
-                else:
-                    genome_count[genome] = 1
+            genome = self.__findSeq(sequence)
+            if genome in genome_count.keys():
+                genome_count[genome] += 1
+            else:
+                genome_count[genome] = 1
             total_reads += 1
 
         # normalize the results
@@ -379,16 +307,18 @@ class GenomeTestSet:
 
 
 """
- python minimap2wrapper.py phageMulti.fa simulatedgenomes_illumina.fa run_1
+python minimap2wrapper.py phageMulti.fa simulatedgenomes_illumina.fa run_1
 """
 def main():
     """ Runs the minimap2 script """
     # input
     config_path = sys.argv[1]
-    fastaFile = sys.argv[2]
-    outfileprefix = sys.argv[3]
+    genomes_to_view = sys.argv[2]
+    fastaFile = sys.argv[3]
+    outfileprefix = sys.argv[4]
+
     # Create object
-    config_object = GenomeTestSet(config_path)
+    config_object = GenomeTestSet(config_path, genomes_to_view)
     config_object.checkSeqFile(fastaFile)
     config_object.plotResult("Simulation Validation", out=outfileprefix+".png")
     config_object.saveResultAsCSV(outfileprefix+".csv")
