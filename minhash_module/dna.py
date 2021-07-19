@@ -2,17 +2,13 @@ import sys
 import re
 
 class DNA:
-    name = ""
-    genome = ""  # string or FASTA file?
-    kmers = []
 
 
     def __init__(self, name, fasta_file):
         '''  '''
-        self.name = name
-        #self.genome = self.fasta_to_genome(fasta_file) # TODO: extract from FASTA file
-        self.genome = fasta_file
-        self.kmers = self.create_kmers(self.genome, 3)
+        self.name: str = name
+        self.genome: str = fasta_file
+        self.kmers: List = self.create_kmers(self.genome, 3)
 
     def create_kmers(self, genome, kmer_len = 20):
         ''' generates k-mers given a dna sequence and specified k-mer length'''
@@ -25,17 +21,10 @@ class DNA:
 
         return kmers
 
-
-    def fasta_to_genome(self):
-        ''' extracts the genome from a fasta file '''
-
-
-
     def print(self):
         print(f'Name: {self.name} \nGenome: {self.genome} \n#k-mers generated: {len(self.kmers)}')
 
-
-    def fasta_to_genome(file):
+    def fasta_to_genome(self, file):
         ''' extracts just the genome from a given FASTA file
             Assumptions: 1) File name is the genome name
                          2) Only single FASTA file is passed (no multi-fasta) '''
@@ -76,6 +65,14 @@ def calc_minhash():
 
 
 def compare_results(jaccard, minhash):
+    """
+    Description:
+        Compares the jaccard to the minhash output
+    Output:
+        float: aboslute difference
+    TODO:
+        Think of metric - percent diff.
+    """
     return abs(jaccard - minhash)
 
 
