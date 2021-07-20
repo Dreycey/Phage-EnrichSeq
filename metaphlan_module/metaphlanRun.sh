@@ -88,5 +88,5 @@ function main() {
   runMetaphlan ${inFasta} ${inputType} ${outfile} ${nproc};
 }
 
-echo "Running the bracken run script";
+echo "Running the metaphlan run script";
 main;
