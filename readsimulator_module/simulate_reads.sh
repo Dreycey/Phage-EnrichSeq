@@ -22,7 +22,7 @@ function simulate_illumina {
     echo "Simulating short illumina reads using ART..";
     if [ ! -f ${out_directory}/${out_name}_illumina.fq ] 
     then
-        ART_CMD_ARGS="-ss MSv3 -sam -i ${ref_gen} -l 100 -f 30 -o ${out_name}_illumina";
+        ART_CMD_ARGS="-ss MSv3 -sam -i ${ref_gen} -l 100 -f 3000 -o ${out_name}_illumina";
         command ./art_bin_MountRainier/art_illumina $ART_CMD_ARGS;
         mv ${out_name}_illumina* ${out_directory};
         # make fasta from fastq
@@ -58,7 +58,7 @@ function simulate_pacbio {
 # main function for controlling the workflow
 function main {
     simulate_illumina;
-    simulate_nanopore;
+    #simulate_nanopore;
     simulate_pacbio;
 }
 main;

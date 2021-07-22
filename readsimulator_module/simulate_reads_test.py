@@ -6,6 +6,7 @@ import sys
 #from Bio import pairwise2
 import mappy as mp
 import matplotlib.pyplot as plt
+import csv
 # in house packages
 from simulate_reads import parseConfig as parse_config
 
@@ -180,7 +181,7 @@ class GenomeTestSet:
         PLOTCOLOR='orange'
         # create figs
         fig, (ax1, ax2) = plt.subplots(2, 1)
-        fig.suptitle(plotTitle)
+        fig.suptitle(plotTitle, size = 30)
         fig.set_size_inches(20,10)
         # create top plot
         values = [ float(i) for i in self.simAbundance.values()]
@@ -188,7 +189,7 @@ class GenomeTestSet:
                 values, 
                 color=PLOTCOLOR,
                 edgecolor='black')
-        ax1.set_ylabel('True Simulated Abundaces')
+        ax1.set_ylabel('True Simulated Abundaces', size = 20)
         # create bottom plot
         ax2.bar(self.resultDict.keys(), 
                 list(self.resultDict.values()), 
@@ -198,6 +199,22 @@ class GenomeTestSet:
         # save the plot
         plt.savefig(out, dpi=300)
 
+    def saveResultAsCSV(self, outfilename):
+        """
+        Save the output as a CSV file.
+        """
+        if len(self.resultDict.keys()) == 0:
+            print("must create a result by running checkSeqFile")
+            exit(1)
+        # write to a CSV
+        with open(outfilename, 'w', newline='') as csvfile:
+            fieldnames = ['genome name', 'predicted abundance']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for genome_name, abundance in self.resultDict.items():
+                writer.writerow({'genome name': genome_name, 
+                                 'predicted abundance': abundance})
+
 def main():
     """ Runs the testing script """
     # input
@@ -206,7 +223,8 @@ def main():
     # Create object
     config_object = GenomeTestSet(config_path) 
     config_object.checkSeqFile(fastaFile) 
-    config_object.plotResult("Simulation Validation", out="simTest.png") 
+    config_object.plotResult("Pipeline Result", out="pipelineBench.png") 
+    config_object.saveResultAsCSV("pipelineBench")
 
 if __name__ == "__main__":
     main()

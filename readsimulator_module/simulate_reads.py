@@ -141,7 +141,7 @@ def create_simulated_fasta(seqtype, args, simulated_read_path, config_array, out
     
     print(simulated_read_path, config_array)
     #total_nucleotides = args.coverage * 
-    total_reads = 10000
+    total_reads = 3000000
     # get output file ready
     filenameout = f"{output_fasta}_{seqtype}.fa"
     if os.path.exists(filenameout):
