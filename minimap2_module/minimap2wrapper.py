@@ -104,7 +104,7 @@ class GenomeTestSet:
                 if  name in genomeName: #in ["Ryadel", "Blessica", "D29", "Paphu", "Perseus"]:
                     print(f"genome name: {genomeName}")
                     # reformat
-                    genome_name = genomeName #.strip("\n").split(",")[0]
+                    genome_name = genomeName.strip("\n").split(",")[0]
                     genome = genome.strip("\n")
                     # add to the genomes dict
                     self.genomes[genome_name] = genome
@@ -121,7 +121,8 @@ class GenomeTestSet:
 
     def print_minimap2output(self):
         """ prints output in minimap_out datastructure """
-        for genomeName in self.genomes:
+
+        for genomeName in self.minimap_out:
             print(genomeName)
             avg_mapq = np.average(self.minimap_out[genomeName]["mapq"])
             print(f"average map quality: {avg_mapq}")
@@ -379,7 +380,7 @@ class GenomeTestSet:
 
 
 """
- python minimap2wrapper.py phageMulti.fa simulatedgenomes_illumina.fa run_1
+python minimap2wrapper.py phageMulti.fa simulatedgenomes_illumina.fasta run_1
 """
 def main():
     """ Runs the minimap2 script """

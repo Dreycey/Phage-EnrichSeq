@@ -182,7 +182,7 @@ class GenomeTestSet:
         genome_from = ""
         # find genome that read is in
         for genome_name, genome_seq in self.genomes.items():
-           # print(f"genome: {genome_name}")
+            print(f"genome: {genome_name}")
             if (self.mapper_1(genome_name, input_seq)):
                 if (genome_from == ""):
                     genome_from = genome_name
