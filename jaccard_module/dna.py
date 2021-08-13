@@ -2,11 +2,11 @@ import sys
 import re
 
 class DNA:
-    def __init__(self, name, fasta_file):
+    def __init__(self, name, fasta_file, kmer_len):
         '''  '''
         self.name: str = name
         self.genome: str = fasta_file
-        self.kmers: List = self.create_kmers(self.genome, 3)
+        self.kmers: List = self.create_kmers(self.genome, kmer_len)
 
     def create_kmers(self, genome, kmer_len = 20):
         ''' generates k-mers given a dna sequence and specified k-mer length'''
@@ -72,44 +72,3 @@ class DNA:
 
     def print(self):
         print(f'Name: {self.name} \nGenome: {self.genome} \n#k-mers generated: {len(self.kmers)}')
-
-
-
-## TODO: remove this section and do unit testing
-def main():
-    ''' testing dna class methods '''
-
-    dna1 = DNA("Blessica", "ACTGAATTTCG")
-    dna2 = DNA("Ryadel", "ACTGTTTCCAG")
-    dna3 = DNA("D29", "AAAACCCCTTTTGGG")
-    dna4 = DNA("Phage1", "ZZZZZZZ")
-    file1 = sys.argv[1]
-    #file2 = sys.argv[2]
-
-
-
-    # Test k-mer building
-    #dna1.print()
-    print(dna1.kmers)
-    print(dna2.kmers)
-    print(dna3.kmers)
-    print(dna4.kmers)
-
-    # Test Jaccard similarity
-    # print(format(calc_jaccard(dna1,dna2),".4f"))
-    # print(format(calc_jaccard(dna1,dna3),".4f"))
-    # print(format(calc_jaccard(dna2,dna3),".4f"))
-
-
-    # Test Jaccard similarity
-    print(dna1.calc_jaccard(dna2))
-    print(dna1.calc_jaccard(dna3))
-    print(dna2.calc_jaccard(dna3))
-
-    # Test MinHash algorithm
-
-
-    # Compare Jaccard and MinHash
-
-if __name__ == "__main__":
-    main()
