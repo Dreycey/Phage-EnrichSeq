@@ -1,15 +1,16 @@
 import sys
 import re
+import ntpath
 
 class DNA:
     def __init__(self, name, fasta_file, kmer_len):
-        '''  '''
+        ''' Initializes dna object with name, reference genome file, and kmer size '''
         self.name: str = name
         self.genome: str = fasta_file
         self.kmers: List = self.create_kmers(self.genome, kmer_len)
 
     def create_kmers(self, genome, kmer_len = 20):
-        ''' generates k-mers given a dna sequence and specified k-mer length'''
+        ''' Generates k-mers given a dna sequence and specified k-mer length'''
         kmers = []
         num_kmers = len(genome) - kmer_len + 1
 
@@ -20,29 +21,41 @@ class DNA:
         return kmers
 
 
-    def fasta_to_genome(self, file):
-        ''' extracts just the genome from a given FASTA file
+    def fasta_to_genome(self):
+        ''' Extracts just the genome from the genome member variable, which should be a file path
             Assumptions: 1) File name is the genome name
                          2) Only single FASTA file is passed (no multi-fasta) '''
 
         # FIRST: get genome name from file path
+        file_name = self.validate_file_extension(ntpath.basename(self.genome))
+        # TODO: check extension is correct
 
         # SECOND: search file for that name and get genome
+        fasta_lines = open(self.genome).readlines()
+        # Make sure desired phage name is in the file. If not, assign null value to genome variable
+        if ">" in fasta_lines[0] and not re.search(self.name, fasta_lines[0], re.IGNORECASE):
+            self.genome = None
+        # If name is found (i.e. this is the correct file), get genome
+        elif ">" in fasta_lines[0] and re.search(self.name, fasta_lines[0], re.IGNORECASE):
+            self.genome = "" # clear current value for genome
+            for line in fasta_lines:
+                if ">" not in line:
+                    self.genome += line.rstrip()
 
-        fasta_lines = open(file).readlines()
-        i=0
-        # search for name in file
-        # for line in fasta_lines:
-        #     if ">" in line and re.search(name, line, re.IGNORECASE):
-        #         print(f"Line #{}{name}")
-        for line in fasta_lines:
-            if ">" in line and re.search(name, line, re.IGNORECASE):
-                genome = name+"_sequence"
-                break
+        return self.genome
+
+
+    def validate_file_extension(self, file):
+        if not file.endswith((".fasta",".fa",".fna", ".fastq")):
+            raise ValueError("Must be a FASTA or FASTQ file")
+        #     return False
+        # else:
+        #     return True
+        return file
 
 
     def calc_jaccard(self, dna2):
-        ''' calculates Jaccard similarity index between this DNA object and another '''
+        ''' Calculates Jaccard similarity index between this DNA object and another '''
         a = set(self.kmers)
         b = set(dna2.kmers)
 
@@ -53,7 +66,7 @@ class DNA:
 
 
     def calc_minhash():
-        ''' calculates probabilistic jaccard using MinHash algorithm between
+        ''' Calculates probabilistic jaccard using MinHash algorithm between
             two DNA objects '''
         return 0
 
