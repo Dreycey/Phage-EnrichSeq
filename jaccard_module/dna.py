@@ -1,29 +1,25 @@
 import sys
 import re
 import ntpath
+from typing import List
+from pathlib import Path
 
 class DNA:
     def __init__(self, name, fasta_file, kmer_len):
         ''' Initializes dna object with name, reference genome file, and kmer size '''
         self.name: str = name
-        
-        # validate file input
-        if self.validate_file_extension(fasta_file):
-            self.genome: str = self.fasta_to_genome(fasta_file)
-            self.kmers: List = self.create_kmers(self.genome, kmer_len)
-        else:
-            return
-
-
-    def set_genome(self, genome_str, kmer_len):
-        self.genome = genome_str
-        self.kmers: List = self.create_kmers(self.genome, kmer_len)
+        self.fasta_file: Path = Path(fasta_file) if self.validate_file_extension(fasta_file) else None
+        self.genome: str = self.fasta_to_genome(fasta_file) if self.fasta_file != None else None
+        self.kmers: List = self.create_kmers(self.genome, kmer_len) if self.genome != None else []
 
 
     def create_kmers(self, genome, kmer_len = 20):
         ''' Generates k-mers given a dna sequence and specified k-mer length'''
         kmers = []
-        num_kmers = len(genome) - kmer_len + 1
+        g_len = len(genome)
+        # assigns 1 kmer if the length passed is bigger than genome length
+        num_kmers = 1 if g_len < kmer_len else (g_len - kmer_len + 1)
+        # num_kmers = len(genome) - kmer_len + 1
 
         for i in range(num_kmers):
             kmer = genome[i:i + kmer_len]
@@ -38,9 +34,7 @@ class DNA:
                          2) Only single FASTA file is passed (no multi-fasta) '''
 
         # FIRST: get genome name from file path
-        file_name = ntpath.basename(fasta_file)
-        # file_name = self.validate_file_extension(ntpath.basename(fasta_file))
-
+        file_name = ntpath.basename(fasta_file) # may not need this (already passed by user)
 
         # SECOND: search file for that name and get genome
         fasta_lines = open(fasta_file).readlines()
@@ -60,7 +54,7 @@ class DNA:
 
     def validate_file_extension(self, file):
         if not file.endswith((".fasta",".fa",".fna", ".fastq")):
-            raise ValueError("Must be a FASTA or FASTQ file")
+            #raise ValueError("Must be a FASTA or FASTQ file")
             return False
         else:
             return True
