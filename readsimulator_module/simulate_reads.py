@@ -68,6 +68,22 @@ def parseArgs(argv=None) -> argparse.Namespace:
     parser.add_argument("-rn", "--readnum", help="number of reads to simulate", required=True)
     return parser.parse_args(argv)
 
+class ReadSimError(Exception):
+    """Base class for exceptions occuring in read simulation"""
+    pass
+
+class FastaTooSmall(ReadSimError):
+    """
+    Exception raised when the simulated fasta does not have enough sequences
+    to support the simulation.
+
+    Attributes:
+        message -- This is the message displayed.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
 @dataclass
 class SimulationConfig:
     """ This datastructure holds the information from a config file,
@@ -96,17 +112,18 @@ class SimulationConfig:
         output_array = []
         config_open = open(self.config_path).readlines()
         for line in config_open:
-            if line[0] != "#":
+            if (line[0] != "#") and (len(line.replace(" ","")) > 1):
                 line_split = line.replace(" ", "").strip("\n").split(",")
                 output_array.append(tuple(line_split))
         return output_array
 
-    def simulate_reads(self, threads) -> List[str]:
+    def simulate_reads(self, threads, num_reads=100) -> List[str]:
         """
         This method runs the bash script for simulating genomes.
         Makes a sub command to a lower level bash script. 
         INPUT:
-            Number of threads
+              1. Number of reads to simulated per genome. [Default: 3000000]
+              2. Number of threads.
         OUTPUT:
             returns a list of directory names for the processed reads. 
         """
@@ -116,8 +133,9 @@ class SimulationConfig:
             directory_name = ntpath.basename(genome_path).strip(".fa").strip(".fasta")
             directory_name = Path(directory_name + "_simulatedreads")
             # TODO: Create a data structure object for running sub commands.
-            subprocess.call(f"bash simulate_reads.sh {genome_path} simulatedgenomes {directory_name} {threads}", shell=True)
+            subprocess.call(f"bash simulate_reads.sh {genome_path} simulatedgenomes {directory_name} {threads} {num_reads}", shell=True)
             directories.append(directory_name)
+            print(f"working, {directory_name}")
         return directories
 
 class ReadSegmenter:
@@ -142,16 +160,45 @@ class ReadSegmenter:
         with self.open_fasta_file(output_fasta_prefix, seqtype) as file_out:
             for index, path_and_abundance in enumerate(self.config_array):
                 # create a dataframe.
-                data = Path(self.simulated_read_path[index] + type_dict[seqtype])
-                seqs_dataframe: pd.DataFrame = self.parseFastaToDB(data)
+                fasta_path = Path(str(self.simulated_read_path[index]) + type_dict[seqtype])  # TODO: Use path 
+                seqs_dataframe: pd.DataFrame = self.parseFastaToDB(fasta_path)
                 # add sub sample of data to file.
                 sim_abundance = path_and_abundance[1]
                 reads_for_genome = float(read_number) * float(sim_abundance)
-                seqs_dataframe = seqs_dataframe.sample(n = reads_for_genome)
+                self.check_readcount_allowed(reads_for_genome, fasta_path)
+                seqs_dataframe = seqs_dataframe.sample(n=int(reads_for_genome))
                 self.addDBtoFile(seqs_dataframe, file_out)
                 del seqs_dataframe 
 
-    def open_fasta_file(output_fasta_prefix, seqtype):
+    def check_readcount_allowed(self, reads_for_genome, fasta_path): 
+        """
+        This method ensure that the read count needed in the partition
+        is big enough for the simulation. For example, if there were 10 reads
+        simulated for a genome and the fraction needed is 100, then there needs to
+        be reads simulated.
+        
+        TODO: so the file is recreated with 100 over the need count. 
+        """
+        num_reads_in_fasta = self.fasta2readcount(fasta_path)
+        if (reads_for_genome > num_reads_in_fasta):
+            ERROR_TEXT = f"There were not enough reads in the simulated"
+            ERROR_TEXT += f"sequences file, therefor the alloted number of"
+            ERROR_TEXT += f"reads is too much. Number of reads needed is {reads_for_genome}"
+            ERROR_TEXT += f"and the number of reads in the fasta is: {num_reads_in_fasta}"
+            raise FastaTooSmall(ERROR_TEXT)
+
+    def fasta2readcount(self, fasta_path):
+        """
+        Counts the number of read names in a fasta file
+        """
+        read_count = 0
+        with open(fasta_path) as fasta:
+            fasta_lines = fasta.readlines()
+            for line in fasta_lines:
+                read_count += 1 if (line[0] == ">") else 0
+        return read_count
+
+    def open_fasta_file(self, output_fasta_prefix, seqtype):
         """
         Create the output fasta file.
         """
@@ -171,7 +218,7 @@ class ReadSegmenter:
         dataframe = pd.DataFrame(data=fa_seqs)
         return dataframe
 
-    def fasta2lists(self, fasta_path):
+    def fasta2lists(self, fasta_path) -> Tuple[List[str]]:
         """
         Takes a fasta path and returns a list of names and sequences.
         """
@@ -186,7 +233,7 @@ class ReadSegmenter:
                     seq_list.append(seq)
         return name_list, seq_list
 
-    def addDBtoFile(self, inputDF, outputfile):
+    def addDBtoFile(self, inputDF: pd.DataFrame, outputfile) -> None:
         """
         This takes an input pandas datafram with col1 as names and col2 as seqs, 
         then converts this data into an output fasta file.
@@ -206,10 +253,9 @@ def main():
     simulated_reads_path = sim_config.simulate_reads(threads=args.threads)
     # segment reads.
     read_simulator = ReadSegmenter(sim_config.config_array, simulated_reads_path)
-    for read_type in ["illumina", "nanopore", "pacbio"]:
+    for read_type in ["illumina"]: #, "nanopore", "pacbio"]:
         read_simulator.create_simulated_fasta(seqtype=read_type, 
                                               read_number=args.readnum, 
                                               output_fasta_prefix=args.output)
 if __name__ == "__main__":
     main()
-
