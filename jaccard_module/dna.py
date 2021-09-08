@@ -18,7 +18,12 @@ class DNA:
         kmers = []
         g_len = len(genome)
         # assigns 1 kmer if the length passed is bigger than genome length
-        num_kmers = 1 if g_len < kmer_len else (g_len - kmer_len + 1)
+        if g_len < kmer_len or kmer_len <= 0:
+            num_kmers = 1
+            kmer_len = g_len
+        else:
+            num_kmers = g_len - kmer_len + 1
+        #num_kmers = 1 if g_len < kmer_len else (g_len - kmer_len + 1)
         # num_kmers = len(genome) - kmer_len + 1
 
         for i in range(num_kmers):
