@@ -136,7 +136,8 @@ class GenomeTestSet:
             return "UNK"
         return genome_from
 
-    def parseFasta(self, fasta_path):
+    @staticmethod
+    def parseFasta(fasta_path):
         """
         DESCRIPTION - parses a fasta or multifasta file.
         INPUT - 1. fasta path
@@ -149,7 +150,7 @@ class GenomeTestSet:
             for counter, line in enumerate(fasta_input):
                 if (line[0] == ">"):
                     seq_name = line[1:]
-                    seq_names.append(seq_name)
+                    seq_names.append(seq_name.strip("\n"))
                     if (counter != 0):
                         sequences.append(sequence_i.strip("\n"))
                         sequence_i = "" # renew sequence
