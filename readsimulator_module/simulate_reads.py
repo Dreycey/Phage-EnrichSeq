@@ -165,6 +165,7 @@ class ReadSegmenter:
                 sim_abundance = path_and_abundance[1]
                 reads_for_genome = float(read_number) * float(sim_abundance)
                 self.check_readcount_allowed(reads_for_genome, fasta_path)
+                print(f"genome: {self.config_array[index]}, number of reads: {reads_for_genome}")
                 seqs_dataframe = seqs_dataframe.sample(n=int(reads_for_genome))
                 self.addDBtoFile(seqs_dataframe, file_out)
                 del seqs_dataframe 
