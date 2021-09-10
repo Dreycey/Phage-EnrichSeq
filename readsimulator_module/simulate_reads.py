@@ -38,7 +38,6 @@ LOGO = (
 | \____/( (/ /| | | | |_| | | | ( (/ / _____) )| |_| | | |
  \_____/ \____)_| |_|\___/|_|_|_|\____|______(_____)_|_|_|
 """)
-print(LOGO)
 
 # Changing to directory of script.
 abspath = os.path.abspath(sys.argv[0])
