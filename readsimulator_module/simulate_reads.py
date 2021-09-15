@@ -251,7 +251,7 @@ def main():
     args = parseArgs(argslist)
     # simulate reads.
     sim_config = SimulationConfig(args.config)
-    simulated_reads_path = sim_config.simulate_reads(threads=args.threads)
+    simulated_reads_path = sim_config.simulate_reads(threads=args.threads, num_reads=args.readnum)
     # segment reads.
     read_simulator = ReadSegmenter(sim_config.config_array, simulated_reads_path)
     for read_type in ["illumina"]: #, "nanopore", "pacbio"]:
