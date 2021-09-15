@@ -2,6 +2,7 @@
 Read simulation will take in a reference genome as input and simulate reads for 
 Illumina, PacBio and Nanopore. 
 
+> The EnrichSeq Readsimulator aims to simulate both short and long reads at different amounts based on the input genomes and their relative abundance levels. 
 
 ## Quick Usage
 
@@ -17,10 +18,21 @@ usage: simulate_reads.py [-h] [-v | -q] -i CONFIG -c COVERAGE -o OUTPUT -t THREA
 
 * example
 ```
-python simulate_reads.py -i simulate_genomes.config  -c 30 -o simulatedgenomes -t 4
+python simulate_reads.py -i simulate_genomes.config -rn 50000 -c 30 -o simulatedgenomes -t 4
 ```
 
+***
+***
+
 ## Detailed Usage
+
+### Testing the read simulator
+Pytest is used as the testing library. Both unit testin and regression testing is set up for the module. 
+
+* To run the suite of tests, use the following command:
+```
+pytest --cov
+```
 
 ### install dependencies
 
