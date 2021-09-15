@@ -1,6 +1,9 @@
 #!/bin/bash
 # Build a kraken2 database
 
+# change to the correct directory.
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 function downloadRequiredFiles() {
   echo "Running downloadRequiredFiles()";
  
