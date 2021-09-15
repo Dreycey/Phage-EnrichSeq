@@ -1,4 +1,3 @@
-
 # print usage if not enough input!
 usage() {
     echo; echo "Usage: bash simulate_reads.sh <reference genome PATH> <Outfilepath> <Threads>";
@@ -11,6 +10,7 @@ ref_gen=$1;
 out_name=$2;
 out_directory=$3;
 THREADS=$4;
+number_of_reads=$5;
 
 if [[ ! -d $out_directory ]]
 then
@@ -22,11 +22,12 @@ function simulate_illumina {
     echo "Simulating short illumina reads using ART..";
     if [ ! -f ${out_directory}/${out_name}_illumina.fq ] 
     then
-        ART_CMD_ARGS="-ss MSv3 -sam -i ${ref_gen} -l 100 -f 10000 -o ${out_name}_illumina";
+        ART_CMD_ARGS="-ss MSv3 -sam -i ${ref_gen} -l 100 -c ${number_of_reads} -o ${out_name}_illumina";
         command ./art_bin_MountRainier/art_illumina $ART_CMD_ARGS;
         mv ${out_name}_illumina* ${out_directory};
         # make fasta from fastq
-        paste - - - - < ${out_directory}/simulatedgenomes_illumina.fq | cut -f 1,2 | sed 's/^@/>/' | tr "\t" "\n" > ${out_directory}/simulatedgenomes_illumina.fa;
+        paste - - - - < ${out_directory}/simulatedgenomes_illumina.fq | cut -f 1,2 | \
+            sed 's/^@/>/' | tr "\t" "\n" > ${out_directory}/simulatedgenomes_illumina.fa;
     fi
 }
 
