@@ -117,7 +117,7 @@ class SimulationConfig:
                 output_array.append(tuple(line_split))
         return output_array
 
-    def simulate_reads(self, threads, num_reads=100) -> List[str]:
+    def simulate_reads(self, threads, num_reads=1000000) -> List[str]:
         """
         This method runs the bash script for simulating genomes.
         Makes a sub command to a lower level bash script. 
