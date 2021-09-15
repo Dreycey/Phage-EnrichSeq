@@ -123,6 +123,8 @@ class GenomeTestSet:
     
     def __findSeq(self, input_seq):
         """ 
+        DESCRIPTION:
+            This method finds a corresponding genome for an input read.
         INPUT 
             1. input read
         OUTPUT
@@ -136,7 +138,7 @@ class GenomeTestSet:
             read_maps_to_genome: bool = minimap_mapper.does_read_map(input_seq)
             if read_maps_to_genome:
                 if (genome_that_read_maps_to == GenomeName.EMPTY):
-                    return genome_name
+                    genome_that_read_maps_to = genome_name
                 else:
                     return GenomeName.MULTIPLE
         # if nothing, return UNK
