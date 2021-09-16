@@ -13,7 +13,7 @@ class DNA:
         self.kmers: List = self.create_kmers(self.genome, kmer_len) if self.genome != None else []
 
 
-    def create_kmers(self, genome, kmer_len = 20):
+    def create_kmers(self, genome, kmer_len = 20) -> List:
         ''' Generates k-mers given a dna sequence and specified k-mer length'''
         kmers = []
         g_len = len(genome)
@@ -32,40 +32,53 @@ class DNA:
 
         return kmers
 
+    # TODO: add multifasta logic
+    def fasta_to_genome(self, fasta_path) -> str:
+        ''' 
+            DESCRIPTION:
+                Extracts just the genome from the genome member variable, which should be a file path.
+                Currently assumes only single FASTA file is passed (no multi-fasta). 
+            
+            INPUT:
+                FASTA/FASTQ file (.fa, .fna, .fasta, .fastq)
+            
+            OUTPUT:
+                Genome in string format
+        '''
+        sequence = ""
+        with open(fasta_path) as fasta_file:
+            fasta_lines = fasta_file.readlines()
+            #fasta_lines = open(fasta_file).readlines()
+            sequence_i = ""
+            # If name is found (i.e. this is the correct file), get genome
+            for counter, line in enumerate(fasta_lines):
+                if line[0] == ">" and re.search(self.name, line, re.IGNORECASE):
+                    if (counter != 0):
+                        sequence += (sequence_i.rstrip())
+                        sequence_i = ""
+                elif line[0] != ">":
+                    sequence += line.rstrip()
 
-    def fasta_to_genome(self, fasta_file):
-        ''' Extracts just the genome from the genome member variable, which should be a file path
-            Assumptions: 1) File name is the genome name
-                         2) Only single FASTA file is passed (no multi-fasta) '''
-
-        # FIRST: get genome name from file path
-        file_name = ntpath.basename(fasta_file) # may not need this (already passed by user)
-
-        # SECOND: search file for that name and get genome
-        fasta_lines = open(fasta_file).readlines()
-        genome = ""
-        # Make sure desired phage name is in the file. If not, assign null value to genome variable
-        # if ">" in fasta_lines[0] and not re.search(self.name, fasta_lines[0], re.IGNORECASE):
-        #     self.genome = None
-        # If name is found (i.e. this is the correct file), get genome
-        if ">" in fasta_lines[0] and re.search(self.name, fasta_lines[0], re.IGNORECASE):
-            #self.genome = "" # clear current value for genome
-            for line in fasta_lines:
-                if ">" not in line:
-                    genome += line.rstrip()
-
-        return genome
+            # if ">" in fasta_lines[0] and re.search(self.name, fasta_lines[0], re.IGNORECASE):
+            #     for line in fasta_lines:
+            #         if ">" not in line:
+            #             print(line)
+            #             genome += line.rstrip()
+            #             print(f'genome val in if statement: {genome}')
+            #         else:
+            #             break  
+        return sequence
 
 
-    def validate_file_extension(self, file):
-        if not file.endswith((".fasta",".fa",".fna", ".fastq")):
+    def validate_file_extension(self, file) -> bool:
+        if str(file).endswith((".fasta",".fa",".fna", ".fastq")):
             #raise ValueError("Must be a FASTA or FASTQ file")
-            return False
-        else:
             return True
+        else:
+            return False
 
 
-    def calc_jaccard(self, dna2):
+    def calc_jaccard(self, dna2) -> float:
         ''' Calculates Jaccard similarity index between this DNA object and another '''
         a = set(self.kmers)
         b = set(dna2.kmers)
@@ -79,20 +92,16 @@ class DNA:
     def calc_minhash():
         ''' Calculates probabilistic jaccard using MinHash algorithm between
             two DNA objects '''
-        return 0
+        raise NotImplimentedError("Minhash function should be implemented first.")
 
 
-    def compare_results(jaccard, minhash):
+    def compare_results(jaccard, minhash) -> float:
         """
         Description:
             Compares the jaccard to the minhash output
-        Output:
+        OUTPUT:
             float: aboslute difference
         TODO:
             Think of metric - percent diff.
         """
         return abs(jaccard - minhash)
-
-
-    def print(self):
-        print(f'Name: {self.name} \nGenome: {self.genome} \n#k-mers generated: {len(self.kmers)}')
