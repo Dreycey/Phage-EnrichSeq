@@ -3,7 +3,7 @@
 Executor = 'local'
 
 def usage() {
-     log.info ''
+    log.info ''
 	log.info 'Usage: nextflow run enrichseq.nf --read single --fasta /Path/to/infile.fasta --workdir /Path/to/working_directory --dbdir /Path/to/databases [--threads 4] [--log=/Path/to/run.log]'
 	log.read '  --read       Ready type (single / paired / long)'
 	log.info '  --fasta		Path to the input FASTA file'
@@ -106,29 +106,28 @@ process Run_Megahit {
 }
 
 
-process Prep_Databases {
-	input:
-	val init from init
+// process Prep_Databases {
+// 	input:
+// 	val init from init
 
-	output:
-	stdout databases
+// 	output:
+// 	stdout databases
 
-	script:
-	"""
-	if [[ ! -f ${databasesDir}/taxo.k2d ]]; then
-		bash ${params.toolpath}/kraken_module/kraken2Build.sh
-	else
-		echo "Kraken DB already exists" > ${krakenDir}/kraken.log
-	fi
-
-	"""
-}
+// 	script:
+// 	"""
+// 	if [[ ! -f ${databasesDir}/taxo.k2d ]]; then
+// 		bash ${params.toolpath}/kraken_module/kraken2Build.sh
+// 	else
+// 		echo "Kraken DB already exists" > ${krakenDir}/kraken.log
+// 	fi
+// 	"""
+// }
 
 
 process Run_Kraken {
 	input:
 	val megaout from megahit
-	val krakendb from databases
+	//val krakendb from databases
 
 	output:
 	stdout kraken
