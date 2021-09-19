@@ -103,6 +103,13 @@ function makeDirectory() {
   fi
 }
 
+function multifasta2fasta(){
+  local multi_fasta_file=$1;
+  local directory_for_fasta_files=$2;
+  echo "Turning ${multi_fasta_file} into multiple fasta files"
+  python multifasta2single.py ${multi_fasta_file} ${directory_for_fasta_files}
+}
+
 function main() {                                                               
   # input arguments                                                             
   source kraken_module.config;
@@ -116,6 +123,7 @@ function main() {
     reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};                     
     addGenomesToDb ${genomeDir} ${dbDir};                                       
     buildKrakenDb ${dbDir};
+    multifasta2fasta ${genomeDir} ${actinoOutFile};
   else
     echo "The database was already built. If you'd like to rebuild, delete '${dbDir}/taxo.k2d' "                                           
   fi                                                                            
