@@ -24,12 +24,12 @@ bash kraken2Build.sh;
 ## Running EnrichSeq.
 * USAGE
 ```
-nextflow
+nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <path to fasta> --workdir <path to output directory> --toolpath <local global path to EnrichSeq repository> --dbdir <Path to the kracken DB> --threads <# of threads to use>
 ```
 
 * EXAMPLE
 ```
-nexflow
+nextflow Nextflow/enrichseq.nf --read single --fasta readsimulator_module/simulatedgenomes_illumina.fa --workdir ./outdirectory --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads 4
 ```
 
 
