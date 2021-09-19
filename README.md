@@ -1,3 +1,5 @@
+![EnrichSeq-LOGO.png](EnrichSeq)
+
 # Phage-EnrichSeq
 Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
 
@@ -11,7 +13,7 @@ conda env create -f environment.yml
 ## Downloading Databases.
 To ensure each module runs correctly, the following installation script needs to be ran.
 
-* From the outermost directory, run the following:
+* From the outermost EnrichSeq directory, run the following:
 ```
 cd kraken_module;
 bash kraken2Build.sh;
