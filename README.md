@@ -1,4 +1,4 @@
-![EnrichSeq](EnrichSeq-LOGO.png)
+![EnrichSeq](figures/EnrichSeq-LOGO.png)
 
 # Phage-EnrichSeq
 Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
