@@ -32,26 +32,22 @@ nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <
 nextflow Nextflow/enrichseq.nf --read single --fasta readsimulator_module/simulatedgenomes_illumina.fa --workdir ./outdirectory --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads 4
 ```
 
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
 
-
-
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
-_
-_
-_
-<br />
-<br />
-<br />
-<br />
-<br />
 ***
 ***
 ***
