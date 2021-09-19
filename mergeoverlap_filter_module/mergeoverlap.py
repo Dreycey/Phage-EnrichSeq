@@ -10,6 +10,11 @@ USAGE:
 
 EXAMPLE:
 
+TODO: 
+    1. Make sure the genomic mapping can be parrallized. 
+        1.A - see if threads can be used for individual mapping.
+    2. Look for dipps in coverage along the genome.
+        2.A - perhaps plot this as well! 
 """
 # std packages
 from abc import ABC, abstractmethod
@@ -31,9 +36,10 @@ abspath = os.path.abspath(sys.argv[0])
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-# GLOBALS
+# GLOBALS.
 PATH = os.path.dirname(os.path.abspath(__file__))
 
+# Create an argparse.Namespace object from input args.
 def parseArgs(argv=None) -> argparse.Namespace:
     """
     This method takes in the arguments from the command and performs
