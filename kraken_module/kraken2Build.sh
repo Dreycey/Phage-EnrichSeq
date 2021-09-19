@@ -23,7 +23,7 @@ function downloadRequiredFiles() {
   if [[ ! -d refseq/viral ]]; then
     echo "Downloading NCBI phage genomes..."
     ncbi-genome-download  --formats fasta --assembly-level complete --genera phage --fuzzy-genus viral --parallel 4 --flat-output -o ${genomeDir} 
-    gzip -d ${genomeDir}/*;
+    find ref_genomes/ -name '*.gz' -exec gzip -d {} +
   fi
 
   # Download phagesDB all phages database
