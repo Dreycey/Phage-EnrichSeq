@@ -40,6 +40,9 @@ nexflow
 ***
 <h1> BELOW THIS NEEDS TO BE DELETED. </h1>
 # Dependency Installation Instructions
+***
+***
+***
 
 1. Create environment for EnrichSeq 
 ```
