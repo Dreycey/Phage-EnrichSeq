@@ -47,7 +47,11 @@ nextflow Nextflow/enrichseq.nf --read single --fasta readsimulator_module/simula
 _
 _
 _
-
+<br />
+<br />
+<br />
+<br />
+<br />
 ***
 ***
 ***
