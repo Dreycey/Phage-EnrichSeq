@@ -4,7 +4,7 @@
 Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
 
 ## Getting Started.
-## Activate enrichseq conda environment with pre-installed dependencies
+### Activate enrichseq conda environment with pre-installed dependencies
 To setup the conda environment, use the following command once conda is installed locally. 
 ```
 conda env create -f environment.yml
