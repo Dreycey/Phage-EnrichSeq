@@ -3,14 +3,14 @@
 # Phage-EnrichSeq
 Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
 
-# Getting Started.
+## Getting Started.
 ## Activate enrichseq conda environment with pre-installed dependencies
 To setup the conda environment, use the following command once conda is installed locally. 
 ```
 conda env create -f environment.yml
 ```
 
-## Downloading Databases.
+### Downloading Databases.
 To ensure each module runs correctly, the following installation script needs to be ran.
 
 * From the outermost EnrichSeq directory, run the following:
@@ -21,7 +21,7 @@ bash kraken2Build.sh;
 
 *NOTE*: While the above is in the **kraken_module**, the information is needed for other modules.
 
-## Running EnrichSeq.
+### Running EnrichSeq.
 * USAGE
 ```
 nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <path to fasta> --workdir <path to output directory> --toolpath <local global path to EnrichSeq repository> --dbdir <Path to the kracken DB> --threads <# of threads to use>
