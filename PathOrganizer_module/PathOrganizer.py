@@ -4,6 +4,7 @@ DESCRIPTION:
     This module contains objects and methods for path disambiguation. 
 """
 # std packages
+import os
 from pathlib import Path
 from typing import Optional
 import re
@@ -31,18 +32,17 @@ class PathOrganizer:
     """ This data structure holds paths and retrieves information """
 
     def __init__(self, database, output_directory):
-        self.database_path: Path = Path(database)
+        self.database_path: str = str(database)
         self.output_path: Path = Path(output_directory)
 
-    @property
+    # @property
     def genome(self, genome_file_prefix) -> Optional[Path]:
         """ This getter grabs a genome file based on the file name prefix """
         genome_path = None
-        regex_expression = re.compile(f'({genome_file_prefix}.*fa$)|({genome_file_prefix}.*fna$)|({genome_file_prefix}.*fasta$)')
-        for genome_path in self.database_path:
-            if regex_expression.match(genome_path):
+        for genome_in_db in os.listdir(self.database_path):
+            if (genome_in_db == genome_file_prefix):
                 if (genome_path == None):
-                    genome_path = Path(genome_path)
+                    genome_path = Path(self.database_path) / Path(genome_in_db)
                 else:
-                    raise DuplicateGenomeError(genome_path, "Duplicate genome for {genome_path}")
+                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {genome_path}")
         return genome_path
