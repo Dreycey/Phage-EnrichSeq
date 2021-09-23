@@ -92,11 +92,11 @@ def test_calc_jaccard(test_dna_obj, compare_dna_obj):
 
     assert test_dna_obj.calc_jaccard(compare_dna_obj) == expected_jaccard_val
 
-@mark.notimplemented
+@pytest.mark.notimplemented
 def test_calc_minhash(test_dna_obj):
     assert test_dna_obj.calc_minash()
 
 
-@mark.notwritten
+@pytest.mark.notwritten
 def test_compare_results(test_dna_obj):
     assert test_dna_obj.compare_results(1,1)

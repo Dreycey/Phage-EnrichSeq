@@ -7,50 +7,55 @@ USAGE:
 """
 import sys
 import re
+from pathlib import Path
 
 
-"""
-DESCRIPTION:
-    Extracts phage names from kraken report (only at species level)
-
-INPUT:
-    kraken report file
-
-OUTPUT:
-    returns list of phages
-"""
 def parseKrakenFile(kraken_file) -> dict:
-    kraken_reports = open(kraken_file).readlines()
-    phages = {}
+    """
+    DESCRIPTION:
+        Extracts phage names from kraken report (only at species level)
 
-    # TODO: don't include duplicates
-    for line in kraken_reports:
-        genome_level = line.strip("\n").split('\t')[3]
-        full_name = line.strip("\n").split('\t')[5]
-        # filter by species
-        if genome_level == 'S' or genome_level == 'S1':
-            taxid = line.strip("\n").split()[4]
-            # check that the phage doesn't already exist
-            if not checkPhageExists(full_name, phages):
-                phages[taxid] = full_name
-                print(f'{taxid} {full_name}')
+    INPUT:
+        kraken report file
+
+    OUTPUT:
+        returns list of phages
+    """
+    phages = {}
+    try:
+        kraken_reports = open(kraken_file).readlines()
+    except FileNotFoundError:
+        raise FileNotFoundError(f'{kraken_file} does not exist.')
+    else:
+        # TODO: don't include duplicates
+        for line in kraken_reports:
+            line_array = line.strip("\n").split('\t')
+            if line and not line.isspace(): 
+                genome_level = line_array[3]
+                full_name = line_array[5]
+                # filter by species
+                if genome_level == 'S' or genome_level == 'S1':
+                    taxid = line.strip("\n").split()[4]
+                    # check that the phage doesn't already exist
+                    if not checkPhageExists(full_name, phages):
+                        phages[taxid] = full_name.strip()
 
     return phages
 
 
-"""
-DESCRIPTION:
-    Check if phage name already exists in the dictionary
+def checkPhageExists(phage_name, phage_dict) -> bool:
+    """
+    DESCRIPTION:
+        Check if phage name already exists in the dictionary
 
-INPUT:
-    full name
-    phage dictionary
+    INPUT:
+        full name
+        phage dictionary
 
-OUTPUT:
-    returns true if it alredy exists
-            false if not
-"""
-def checkPhageExists(phage_name, phage_dict):
+    OUTPUT:
+        returns true if it alredy exists
+                false if not
+    """
     if len(phage_name.split()) > 2:
         shortened_name = phage_name.split()[2]
     elif len(phage_name.split()) == 1:
@@ -61,43 +66,49 @@ def checkPhageExists(phage_name, phage_dict):
     return False
 
 
-"""
-DESCRIPTION:
-    Saves phage taxon ids in list to specified output file
+def saveTaxidToFile(outfile, kraken_phages) -> Path:
+    """
+    DESCRIPTION:
+        Saves phage taxon ids in list to specified output file
 
-INPUT:
-    output file to open and write to
-    list to store phage taxon ids
+    INPUT:
+        output file to open and write to
+        list to store phage taxon ids
 
-OUTPUT:
-    none (writes to file)
-"""
+    OUTPUT:
+        none (writes to file)
+    """ 
 
-def saveTaxidToFile(outfile, kraken_phages):
-    # save only phage taxids specified output file
-    output_file = open(outfile, "w")
-    for taxid in kraken_phages:
-        output_file.write(taxid + "\n")
-    output_file.close()
+    if not kraken_phages:
+        return None
+    else:
+        output_file = open(outfile, "w")
+        for taxid in kraken_phages:
+            output_file.write(taxid + "\n")
+        output_file.close()
+        return Path(outfile)
 
-"""
-DESCRIPTION:
-    Saves phage names in list to specified output file
 
-INPUT:
-    output file to open and write to
-    list to store phage names
+def saveNameToFile(outfile, kraken_phages) -> Path:
+    """
+    DESCRIPTION:
+        Saves phage names in list to specified output file
 
-OUTPUT:
-    none (writes to file)
-"""
+    INPUT:
+        output file to open and write to
+        list to store phage names
 
-def saveNameToFile(outfile, kraken_phages):
-    # save only phage taxids specified output file
-    output_file = open(outfile, "w")
-    for taxid in kraken_phages:
-        output_file.write(kraken_phages[taxid].strip() + "\n")
-    output_file.close()
+    OUTPUT:
+        file path or None if no phages found
+    """
+    if not kraken_phages:
+        return None
+    else:
+        output_file = open(outfile, "w")
+        for taxid in kraken_phages:
+            output_file.write(kraken_phages[taxid].strip() + "\n")
+        output_file.close()
+        return Path(outfile)
 
 
 def main():
