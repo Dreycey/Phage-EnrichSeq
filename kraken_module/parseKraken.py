@@ -6,24 +6,24 @@ USAGE:
     python parse_kraken.py <kraken_outfile> <outputfile_taxids> <outputfile_names>
 """
 import sys
-import csv
 import re
 
 
 """
-Extracts phage names from kraken report (only at species level)
+DESCRIPTION:
+    Extracts phage names from kraken report (only at species level)
 
-Input:
+INPUT:
     kraken report file
 
-Output:
+OUTPUT:
     returns list of phages
 """
-def parseKrakenFile(kraken_file):
+def parseKrakenFile(kraken_file) -> dict:
     kraken_reports = open(kraken_file).readlines()
     phages = {}
 
-    # TODO: Add 'S1' in if statement and don't include duplicates
+    # TODO: don't include duplicates
     for line in kraken_reports:
         genome_level = line.strip("\n").split('\t')[3]
         full_name = line.strip("\n").split('\t')[5]
@@ -39,7 +39,8 @@ def parseKrakenFile(kraken_file):
 
 
 """
-Check if phage name already exists in the dictionary
+DESCRIPTION:
+    Check if phage name already exists in the dictionary
 
 INPUT:
     full name
@@ -50,21 +51,25 @@ OUTPUT:
             false if not
 """
 def checkPhageExists(phage_name, phage_dict):
-    shortened_name = phage_name.split()[2]
+    if len(phage_name.split()) > 2:
+        shortened_name = phage_name.split()[2]
+    elif len(phage_name.split()) == 1:
+        shortened_name = phage_name
     for key in phage_dict:
-        if shortened_name in phage_dict[key]:
+        if re.search(shortened_name, phage_dict[key], re.IGNORECASE):
             return True
     return False
 
 
 """
-Saves phage taxon ids in list to specified output file
+DESCRIPTION:
+    Saves phage taxon ids in list to specified output file
 
-Input:
+INPUT:
     output file to open and write to
     list to store phage taxon ids
 
-Output:
+OUTPUT:
     none (writes to file)
 """
 
@@ -76,13 +81,14 @@ def saveTaxidToFile(outfile, kraken_phages):
     output_file.close()
 
 """
-Saves phage names in list to specified output file
+DESCRIPTION:
+    Saves phage names in list to specified output file
 
-Input:
+INPUT:
     output file to open and write to
     list to store phage names
 
-Output:
+OUTPUT:
     none (writes to file)
 """
 
