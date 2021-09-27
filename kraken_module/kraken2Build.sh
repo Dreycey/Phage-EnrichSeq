@@ -63,9 +63,8 @@ function reorganizeFiles() {
   # downloading PhageDB genomes
   if [[ -f nucl_wgs.accession2taxid.gz ]]; then
     gzip -d nucl_wgs.accession2taxid.gz;
+    moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
   fi
-  moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
-  moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
 
   # Reformat Action file to be compatible with kraken
   python ${DIR}/kraken_db_format.py ${dbDir}/taxonomy/names.dmp \
@@ -132,7 +131,7 @@ function main() {
   actinoOutFile=${DIR}/${actinoOutFile};
   echo $actinoOutFile;
   # run the script                                           
-  if [[ ! -f ${DIR}/${dbDir}/taxo.k2d ]]; 
+  if [[ ! -f ${dbDir}/taxo.k2d ]]; 
   then   
     makeDirectory ${genomeDir};
     makeDirectory ${dbDir};
