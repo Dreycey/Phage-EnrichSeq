@@ -4,8 +4,10 @@ Description:
     This script simulates a fasta file with different percentages of 
     nucleotides from a list of input genomes in a config file.
 
+Usage:
+    python simulate_reads.py -i <input config file> -o <output fasta file> -rn <integer number of reads> -t <threads>
 Usage Example:
-    python simulate_reads.py -i simulate_genomes.config  -c 30 -o simulatedgenomes -t 4
+    python simulate_reads.py -i simulate_genomes.config -o simulate_genomes_1000reads -rn 1000 -t 4
 """
 # std library
 from pickle import LIST
@@ -62,7 +64,6 @@ def parseArgs(argv=None) -> argparse.Namespace:
     group.add_argument("-v", "--verbose", action="store_true")
     group.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("-i", "--config", help="input config file", required=True)
-    parser.add_argument("-c", "--coverage", help="coverage for output", required=True)
     parser.add_argument("-o", "--output", help="the output file prefix", required=True)
     parser.add_argument("-t", "--threads", help="number of threads", required=True)
     parser.add_argument("-rn", "--readnum", help="number of reads to simulate", required=True)
@@ -168,7 +169,7 @@ class ReadSegmenter:
                 self.check_readcount_allowed(reads_for_genome, fasta_path)
                 print(f"genome: {self.config_array[index]}, number of reads: {reads_for_genome}")
                 seqs_dataframe = seqs_dataframe.sample(n=int(reads_for_genome))
-                self.addDBtoFile(seqs_dataframe, file_out)
+                self.addDBtoFile(seqs_dataframe, file_out, Path(self.config_array[index][0]).name)
                 del seqs_dataframe 
 
     def check_readcount_allowed(self, reads_for_genome, fasta_path): 
@@ -234,15 +235,14 @@ class ReadSegmenter:
                     seq_list.append(seq)
         return name_list, seq_list
 
-    def addDBtoFile(self, inputDF: pd.DataFrame, outputfile) -> None:
+    def addDBtoFile(self, inputDF: pd.DataFrame, outputfile, file_name) -> None:
         """
         This takes an input pandas datafram with col1 as names and col2 as seqs, 
         then converts this data into an output fasta file.
         """
         for index, row in inputDF.iterrows():
             name, seq = row['names'], row['seqs']
-            outputfile.write(">" + name)
-            outputfile.write(seq)
+            outputfile.write(">" + name.strip("\n") + "|" + file_name + "\n" + seq)
 
 # MAIN
 def main():
