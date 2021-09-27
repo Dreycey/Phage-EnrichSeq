@@ -147,16 +147,16 @@ process Run_Kraken {
 
 
 process Run_KrakenParser {
-    input: 
-    val krakenout from kraken
+   input: 
+   val krakenout from kraken
 
-    output:
-    stdout kraken_parser
+   output:
+   stdout kraken_parser
 
-    script:
-    """
-    python ${params.toolpath}/kraken_module/parseKraken.py ${krakenDir}/kraken_orig.report ${krakenDir}/taxid_file.txt ${krakenDir}/parsed_kraken_phages.txt
-    """
+   script:
+   """
+   python ${params.toolpath}/kraken_module/parseKraken.py ${krakenDir}/kraken_assembled.report ${krakenDir}/taxid_file.txt ${krakenDir}/parsed_kraken_phages.txt
+   """
 }
 
 process Run_Bracken {
