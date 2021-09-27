@@ -80,6 +80,13 @@ class MinimapMapper(GenomeMapper):
             return False
         return True
 
+@dataclass
+class GenomeName:
+    """ this data class hold the names corresponding to genomes. """
+    EMPTY: str = "EMPTY"
+    UNKOWN: str = "UNK"
+    MULTIPLE: str = "MULTIPLE"
+
 class GenomeTestSet:
     """
     This class is used to test the a folder of simulated sequences
@@ -116,25 +123,28 @@ class GenomeTestSet:
     
     def __findSeq(self, input_seq):
         """ 
+        DESCRIPTION:
+            This method finds a corresponding genome for an input read.
         INPUT 
             1. input read
         OUTPUT
             which genome
             if no genome matching OR more than one, output null 
         """
-        genome_from = ""
+        genome_that_read_maps_to: str = GenomeName.EMPTY
         # find genome that read is in
         for genome_name in self.genomes.keys():
             minimap_mapper: MinimapMapper = self.genomeMap[genome_name]
             read_maps_to_genome: bool = minimap_mapper.does_read_map(input_seq)
             if read_maps_to_genome:
-                if (genome_from == ""):
-                    return genome_name
+                if (genome_that_read_maps_to == GenomeName.EMPTY):
+                    genome_that_read_maps_to = genome_name
                 else:
-                    return "MULTIPLE"
-        if genome_from == "":  # if nothing, return UNK
-            return "UNK"
-        return genome_from
+                    return GenomeName.MULTIPLE
+        # if nothing, return UNK
+        if genome_that_read_maps_to == GenomeName.EMPTY:
+            return GenomeName.UNKOWN
+        return genome_that_read_maps_to
 
     @staticmethod
     def parseFasta(fasta_path):

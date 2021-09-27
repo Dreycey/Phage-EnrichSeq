@@ -1,0 +1,417 @@
+  0.31	161	161	U	0	unclassified
+ 99.69	51919	0	R	1	root
+ 99.69	51919	42347	D	10239	  Viruses
+ 18.17	9462	0	D1	2731341	    Duplodnaviria
+ 18.17	9462	27	D2	2731360	      Heunggongvirae
+ 18.12	9435	0	P	2731618	        Uroviricota
+ 18.12	9435	0	C	2731619	          Caudoviricetes
+ 18.12	9435	173	O	28883	            Caudovirales
+ 17.77	9253	1570	F	10699	              Siphoviridae
+  7.82	4071	2305	G	186764	                Fromanvirus
+  2.13	1109	402	G1	2562661	                  unclassified Fromanvirus
+  0.06	29	29	S	2502430	                    Mycobacterium phage Fushigi
+  0.04	22	22	S	2599873	                    Mycobacterium phage Paphu
+  0.04	21	21	S	1913110	                    Mycobacterium phage StarStuff
+  0.03	16	16	S	2250310	                    Mycobacterium phage Tomathan
+  0.03	15	15	S	2108131	                    Mycobacterium phage Smeagol
+  0.03	14	14	S	1675553	                    Mycobacterium phage Nhonho
+  0.02	12	12	S	2024297	                    Mycobacterium phage MissWhite
+  0.02	12	12	S	2572534	                    Mycobacterium phage XianYue
+  0.02	12	12	S	2656586	                    Mycobacterium phage Killigrew
+  0.02	11	11	S	2656608	                    Mycobacterium phage Superchunk
+  0.02	11	11	S	1897440	                    Mycobacterium phage Kerberos
+  0.02	11	11	S	1458724	                    Mycobacterium phage Alsfro
+  0.02	11	11	S	1458717	                    Mycobacterium phage 40AC
+  0.02	11	11	S	2282911	                    Mycobacterium phage Zeeculate
+  0.02	11	11	S	2572318	                    Mycobacterium phage Sumter
+  0.02	10	10	S	2530144	                    Mycobacterium phage Ringer
+  0.02	8	8	S	1897543	                    Mycobacterium phage Pomar16
+  0.02	8	8	S	2250290	                    Mycobacterium phage Acolyte
+  0.02	8	8	S	2041553	                    Mycobacterium phage TipsytheTRex
+  0.02	8	8	S	1983408	                    Mycobacterium phage Journey13
+  0.02	8	8	S	2590945	                    Mycobacterium phage NothingSpecial
+  0.01	7	7	S	1675548	                    Mycobacterium phage Barriga
+  0.01	7	7	S	2099448	                    Mycobacterium phage Ruotula
+  0.01	7	7	S	2656617	                    Mycobacterium phage Yecey3
+  0.01	7	7	S	1930080	                    Mycobacterium phage Zephyr
+  0.01	7	7	S	1735466	                    Mycobacterium phage Pepe
+  0.01	7	7	S	2099449	                    Mycobacterium phage Scowl
+  0.01	7	7	S	2283260	                    Mycobacterium phage Target
+  0.01	7	7	S	2015877	                    Mycobacterium phage Changeling
+  0.01	6	6	S	2094135	                    Mycobacterium phage Kykar
+  0.01	6	6	S	2601640	                    Mycobacterium phage Herbertwm
+  0.01	6	6	S	2126809	                    Mycobacterium phage Lopton
+  0.01	6	6	S	2126814	                    Mycobacterium phage Jsquared
+  0.01	6	6	S	2725624	                    Mycobacterium phage Iwokeuplikedis
+  0.01	6	6	S	2250361	                    Mycobacterium phage Magnar
+  0.01	6	6	S	1897545	                    Mycobacterium phage Kalpine
+  0.01	6	6	S	2502434	                    Mycobacterium phage Cueylyss
+  0.01	6	6	S	2041533	                    Mycobacterium phage ILeeKay
+  0.01	5	5	S	2301549	                    Mycobacterium phage Crispicous1
+  0.01	5	5	S	1873889	                    Mycobacterium phage Makemake
+  0.01	5	5	S	2762393	                    Mycobacterium phage HarryOW
+  0.01	5	5	S	1383054	                    Mycobacterium phage Wheeler
+  0.01	5	5	S	1815969	                    Mycobacterium phage Loser
+  0.01	5	5	S	2664223	                    Mycobacterium phage BaconJack
+  0.01	5	5	S	1690684	                    Mycobacterium phage Phlei
+  0.01	5	5	S	2315713	                    Mycobacterium phage NicoleTera
+  0.01	5	5	S	1567466	                    Mycobacterium phage Alvin
+  0.01	5	5	S	2652891	                    Mycobacterium phage JackSparrow
+  0.01	5	5	S	2652419	                    Mycobacterium phage GaugeLDP
+  0.01	5	5	S	2047842	                    Mycobacterium phage Ph8s
+  0.01	5	5	S	2234077	                    Mycobacterium phage Mryolo
+  0.01	5	5	S	2656602	                    Mycobacterium phage Sagefire
+  0.01	5	5	S	2250300	                    Mycobacterium phage Hope4ever
+  0.01	4	4	S	2250309	                    Mycobacterium phage Steamy
+  0.01	4	4	S	1718172	                    Mycobacterium phage Theia
+  0.01	4	4	S	2250326	                    Mycobacterium phage DrFeelGood
+  0.01	4	4	S	2517948	                    Mycobacterium phage Dulcie
+  0.01	4	4	S	2234076	                    Mycobacterium phage Michley
+  0.01	4	4	S	2178922	                    Mycobacterium phage Oogway
+  0.01	4	4	S	2517945	                    Mycobacterium phage DBQu4n
+  0.01	4	4	S	1927018	                    Mycobacterium phage Petruchio
+  0.01	4	4	S	2653766	                    Mycobacterium phage Rahalelujah
+  0.01	4	4	S	2530146	                    Mycobacterium phage Rutherferd
+  0.01	4	4	S	2759390	                    Mycobacterium phage Jorgensen
+  0.01	4	4	S	1567479	                    Mycobacterium phage Treddle
+  0.01	4	4	S	2027901	                    Mycobacterium phage Smairt
+  0.01	4	4	S	2341048	                    Mycobacterium phage Tripl3t
+  0.01	4	4	S	1383059	                    Mycobacterium phage Adzzy
+  0.01	4	4	S	2488788	                    Mycobacterium phage Rhynn
+  0.01	4	4	S	2596981	                    Mycobacterium phage Buttons
+  0.01	4	4	S	2488962	                    Mycobacterium phage BigPaolini
+  0.01	3	3	S	2081620	                    Mycobacterium phage BeesKnees
+  0.01	3	3	S	2099646	                    Mycobacterium phage Bob3
+  0.01	3	3	S	2178920	                    Mycobacterium phage ConceptII
+  0.01	3	3	S	2282908	                    Mycobacterium phage Homines
+  0.01	3	3	S	540064	                    Mycobacterium phage DD5
+  0.01	3	3	S	2041517	                    Mycobacterium phage Anselm
+  0.01	3	3	S	2341047	                    Mycobacterium phage Zeuska
+  0.01	3	3	S	2024303	                    Mycobacterium phage MyraDee
+  0.01	3	3	S	1468169	                    Mycobacterium phage Lamina13
+  0.01	3	3	S	2024295	                    Mycobacterium phage Kimona
+  0.01	3	3	S	2502422	                    Mycobacterium phage SpikeBT
+  0.01	3	3	S	1458714	                    Mycobacterium phage Seabiscuit
+  0.01	3	3	S	2530129	                    Mycobacterium phage Francis47
+  0.01	3	3	S	2585231	                    Mycobacterium phage Carlyle
+  0.01	3	3	S	2590940	                    Mycobacterium phage Ajay
+  0.01	3	3	S	1340825	                    Mycobacterium phage Trouble
+  0.01	3	3	S	2653760	                    Mycobacterium phage KyMonks1A
+  0.01	3	3	S	1912975	                    Mycobacterium phage DarthPhader
+  0.01	3	3	S	2656588	                    Mycobacterium phage Leogania
+  0.01	3	3	S	2656603	                    Mycobacterium phage SheaKeira
+  0.01	3	3	S	1897449	                    Mycobacterium phage CactusRose
+  0.01	3	3	S	1168595	                    Mycobacterium phage Aeneas
+  0.01	3	3	S	2656611	                    Mycobacterium phage Traft412
+  0.01	3	3	S	2686230	                    Mycobacterium phage Atkinbua
+  0.01	3	3	S	1815972	                    Mycobacterium phage ArcherNM
+  0.00	2	2	S	2805842	                    Mycobacterium phage Rubeus
+  0.00	2	2	S	2047845	                    Mycobacterium phage Wilkins
+  0.00	2	2	S	1701853	                    Mycobacterium phage Serenity
+  0.00	2	2	S	2776846	                    Mycobacterium phage Topgun
+  0.00	2	2	S	2079571	                    Mycobacterium phage Pippin
+  0.00	2	2	S	1873891	                    Mycobacterium phage Papez
+  0.00	2	2	S	2015842	                    Mycobacterium phage BobSwaget
+  0.00	2	2	S	2099635	                    Mycobacterium phage MPlant7149
+  0.00	2	2	S	1567468	                    Mycobacterium phage Edtherson
+  0.00	2	2	S	2250382	                    Mycobacterium phage Niza
+  0.00	2	2	S	1881141	                    Mycobacterium phage Magnito
+  0.00	2	2	S	2283298	                    Mycobacterium phage NEHalo
+  0.00	2	2	S	1897439	                    Mycobacterium phage Jaan
+  0.00	2	2	S	2656604	                    Mycobacterium phage Snazzy
+  0.00	2	2	S	2301546	                    Mycobacterium phage Adahisdi
+  0.00	2	2	S	2301709	                    Mycobacterium phage Maroc7
+  0.00	2	2	S	1498204	                    Mycobacterium phage Pinto
+  0.00	2	2	S	2500574	                    Mycobacterium phage Malec
+  0.00	2	2	S	2500791	                    Mycobacterium phage Beatrix
+  0.00	2	2	S	1458726	                    Mycobacterium phage 20ES
+  0.00	2	2	S	1327773	                    Mycobacterium phage PattyP
+  0.00	2	2	S	2653761	                    Mycobacterium phage LoneWolf
+  0.00	2	2	S	2502444	                    Mycobacterium phage Rajelicia
+  0.00	2	2	S	2502451	                    Mycobacterium phage PinkPlastic
+  0.00	2	2	S	1429904	                    Mycobacterium phage HanShotFirst
+  0.00	2	2	S	2591126	                    Mycobacterium phage Big3
+  0.00	2	2	S	2575611	                    Mycobacterium phage Keziacharles14
+  0.00	2	2	S	1391432	                    Mycobacterium phage Graduation
+  0.00	2	2	S	2530187	                    Mycobacterium phage Elephantoon
+  0.00	2	2	S	1897544	                    Mycobacterium phage Isiphiwo
+  0.00	1	1	S	2517968	                    Mycobacterium phage Scorpia
+  0.00	1	1	S	2530173	                    Mycobacterium phage Arissanae
+  0.00	1	1	S	2596980	                    Mycobacterium phage Anglerfish
+  0.00	1	1	S	2599883	                    Mycobacterium phage Vanisoa
+  0.00	1	1	S	2502450	                    Mycobacterium phage JewelBug
+  0.00	1	1	S	1784956	                    Mycobacterium phage Bactobuster
+  0.00	1	1	S	2653721	                    Mycobacterium phage DreamCatcher
+  0.00	1	1	S	2656559	                    Mycobacterium phage BiancaTri92
+  0.00	1	1	S	2502417	                    Mycobacterium phage Petp2012
+  0.00	1	1	S	1897486	                    Mycobacterium phage BabyRay
+  0.00	1	1	S	2656564	                    Mycobacterium phage Briton15
+  0.00	1	1	S	2499042	                    Mycobacterium phage IronMan
+  0.00	1	1	S	2488968	                    Mycobacterium phage Froghopper
+  0.00	1	1	S	2488963	                    Mycobacterium phage Bones
+  0.00	1	1	S	1458846	                    Mycobacterium phage RhynO
+  0.00	1	1	S	2656599	                    Mycobacterium phage QueenB2
+  0.00	1	1	S	2315612	                    Mycobacterium phage Arcanine
+  0.00	1	1	S	1195069	                    Mycobacteriophage ElTiger69
+  0.00	1	1	S	2301569	                    Mycobacterium phage PherrisBueller
+  0.00	1	1	S	1927024	                    Mycobacterium phage Camperdownii
+  0.00	1	1	S	1897448	                    Mycobacterium phage Baehexic
+  0.00	1	1	S	1897425	                    Mycobacterium phage Bigfoot
+  0.00	1	1	S	1881139	                    Mycobacterium phage LittleGuy
+  0.00	1	1	S	1551710	                    Mycobacterium phage Abrogate
+  0.00	1	1	S	2163589	                    Mycobacterium phage AbbyPaige
+  0.00	1	1	S	2126943	                    Mycobacterium phage Fameo
+  0.00	1	1	S	2126813	                    Mycobacterium phage GageAP
+  0.00	1	1	S	1089117	                    Mycobacterium phage Blue7
+  0.00	1	1	S	2108125	                    Mycobacterium phage KittenMittens
+  0.00	1	1	S	2108118	                    Mycobacterium phage Fascinus
+  0.00	1	1	S	1076630	                    Mycobacterium phage AnnaL29
+  0.00	1	1	S	2099633	                    Mycobacterium phage Ichabod
+  0.00	1	1	S	1983575	                    Mycobacterium phage Heffalump
+  0.00	1	1	S	2099631	                    Mycobacterium phage Corvo
+  0.00	1	1	S	1647300	                    Mycobacterium phage Luchador
+  0.00	1	1	S	1647308	                    Mycobacterium phage Nerujay
+  0.00	1	1	S	1873903	                    Mycobacterium phage Bircsak
+  0.00	1	1	S	1673873	                    Mycobacterium phage Smeadley
+  0.00	1	1	S	2081623	                    Mycobacterium phage Fajezeel
+  0.00	1	1	S	2725645	                    Mycobacterium phage ANI8
+  0.00	1	1	S	2047846	                    Mycobacterium phage WunderPhul
+  0.00	1	1	S	2024294	                    Mycobacterium phage JoshKayV
+  0.00	1	1	S	2776872	                    Mycobacterium phage STLscum
+  0.00	1	1	S	1701849	                    Mycobacterium phage Turj99
+  0.00	1	1	S	2182403	                    Mycobacterium phage Priamo
+  0.00	1	1	S	2041524	                    Mycobacterium phage Cindaradix
+  0.84	439	439	S	1076136	                  Mycobacterium virus Perseus
+  0.27	139	139	S	28369	                  Mycobacterium virus D29
+  0.03	14	14	S	373405	                  Mycobacterium virus Che12
+  0.02	10	0	S	1993867	                  Mycobacterium virus Trixie
+  0.02	10	10	S1	1071503	                    Mycobacterium phage Trixie
+  0.02	8	8	S	148603	                  Mycobacterium virus Bxb1
+  0.01	5	5	S	540068	                  Mycobacterium virus Pukovnik
+  0.01	5	0	S	2003503	                  Mycobacterium virus Ridgecb
+  0.01	5	5	S1	1071506	                    Mycobacterium phage RidgeCB
+  0.01	5	0	S	1993885	                  Mycobacterium virus Solon
+  0.01	5	5	S1	555603	                    Mycobacterium phage Solon
+  0.01	5	5	S	1051138	                  Mycobacterium virus Doom
+  0.01	4	0	S	1993886	                  Mycobacterium virus Skipole
+  0.01	4	4	S1	701456	                    Mycobacterium phage SkiPole
+  0.01	4	0	S	1993861	                  Mycobacterium virus Violet
+  0.01	4	4	S1	1086800	                    Mycobacterium phage Violet
+  0.01	4	4	S	1089116	                  Mycobacterium virus Billknuckles
+  0.01	3	3	S	1034108	                  Mycobacterium virus JC27
+  0.00	2	2	S	540067	                  Mycobacterium virus lockley
+  0.00	2	2	S	1034110	                  Mycobacterium virus Lesedi
+  0.00	2	2	S	1036613	                  Mycobacterium virus Mrgordo
+  0.00	1	1	S	540066	                  Mycobacterium virus KBG
+  0.00	1	1	S	663557	                  Mycobacterium virus Peaches
+  0.00	1	1	S	1032892	                  Mycobacterium virus Heldan
+  0.00	1	0	S	2003504	                  Mycobacterium virus Redrock
+  0.00	1	1	S1	711470	                    Mycobacterium phage RedRock
+  0.00	1	1	S	1211283	                  Mycobacterium virus Marcell
+  0.00	1	1	S	1089128	                  Mycobacterium virus Kugel
+  6.75	3513	570	G	1623285	                Corndogvirus
+  5.60	2919	2008	G1	2267238	                  unclassified Corndogvirus
+  1.43	744	744	S	2656560	                    Mycobacterium phage Blessica
+  0.20	104	104	S	2283292	                    Mycobacterium phage Ryadel
+  0.02	13	13	S	1505226	                    Mycobacterium phage YungJamal
+  0.02	13	13	S	2652896	                    Mycobacterium phage Smooch
+  0.02	12	12	S	1340819	                    Mycobacterium phage Catdawg
+  0.01	7	7	S	2047838	                    Mycobacterium phage Familton
+  0.01	5	5	S	1698716	                    Mycobacterium phage Zakhe101
+  0.01	4	4	S	1340831	                    Mycobacterium phage Dylan
+  0.01	4	4	S	2126790	                    Mycobacterium phage SchoolBus
+  0.01	3	3	S	2081625	                    Mycobacterium phage JangDynasty
+  0.00	2	2	S	2794949	                    Mycobacterium phage TelAviv
+  0.02	12	12	S	205875	                  Mycobacterium virus Corndog
+  0.02	12	12	S	1089135	                  Mycobacterium virus Firecracker
+  0.08	44	1	F1	196894	                unclassified Siphoviridae
+  0.03	17	17	S	2713262	                  Gordonia phage DumpsterDude
+  0.02	12	12	S	10727	                  Staphylococcus phage L54a
+  0.01	4	4	S	2801893	                  Mycobacterium phage Gandalf20
+  0.01	4	4	S	2419611	                  Arthrobacter phage Seahorse
+  0.00	2	2	S	2772030	                  Mycobacterium phage NiebruSaylor
+  0.00	2	2	S	2301574	                  Streptomyces phage LibertyBell
+  0.00	1	1	S	2793699	                  Gordonia phage Schwartz33
+  0.00	1	1	S	2772032	                  Mycobacterium phage Shida
+  0.03	16	2	G	1623281	                Cheoctovirus
+  0.02	9	2	G1	2562660	                  unclassified Cheoctovirus
+  0.00	2	2	S	2767562	                    Mycobacterium phage Mova
+  0.00	1	1	S	2725612	                    Mycobacterium phage DRBy19
+  0.00	1	1	S	2653763	                    Mycobacterium phage MinionDave
+  0.00	1	1	S	2517944	                    Mycobacterium phage Cornucopia
+  0.00	1	1	S	2484216	                    Mycobacterium phage Whouxphf
+  0.00	1	1	S	1698715	                    Mycobacterium phage XFactor
+  0.01	3	3	S	1034112	                  Mycobacterium virus Mozy
+  0.00	1	1	S	1034107	                  Mycobacterium virus Ibhubesi
+  0.00	1	1	S	1034150	                  Mycobacterium virus Yoshi
+  0.02	10	0	F1	1982876	                Bclasvirinae
+  0.01	6	0	G	1623295	                  Pegunavirus
+  0.01	4	0	S	1982928	                    Mycobacterium virus Soto
+  0.01	4	4	S1	1235691	                      Mycobacterium phage Gyarad
+  0.00	2	0	G1	2562662	                    unclassified Pegunavirus
+  0.00	1	1	S	2656574	                      Mycobacterium phage Duggie
+  0.00	1	1	S	2499044	                      Mycobacterium phage JakeO
+  0.01	4	0	G	1982900	                  Rosebushvirus
+  0.01	4	0	G1	2099797	                    unclassified Rosebushvirus
+  0.01	3	3	S	2126947	                      Mycobacterium phage Boyle
+  0.00	1	1	S	2301611	                      Mycobacterium phage Eaglehorse
+  0.02	8	0	G	1623306	                Timquatrovirus
+  0.02	8	0	G1	2562717	                  unclassified Timquatrovirus
+  0.01	6	6	S	2041539	                    Mycobacterium phage LilPharaoh
+  0.00	2	2	S	2250291	                    Mycobacterium phage Aminay
+  0.01	4	0	G	1982562	                Soupsvirus
+  0.01	4	0	G1	2219090	                  unclassified Soupsvirus
+  0.01	4	4	S	2234025	                    Gordonia phage Nedarya
+  0.01	3	0	F1	2169598	                Dclasvirinae
+  0.01	3	0	G	2169613	                  Plotvirus
+  0.01	3	0	S	2170099	                    Mycobacterium virus Plot
+  0.01	3	3	S1	561999	                      Mycobacterium phage Troll4
+  0.01	3	1	G	1623284	                Kostyavirus
+  0.00	2	2	G1	1776684	                  unclassified Kostyavirus
+  0.01	3	0	G	1623292	                Omegavirus
+  0.01	3	1	G1	2233782	                  unclassified Omegavirus
+  0.00	1	1	S	1541824	                    Mycobacterium phage Ariel
+  0.00	1	1	S	2530152	                    Mycobacterium phage ThreeRngTarjay
+  0.00	2	0	G	2560106	                Bowservirus
+  0.00	2	1	G1	2572004	                  unclassified Bowservirus
+  0.00	1	1	S	2790986	                    Gordonia phage Bunker
+  0.00	2	0	F1	1982875	                Arquatrovirinae
+  0.00	2	0	G	1982881	                  Arequatrovirus
+  0.00	2	0	G1	2220065	                    unclassified Arequatrovirus
+  0.00	2	2	S	2041208	                      Streptomyces phage SqueakyClean
+  0.00	1	1	S	1109716	                Rhodococcus virus RGL3
+  0.00	1	0	G	1623288	                Liefievirus
+  0.00	1	0	G1	2201169	                  unclassified Liefievirus
+  0.00	1	1	S	1698359	                    Mycobacterium phage Phreak
+  0.00	1	0	G	1982091	                Marvinvirus
+  0.00	1	1	S	1982093	                  Mycobacterium virus Mosmoris
+  0.00	1	1	G	1982076	                Korravirus
+  0.01	5	0	F	10662	              Myoviridae
+  0.01	3	0	G	1298971	                Viunavirus
+  0.01	3	0	S	1987153	                  Salmonella virus Marshall
+  0.01	3	3	S1	1406794	                    Salmonella phage Marshall
+  0.00	2	0	G	680114	                Bixzunavirus
+  0.00	1	0	G1	1133560	                  unclassified Bixzunavirus
+  0.00	1	1	S	2234031	                    Mycobacterium phage ParkTD
+  0.00	1	0	S	2006134	                  Mycobacterium virus Bxz1
+  0.00	1	1	S1	546807	                    Mycobacterium phage ScottMcG
+  0.01	4	0	F	2560065	              Herelleviridae
+  0.01	4	0	F1	2560070	                Bastillevirinae
+  0.01	4	0	G	1918010	                  Bastillevirus
+  0.01	4	0	G1	2315196	                    unclassified Bastillevirus
+  0.01	4	4	S	2024253	                      Bacillus phage Anthony
+  0.14	72	0	D1	2559587	    Riboviria
+  0.14	71	1	K	2732396	      Orthornavirae
+  0.06	32	0	P	2732406	        Kitrinoviricota
+  0.05	26	0	C	2732461	          Alsuviricetes
+  0.05	24	0	O	2732543	            Hepelivirales
+  0.05	24	0	F	291484	              Hepeviridae
+  0.05	24	0	F1	1009842	                unclassified Hepeviridae
+  0.05	24	24	S	2116399	                  Wenling samurai squirrelfish hepevirus
+  0.00	2	0	O	2732544	            Martellivirales
+  0.00	2	0	F	675071	              Virgaviridae
+  0.00	2	0	G	12234	                Tobamovirus
+  0.00	2	0	S	12235	                  Cucumber green mottle mosaic virus
+  0.00	2	2	S1	12236	                    Cucumber green mottle mosaic virus (watermelon strain SH)
+  0.01	3	0	C	2732462	          Flasuviricetes
+  0.01	3	0	O	2732545	            Amarillovirales
+  0.01	3	0	F	11050	              Flaviviridae
+  0.01	3	0	G	11095	                Pestivirus
+  0.00	2	0	S	2170082	                  Pestivirus C
+  0.00	2	0	S1	358770	                    Classical swine fever virus isolates
+  0.00	2	2	S2	72372	                      Hog cholera virus 'Switzerland 1/93'
+  0.00	1	0	S	2170087	                  Pestivirus H
+  0.00	1	1	S1	266829	                    Pestivirus strain D32/00_HoBi
+  0.01	3	0	C	2732464	          Magsaviricetes
+  0.01	3	0	O	2732546	            Nodamuvirales
+  0.01	3	0	F	12283	              Nodaviridae
+  0.01	3	0	G	143919	                Betanodavirus
+  0.01	3	0	G1	330379	                  unclassified Betanodavirus
+  0.01	3	3	S	1286775	                    Zebrafish nervous necrosis virus
+  0.04	21	0	P	2497569	        Negarnaviricota
+  0.03	18	1	P1	2497571	          Polyploviricotina
+  0.03	16	0	C	2497577	            Insthoviricetes
+  0.03	16	0	O	2499411	              Articulavirales
+  0.03	16	0	F	11308	                Orthomyxoviridae
+  0.03	16	0	G	197911	                  Alphainfluenzavirus
+  0.03	16	2	S	11320	                    Influenza A virus
+  0.02	9	0	S1	119210	                      H3N2 subtype
+  0.01	5	5	S2	513906	                        Influenza A virus (A/Texas/TX-VC3-1265/2003(H3N2))
+  0.00	2	2	S2	62403	                        Influenza A virus (A/Paris/1/92(H3N2))
+  0.00	2	2	S2	142603	                        Influenza A virus (A/Charlottesville/10/99 (H3N2))
+  0.00	2	2	S1	102797	                      Influenza A virus with incomplete names
+  0.00	2	0	S1	215855	                      H3N6 subtype
+  0.00	2	2	S2	627376	                        Influenza A virus (A/American black duck/New Brunswick/25182/2007(H3N6))
+  0.00	1	0	S1	114727	                      H1N1 subtype
+  0.00	1	1	S2	31663	                        Influenza A virus (A/turkey/Bethlehem-Glilit/1492-B/1982(H1N1))
+  0.00	1	0	C	2497576	            Ellioviricetes
+  0.00	1	0	O	1980410	              Bunyavirales
+  0.00	1	0	F	1980413	                Hantaviridae
+  0.00	1	0	F1	2560074	                  Mammantavirinae
+  0.00	1	0	G	1980442	                    Orthohantavirus
+  0.00	1	0	G1	1986491	                      unclassified Orthohantavirus
+  0.00	1	1	S	47301	                        Muleshoe hantavirus
+  0.01	3	0	P1	2497570	          Haploviricotina
+  0.01	3	0	C	2497574	            Monjiviricetes
+  0.01	3	0	O	11157	              Mononegavirales
+  0.01	3	0	F	11244	                Pneumoviridae
+  0.01	3	0	G	162387	                  Metapneumovirus
+  0.01	3	0	S	162145	                    Human metapneumovirus
+  0.01	3	3	S1	694067	                      Human metapneumovirus CAN97-83
+  0.02	12	0	P	2732408	        Pisuviricota
+  0.02	12	0	C	2732507	          Stelpaviricetes
+  0.02	12	0	O	2732550	            Patatavirales
+  0.02	12	0	F	39729	              Potyviridae
+  0.02	12	0	G	12195	                Potyvirus
+  0.02	8	8	S	31732	                  Passion fruit woodiness virus
+  0.01	4	4	S	29271	                  Dasheen mosaic virus
+  0.01	4	0	P	2732405	        Duplornaviricota
+  0.01	4	0	C	2732459	          Resentoviricetes
+  0.01	4	0	O	2732541	            Reovirales
+  0.01	4	0	F	10880	              Reoviridae
+  0.01	4	0	F1	689832	                Sedoreovirinae
+  0.01	4	0	G	10892	                  Orbivirus
+  0.01	4	0	S	40051	                    Bluetongue virus
+  0.01	4	4	S1	10895	                      Australian bluetongue virus
+  0.00	1	0	F	10993	        Birnaviridae
+  0.00	1	0	G	39750	          Aquabirnavirus
+  0.00	1	0	S	11002	            Infectious pancreatic necrosis virus
+  0.00	1	1	S1	11003	              Infectious pancreatic necrosis virus - Jasper
+  0.00	1	0	D2	2585030	      unclassified Riboviria
+  0.00	1	1	S	2707219	        Filchner virus
+  0.06	29	0	D1	2731342	    Monodnaviria
+  0.06	29	0	K	2732092	      Shotokuvirae
+  0.04	23	0	P	2732415	        Cossaviricota
+  0.04	21	0	C	2732421	          Papovaviricetes
+  0.04	21	0	O	2732533	            Zurhausenvirales
+  0.04	21	0	F	151340	              Papillomaviridae
+  0.04	20	0	F1	333774	                unclassified Papillomaviridae
+  0.04	20	0	F2	333938	                  non-primate mammal papillomaviruses
+  0.04	20	0	F3	291588	                    manatee papillomaviruses
+  0.04	20	20	S	255363	                      Florida manatee papillomavirus
+  0.00	1	0	F1	2169595	                Firstpapillomavirinae
+  0.00	1	0	G	325462	                  Lambdapapillomavirus
+  0.00	1	0	S	181667	                    Lambdapapillomavirus 1
+  0.00	1	1	S1	323364	                      Lynx rufus papillomavirus type 1
+  0.00	2	0	C	2732422	          Quintoviricetes
+  0.00	2	0	O	2732534	            Piccovirales
+  0.00	2	0	F	10780	              Parvoviridae
+  0.00	2	0	F1	40119	                Parvovirinae
+  0.00	2	0	G	40121	                  Erythroparvovirus
+  0.00	2	0	S	1511904	                    Rodent erythroparvovirus 1
+  0.00	2	2	S1	56820	                      Chipmunk parvovirus
+  0.01	6	0	P	2732416	        Cressdnaviricota
+  0.01	6	0	C	2732424	          Repensiviricetes
+  0.01	6	0	O	2732539	            Geplafuvirales
+  0.01	6	0	F	10811	              Geminiviridae
+  0.01	4	0	G	10814	                Begomovirus
+  0.01	3	0	G1	291027	                  unclassified Begomovirus
+  0.01	3	3	S	1037418	                    Gaillardia yellow mosaic begomovirus
+  0.00	1	1	S	1046573	                  West African Asystasia virus 1
+  0.00	2	0	G	10812	                Mastrevirus
+  0.00	2	2	S	10825	                  Miscanthus streak virus
+  0.01	6	0	D1	12333	    unclassified bacterial viruses
+  0.01	6	6	S	2809057	      Mycobacterium phage Winget
+  0.01	3	0	G	39759	    Deltavirus
+  0.01	3	0	S	12475	      Hepatitis delta virus
+  0.01	3	3	S1	31763	        Hepatitis delta virus (ISOLATE LEBANON-1)

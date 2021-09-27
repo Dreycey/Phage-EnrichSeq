@@ -1,0 +1,14 @@
+  0.31	161	161	U	0	unclassified
+ 99.69	51919	0	R	1	root
+ 99.69	51919	42347	D	10239	  Viruses
+ 18.17	9462	0	D1	2731341	    Duplodnaviria
+ 18.17	9462	27	D2	2731360	      Heunggongvirae
+ 18.12	9435	0	P	2731618	        Uroviricota
+ 18.12	9435	0	C	2731619	          Caudoviricetes
+ 18.12	9435	173	O	28883	            Caudovirales
+ 17.77	9253	1570	F	10699	              Siphoviridae
+  7.82	4071	2305	G	186764	                Fromanvirus
+  2.13	1109	402	G1	2562661	                  unclassified Fromanvirus
+  0.06	29	29	S	2502430	                    Fushigi
+  0.04	22	22	S	2599873	                    Paphu
+  0.04	21	21	S	1913110	                    StarStuff

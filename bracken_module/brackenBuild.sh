@@ -2,6 +2,9 @@
 #
 # Build bracken
 
+# change to the correct directory.
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 function buildBracken() {
   echo "Running buildBracken()";
   
