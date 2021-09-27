@@ -21,31 +21,34 @@ function downloadRequiredFiles() {
 
   # download NCBI phage genomes
   if [[ ! -d refseq/viral ]]; then
-    echo "Downloading NCBI phage genomes..."
-    ncbi-genome-download  --formats fasta --assembly-level complete --genera phage --fuzzy-genus viral --parallel 4 --flat-output -o ${genomeDir} 
-    find ref_genomes/ -name '*.gz' -exec gzip -d {} +
+    echo "Downloading NCBI phage genomes...";
+    ncbi-genome-download  --formats fasta --assembly-level complete \
+                          --genera phage --fuzzy-genus viral --parallel 4 \
+                          --flat-output -o ${genomeDir}; 
+    # unzip the downloaded genomes
+    find ref_genomes/ -name '*.gz' -exec gzip -d {} +;
   fi
 
   # Download phagesDB all phages database
   if [[ ! -f Actinobacteriophages-All.fasta ]]; then
-    echo "Downloading Actinobacteriophage genomes..."
-    wget https://phagesdb.org/media/Actinobacteriophages-All.fasta
+    echo "Downloading Actinobacteriophage genomes...";
+    wget https://phagesdb.org/media/Actinobacteriophages-All.fasta;
   fi
   
   # Download NCBI taxonomy
   if [[ ! -f ${dbDir}/taxonomy/names.dmp && ! -f new_taxdump.tar.gz ]]; then 
-    echo "Downloading NCBI taxonomy..."
-    wget https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+    echo "Downloading NCBI taxonomy...";
+    wget https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz;
   fi
 
   if [[ ! -f ${dbDir}/taxonomy/nucl_wgs.accession2taxid && ! -f nucl_wgs.accession2taxid.gz ]]; then
-    echo "Downloading accession to taxon ID conversion..."
-    wget https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz
+    echo "Downloading accession to taxon ID conversion...";
+    wget https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz;
   fi
 }
 
 function reorganizeFiles() {
-  echo "Running reorganizeFiles()"
+  echo "Running reorganizeFiles()";
   
   # arguments
   local genomeDir=$1;
@@ -55,18 +58,18 @@ function reorganizeFiles() {
   # organize taxdump files into the appropriate location
   if [[ -f new_taxdump.tar.gz ]]; then
     tar -xf new_taxdump.tar.gz --directory ${dbDir}/taxonomy;
-    rm new_taxdump.tar.gz
+    rm new_taxdump.tar.gz;
   fi
   # downloading PhageDB genomes
   if [[ -f nucl_wgs.accession2taxid.gz ]]; then
     gzip -d nucl_wgs.accession2taxid.gz;
+    moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
   fi
-  moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
-  moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
 
   # Reformat Action file to be compatible with kraken
-  python kraken_db_format.py ${dbDir}/taxonomy/names.dmp Actinobacteriophages-All.fasta ${actinoOutFile};
-  mv ${actinoOutFile} ${genomeDir};
+  python ${DIR}/kraken_db_format.py ${dbDir}/taxonomy/names.dmp \
+         Actinobacteriophages-All.fasta ${actinoOutFile};
+  moveFile ${actinoOutFile} ${genomeDir};
   rm Actinobacteriophages-All.fasta;
 }
 
@@ -80,16 +83,17 @@ function moveFile() {
 }
 
 function addGenomesToDb() {
-  echo "Running addGenomesToDb()"
+  echo "Running addGenomesToDb()";
   # arguments
   local genomeDir=$1;
   local dbDir=$2;
   # add all fasta files in the genomes directory to the kraken library
-  find ${genomeDir}/ \( -name "*.fa" -o -name "*.fasta" -o -name "*.fna" \) -print0 | xargs -0 -I{} -n1 kraken2-build --add-to-library {} --db ${dbDir};
+  find ${genomeDir}/ \( -name "*.fa" -o -name "*.fasta" -o -name "*.fna" \) \
+       -print0 | xargs -0 -I{} -n1 kraken2-build --add-to-library {} --db ${dbDir};
 }
 
 function buildKrakenDb() {
-  echo "Running buildKrakenDb()"
+  echo "Running buildKrakenDb()";
   # arguments
   local dbDir=$1;
   kraken2-build --build --db ${dbDir};
@@ -106,36 +110,39 @@ function makeDirectory() {
 function multifasta2fasta(){
   local multi_fasta_file=$1;
   local directory_for_fasta_files=$2;
-  echo "Turning ${multi_fasta_file} into multiple fasta files"
-  python multifasta2single.py ${multi_fasta_file} ${directory_for_fasta_files}
+  echo "Turning ${multi_fasta_file} into multiple fasta files";
+  python ${DIR}/multifasta2single.py ${multi_fasta_file} ${directory_for_fasta_files};
+  rm ${multi_fasta_file};
 }
 
 function main() {                                                               
   # input arguments                                                             
   if [[ -f ${DIR}/kraken_module.config ]];
   then
-    source kraken_module.config;
+    source ${DIR}/kraken_module.config;
   else
     echo "The config file (kraken_module.config) is missing!";
     exit 1;
   fi
   # update arguments with full path
-  genomeDir=${DIR}/${genomeDir}
-  dbDir=${DIR}/${dbDir}
-  actinoOutFile=${DIR}/${actinoOutFile}
+  genomeDir=${DIR}/${genomeDir};
+  dbDir=${DIR}/${dbDir};
+  movedActinoOutFile=${genomeDir}/${actinoOutFile}
+  actinoOutFile=${DIR}/${actinoOutFile};
+  echo $actinoOutFile;
   # run the script                                           
-  if [[ ! -f ${DIR}/${dbDir}/taxo.k2d ]]; 
+  if [[ ! -f ${dbDir}/taxo.k2d ]]; 
   then   
     makeDirectory ${genomeDir};
     makeDirectory ${dbDir};
     makeDirectory ${dbDir}/taxonomy;                                      
     downloadRequiredFiles;                                                      
-    reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};                     
+    reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};                   
     addGenomesToDb ${genomeDir} ${dbDir};                                       
     buildKrakenDb ${dbDir};
-    multifasta2fasta ${genomeDir} ${actinoOutFile};
+    multifasta2fasta ${movedActinoOutFile} ${genomeDir};
   else
-    echo "The database was already built. If you'd like to rebuild, delete '${dbDir}/taxo.k2d' "                                           
+    echo "The database was already built. If you'd like to rebuild, delete '${dbDir}/taxo.k2d'";
   fi                                                                            
 }
 
