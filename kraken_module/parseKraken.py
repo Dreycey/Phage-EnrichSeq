@@ -60,6 +60,8 @@ def checkPhageExists(phage_name, phage_dict) -> bool:
         shortened_name = phage_name.split()[2]
     elif len(phage_name.split()) == 1:
         shortened_name = phage_name
+    else:
+        shortened_name = phage_name
     for key in phage_dict:
         if re.search(shortened_name, phage_dict[key], re.IGNORECASE):
             return True
