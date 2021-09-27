@@ -112,9 +112,19 @@ function multifasta2fasta(){
 
 function main() {                                                               
   # input arguments                                                             
-  source kraken_module.config;
+  if [[ -f ${DIR}/kraken_module.config ]];
+  then
+    source kraken_module.config;
+  else
+    echo "The config file (kraken_module.config) is missing!";
+    exit 1;
+  fi
+  # update arguments with full path
+  genomeDir=${DIR}/${genomeDir}
+  dbDir=${DIR}/${dbDir}
+  actinoOutFile=${DIR}/${actinoOutFile}
   # run the script                                           
-  if [[ ! -f ${dbDir}/taxo.k2d ]]; 
+  if [[ ! -f ${DIR}/${dbDir}/taxo.k2d ]]; 
   then   
     makeDirectory ${genomeDir};
     makeDirectory ${dbDir};
