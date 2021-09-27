@@ -137,11 +137,11 @@ function main() {
     makeDirectory ${genomeDir};
     makeDirectory ${dbDir};
     makeDirectory ${dbDir}/taxonomy;                                      
-   downloadRequiredFiles;                                                      
-   reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};
-    multifasta2fasta ${movedActinoOutFile} ${genomeDir};                   
+    downloadRequiredFiles;                                                      
+    reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};                   
     addGenomesToDb ${genomeDir} ${dbDir};                                       
     buildKrakenDb ${dbDir};
+    multifasta2fasta ${movedActinoOutFile} ${genomeDir};
   else
     echo "The database was already built. If you'd like to rebuild, delete '${dbDir}/taxo.k2d'";
   fi                                                                            
