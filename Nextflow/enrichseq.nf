@@ -49,6 +49,7 @@ megahitDir = file("$workingDir/$WORKFLOW/megahit")
 krakenDir = file("$workingDir/$WORKFLOW/kraken")
 brackenDir = file("$workingDir/$WORKFLOW/bracken")
 blastWorkingDir = file("$workingDir/$WORKFLOW/blast")
+mergeOverlapDir = file("$workingDir/$WORKFLOW/merge_overlap_filter")
 
 
 process Create_Working_Directories {
@@ -63,11 +64,13 @@ process Create_Working_Directories {
     if [ -d $krakenDir ]; then rm -rf $krakenDir; fi;
     if [ -d $brackenDir ]; then rm -rf $brackenDir; fi;
     if [ -d $blastWorkingDir ]; then rm -rf $blastWorkingDir; fi;
+    if [ -d $mergeOverlapDir ]; then rm -rf $mergeOverlapDir; fi;
 
     #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
     mkdir $blastWorkingDir
+    mkdir $mergeOverlapDir
     """
 }
 
@@ -155,7 +158,8 @@ process Run_KrakenParser {
 
    script:
    """
-   python ${params.toolpath}/kraken_module/parseKraken.py ${krakenDir}/kraken_assembled.report ${krakenDir}/taxid_file.txt ${krakenDir}/parsed_kraken_phages.txt
+   python ${params.toolpath}/kraken_module/parseKraken.py ${krakenDir}/kraken_assembled.report \
+          ${krakenDir}/taxid_file.txt ${krakenDir}/parsed_kraken_phages.txt
    """
 }
 
@@ -167,13 +171,31 @@ process Run_Bracken {
 	stdout bracken
 
 	script:
-	"""
-	echo "Running Run_Bracken" > ${brackenDir}/bracken.log
+    """
+    echo "Running Run_Bracken" > ${brackenDir}/bracken.log
 	bash ${params.toolpath}/bracken_module/brackenBuild.sh
 	bash ${params.toolpath}/bracken_module/brackenRun.sh --krakendb=${databasesDir} \
 				--input=${krakenDir}/kraken_orig.report \
 				--out=${brackenDir}/bracken_run_orig \
 				--read=${params.readlength}
+	"""
+}
+
+process Run_MergeOverlap {
+	input:
+    val kraken_parse from kraken_parser
+
+	output:
+	stdout merge_overlap
+
+	script:    
+	"""
+	echo "Running the Merge Overlap Filter" > ${brackenDir}/bracken.log;
+	python ${params.toolpath}/mergeoverlap_filter_module/mergeoverlap.py \
+            --input ${krakenDir}/parsed_kraken_phages.txt \
+            --output_prefix ${mergeOverlapDir}/merge_overlap_out \
+            --fasta ${fastafile} \
+            --threads ${THREADS} 
 	"""
 }
 
