@@ -9,6 +9,7 @@ def usage() {
 	log.info '  --fasta		Path to the input FASTA file'
 	log.info '  --workdir	Path to the output working directory'
 	log.info "  --dbdir		Path to the classification databases"
+    log.info "  --genomedir Path to the genome directory, built running the Krake2Build.sh script"
 	log.info "  --threads	Number of threads to use (Default=1)"
 	log.info "  --log		Log file (Default=Don't save the log)"
 	log.info '  --help		Print this help message out'
@@ -40,6 +41,7 @@ logfile = file(params.log)
 fastafile = file(params.fasta)
 workingDir = file(params.workdir)
 databasesDir = file(params.dbdir)
+genomeDir = file(params.genomedir)
 
 BASE = fastafile.getName()
 THREADS = params.threads
@@ -194,6 +196,7 @@ process Run_MergeOverlap {
 	python ${params.toolpath}/mergeoverlap_filter_module/mergeoverlap.py \
             --input ${krakenDir}/parsed_kraken_phages.txt \
             --output_prefix ${mergeOverlapDir}/merge_overlap_out \
+            --genome_directory ${genomeDir} \
             --fasta ${fastafile} \
             --threads ${THREADS} 
 	"""
