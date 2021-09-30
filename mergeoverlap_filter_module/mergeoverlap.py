@@ -58,6 +58,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
     parser.add_argument("-i", "--input", help="the input lsv file with phage names", required=True)
     parser.add_argument("-o", "--output_prefix", help="the output file prefix", required=True)
     parser.add_argument("-f", "--fasta", help="input fasta path", required=True)
+    parser.add_argument("-g", "--genome_directory", help="path to the directory of genomes", required=True)
     parser.add_argument("-t", "--threads", help="number of threads", required=True)
     return parser.parse_args(argv)
 
@@ -153,15 +154,6 @@ class MinimapMapper(GenomeMapper):
         except StopIteration:
             return False
         return True
-
-
-
-
-
-
-
-
-
 
 class GenomeTestSet:
     """
@@ -420,7 +412,7 @@ def main():
     output_testing = open(arguments.output_prefix+"_testingArguments", "w")
 
     # Running the algorithm.
-    GENOME_DIR = "/Users/dreyceyalbin/Desktop/Phage-EnrichSeq/kraken_module/ref_genomes/"
+    GENOME_DIR = arguments.genome_directory
     genomeTestObj = GenomeTestSet(line_seperated_genomes=arguments.input, genome_directory=GENOME_DIR)
     genomeTestObj.checkSeqFile(arguments.fasta)
     genomeTestObj.plotResult("Estimated Abundances Using Raw Read Mapping", out=arguments.output_prefix+".png")
