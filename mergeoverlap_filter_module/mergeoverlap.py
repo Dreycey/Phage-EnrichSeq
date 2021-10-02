@@ -19,19 +19,24 @@ TODO:
 # std packages
 from abc import ABC, abstractmethod
 import sys
-from typing import Dict, List, Optional
+from typing import Dict, Union, List, Tuple, Optional
 import csv
 import os
 import argparse
 import numpy as np
-import pickle
+import pickle as pickle
+from matplotlib import pyplot
 # non-std packages
 import mappy as mp
 import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.mixture import GaussianMixture
+from numpy import unique
+from numpy import where
 # in house packages
 sys.path.append("/Users/dreyceyalbin/Desktop/Phage-EnrichSeq/PathOrganizer_module")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
-from typing import Dict, Union, List, Tuple,Optional
+
 
 
 
@@ -533,6 +538,42 @@ def print_values_for_mappedinfo(dataset: Dict[str,Dict[str, Union[set, int, floa
                 x_vector[index].append(dataset[genome][metric])
     return np.array(y_vector), np.array(x_vector)
 
+def plot_scatter_plot(x_vector, y_vector, outfile):
+    """
+    plots a scatter plot of the output values. 
+    """
+    # plot a scatterplot of the data
+    plt.figure(figsize=(8,6))
+    plt.scatter(x_vector[:,0], x_vector[:,1], s=300,color="red")
+    plt.title("Scatter Plot with annotations",fontsize=15)
+    plt.ylabel("Overlap Percentage",fontsize=15)
+    plt.xlabel("Average Mapq",fontsize=15)
+    for i, label in enumerate(y_vector):
+        plt.annotate(label, (x_vector[:,0][i], x_vector[:,1][i]))
+    plt.savefig(outfile, dpi=300)
+    plt.close()
+
+def scatter_of_filtered(clusters, x_vector, y_vector, outfile):
+    """
+    plots a scatterplot of the filtered genomes. 
+    """
+    # retrieve unique clusters
+    clusters = unique(clusters)
+    # create scatter plot for samples from each cluster
+    for cluster in clusters:
+        # get row indexes for samples with this cluster
+        row_ix = where(clusters == cluster)
+        # create scatter of these samples
+        pyplot.scatter(x_vector[row_ix, 0], x_vector[row_ix, 1], s=300)
+        for row in enumerate(row_ix):
+            x = list(x_vector[row_ix, 0])[0]
+            y = list(x_vector[row_ix, 1])[0]
+            for i in range(len(x)):
+                plt.annotate(y_vector[row_ix[0][i]], (x[i], y[i]))
+    plt.show()
+    plt.savefig(outfile, dpi=300)
+    plt.close()
+
 def main():
     print("RUNNING THE MERGE OVERLAP FILTER")
     arguments = parseArgs(argv=sys.argv[1:])
@@ -554,15 +595,17 @@ def main():
 
     # use unsupervised model to obtain true genomes in sample
     y_vector, x_vector = print_values_for_mappedinfo(genomeTestObj.minimap_out)
-    yhat = GaussianMixModel().model_predict(x_vector)
+    plot_scatter_plot(x_vector, y_vector, f"{arguments.output_prefix}_scatterplot.png")
+    clusters = GaussianMixModel().model_predict(x_vector)
+    scatter_of_filtered(clusters, x_vector, y_vector, f"{arguments.output_prefix}_clusters_scatterplot.png")
     true_pos_genome = get_true_positive(y_vector, x_vector)
     print(f"true positive genome: {true_pos_genome}")
     true_genomes = get_filtered_genomes(true_positive_name=true_pos_genome, 
-                                        model=yhat, 
+                                        model=clusters, 
                                         name_list=y_vector)
     # add filtered genomes to output file. 
     for genome_name in true_genomes:
-        filtered_genomes.write(genome_name)
+        filtered_genomes.write(genome_name + "\n")
 
 if __name__ == "__main__":
     main()
