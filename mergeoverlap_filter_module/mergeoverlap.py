@@ -19,18 +19,19 @@ TODO:
 # std packages
 from abc import ABC, abstractmethod
 import sys
-from typing import Dict, List
+from typing import Dict, List, Optional
 import csv
 import os
 import argparse
 import numpy as np
+import pickle
 # non-std packages
 import mappy as mp
 import matplotlib.pyplot as plt
 # in house packages
 sys.path.append("/Users/dreyceyalbin/Desktop/Phage-EnrichSeq/PathOrganizer_module")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
-
+from typing import Dict, Union, List, Tuple,Optional
 
 
 
@@ -61,6 +62,101 @@ def parseArgs(argv=None) -> argparse.Namespace:
     parser.add_argument("-g", "--genome_directory", help="path to the directory of genomes", required=True)
     parser.add_argument("-t", "--threads", help="number of threads", required=True)
     return parser.parse_args(argv)
+
+class TrueGenomeFinder(ABC):
+    """ This is the abstract class for the unsupervised genome finder """
+
+    @property
+    @abstractmethod
+    def model_name(self):
+        """ getter for model name (encapsulation) """
+        pass
+    
+    @property
+    @abstractmethod
+    def model(self):
+        """ This is the model for the unsupervised classification """
+        pass
+    
+    @abstractmethod
+    def model_predict(self, x_vector):
+        """
+        Sine the model clusters data, there's not necessarily 
+        a training set needed - it's practically just binary
+        clustering. 
+        """
+        pass
+
+class GaussianMixModel(TrueGenomeFinder):
+    """ This is the abstract class for the unsupervised genome finder """
+    
+    def __init__(self):
+        self._model = GaussianMixture(n_components=2)
+        self._model_name = "Gassiaun Mixture Model"
+
+    @property
+    def model(self):
+        """ This is the model for the unsupervised classification """
+        return self._model
+
+    @property
+    def model_name(self):
+        """ This is the model for the unsupervised classification """
+        return self._model_name
+    
+    def model_predict(self, x_vector):
+        """
+        Sine the model clusters data, there's not necessarily 
+        a training set needed - it's practically just binary
+        clustering. 
+        """
+        FIT_MODEL = self.model.fit(x_vector)
+        return FIT_MODEL.predict(x_vector)
+    
+def get_true_positive(name_list, x_vector) -> Optional[str]:
+    """
+    Description:
+        The goal for this method is to find a genome in the list of 
+        genomes that is likely to be a part of the true cluster of genomes
+        in the sample. An assumption used here is that the best genome will
+        have a high mapq average and a high mergeoverlap percentage. 
+    Input:
+        1. name_list
+        2. x_vector
+                [mapq, overlap percentage]
+    Output:
+        1. High probability candidate name (str)
+    """
+    max_score = 0
+    high_prob_genome = None
+    for row_number, values in enumerate(x_vector):
+        mapq = values[0]
+        overlap_percentage = values[1]
+        score = (mapq / 60) + overlap_percentage
+        print(score)
+        if score > max_score:
+            max_score = score
+            high_prob_genome = name_list[row_number]
+    return high_prob_genome
+    
+
+def get_filtered_genomes(true_positive_name, model,  name_list):
+    """
+    Description:
+        This method takes in a genome with the highest confidence 
+        of being true, and collects all other genomes in the same
+        bin. 
+    Input:
+        1. true_positive_name (str) - a name of a genome known to be true.
+        2. model - a vector of 0s and 1s inidicating the binary clusters
+                    NOTE: should have same order as the name list.
+        3. name_list (List[str]) - 
+    """
+    cluster = None
+    for index, name in enumerate(name_list):
+        if name == true_positive_name: 
+            cluster = model[index]
+    return [name_list[index] for index, val in enumerate(model) if val == cluster]
 
 class GenomeMapper(ABC):
     """ This acts as an adapter for mapping reads to a genome """
@@ -154,6 +250,7 @@ class MinimapMapper(GenomeMapper):
         except StopIteration:
             return False
         return True
+
 
 class GenomeTestSet:
     """
@@ -323,7 +420,6 @@ class GenomeTestSet:
             else:                   # if no overlap, set p1=p2 and p2++
                 mergedSet.add((p1_start, p1_end))
                 p1_start, p1_end = sorted_mapped_reads[p2] #notice: using p2
-
             p2 += 1
         # add last interval to to the merged set
         mergedSet.add((p1_start, p1_end))
@@ -403,13 +499,46 @@ class GenomeTestSet:
             overlappMerge = self.overlapMerge(genomeName)
             percenOverlap = self.calcGenomePercetage(genomeName, overlappMerge)
             print(f"percent overlap: {percenOverlap}")
+            self.minimap_out[genomeName]["overlappMerge"] = overlappMerge
+            self.minimap_out[genomeName]["percenOverlap"] = percenOverlap
+
+def print_values_for_mappedinfo(dataset: Dict[str,Dict[str, Union[set, int, float]]]) -> Tuple[List[float]]:
+    """ 
+    takes in the pickle output from the MergeOverlap and prints metrics 
+    
+    :input (Dict[str,Dict[str, Union[set, int, float]]]):
+        The input is a nested dicitonary containing information from the
+        primary data structure generated during MergeOverlap. This is
+        put into a pickle file and used for data analysis here.
+        
+    :output (tuple[List[float]):
+        1. np.array(y_vector) - a vector containing the names for the phages
+        2. np.array(x_vector) - a vector containing a 2D vector of [mapq, overlapmerge percentage]
+    """
+    y_vector = []
+    x_vector = []
+    for index, genome in enumerate(dataset.keys()):
+        print("\n" + genome)
+        y_vector.append(genome)
+        x_vector.append([])
+        for metric in dataset[genome].keys(): 
+            if metric in ['mapq', 'readmaps', 'readcount']:
+                print(f" {metric}: {np.average(dataset[genome][metric])}")
+                if metric == 'mapq':
+                    x_vector[index].append(np.average(dataset[genome][metric]))
+            elif metric == "overlappMerge":
+                print(f" {metric}: {len(dataset[genome][metric]) }")
+            else:
+                print(f" {metric}: {dataset[genome][metric]}")
+                x_vector[index].append(dataset[genome][metric])
+    return np.array(y_vector), np.array(x_vector)
 
 def main():
     print("RUNNING THE MERGE OVERLAP FILTER")
     arguments = parseArgs(argv=sys.argv[1:])
 
     #TESTING.
-    output_testing = open(arguments.output_prefix+"_testingArguments", "w")
+    filtered_genomes = open(arguments.output_prefix+"_filtered_genomes.lsv", "w")
 
     # Running the algorithm.
     GENOME_DIR = arguments.genome_directory
@@ -419,8 +548,21 @@ def main():
     genomeTestObj.saveResultAsCSV(arguments.output_prefix+".csv")
     genomeTestObj.print_minimap2output(arguments.output_prefix)
 
-    # save to file
-    output_testing.write("RESULT: \n"+str(genomeTestObj.resultDict))
+    # save the pickle output.
+    with open(f'{arguments.output_prefix}_minimap_out.pickle', 'wb') as handle:
+        pickle.dump(genomeTestObj.minimap_out, handle)
+
+    # use unsupervised model to obtain true genomes in sample
+    y_vector, x_vector = print_values_for_mappedinfo(genomeTestObj.minimap_out)
+    yhat = GaussianMixModel().model_predict(x_vector)
+    true_pos_genome = get_true_positive(y_vector, x_vector)
+    print(f"true positive genome: {true_pos_genome}")
+    true_genomes = get_filtered_genomes(true_positive_name=true_pos_genome, 
+                                        model=yhat, 
+                                        name_list=y_vector)
+    # add filtered genomes to output file. 
+    for genome_name in true_genomes:
+        filtered_genomes.write(genome_name)
 
 if __name__ == "__main__":
     main()
