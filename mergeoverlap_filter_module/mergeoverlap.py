@@ -558,9 +558,9 @@ def scatter_of_filtered(clusters, x_vector, y_vector, outfile):
     plots a scatterplot of the filtered genomes. 
     """
     # retrieve unique clusters
-    clusters = unique(clusters)
+    clusters_set = unique(clusters)
     # create scatter plot for samples from each cluster
-    for cluster in clusters:
+    for cluster in clusters_set:
         # get row indexes for samples with this cluster
         row_ix = where(clusters == cluster)
         # create scatter of these samples
