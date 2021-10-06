@@ -9,8 +9,33 @@ from pathlib import Path
 
 
 class GenomeCompare:
-    def __init__(self, dna_list):
+    def __init__(self, dnaList):
         ''' Initializes GenomeCompare object given a list of DNA objects '''
-        self.dna_list: List = dna_list # should set be used instead of list?
+        self.dnaList: List = dnaList 
+
+    
+    def create_adjacency_matrix(self):
+        ''' 
+            DESCRIPTION:
+                Creates and returns a 2D array representing similarities of DNA objects based
+                jaccard index
+            INPUT:
+                -
+            OUTPUT:
+                2D array of float values (jaccard indices)
+        '''
+        pass
+
+
+    def prune_adj_matrix(self, threshold = 0.0):
+        ''' 
+            DESCRIPTION:
+                Retrieves DNA objects that are genetically similar 
+            INPUT:
+                Threshold value between 0.0 and 1.0
+            OUTPUT:
+                List of Sets. Sets represent clusters of similar DNA objects
+        '''
+        pass
     
 
