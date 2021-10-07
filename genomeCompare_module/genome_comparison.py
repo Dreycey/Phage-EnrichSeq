@@ -11,7 +11,8 @@ from pathlib import Path
 class GenomeCompare:
     def __init__(self, dnaList):
         ''' Initializes GenomeCompare object given a list of DNA objects '''
-        self.dnaList: List = dnaList 
+        self.dnaList: List = dnaList # TODO: implement mechanism to prevent duplicates
+        self.adjacencyMatrix = np.zeros((len(dnaList), len(dnaList)), float)
 
     
     def create_adjacency_matrix(self):
@@ -24,7 +25,11 @@ class GenomeCompare:
             OUTPUT:
                 2D array of float values (jaccard indices)
         '''
-        pass
+        # update matrix values
+        for row in range(len(self.dnaList)):
+            for col in range(len(self.dnaList)):
+                self.adjacencyMatrix[row,col] = self.dnaList[row].calc_jaccard(self.dnaList[col])
+
 
 
     def prune_adj_matrix(self, threshold = 0.0):
@@ -38,4 +43,11 @@ class GenomeCompare:
         '''
         pass
     
+
+    def display_adjacency_matrix(self):
+        if self.adjacencyMatrix == None:
+            # TODO: raise exception
+            print("Cannot compare --no DNA objects provided.")
+        else:
+            print(pd.DataFrame(self.adjacencyMatrix))
 

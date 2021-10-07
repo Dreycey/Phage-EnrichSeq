@@ -75,7 +75,7 @@ class DNA:
         intersection = len(a.intersection(b))
         union = len(a.union(b))
 
-        return round(intersection / union, 4)
+        return round(intersection / union, 8)
 
 
     def calc_minhash():

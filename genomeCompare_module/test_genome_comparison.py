@@ -16,7 +16,7 @@ def default_kmer_len():
 
 @pytest.fixture
 def genome_ref_path():
-    genome_ref_path = "/Users/latifa/GitHub/Phage-EnrichSeq/jaccard_module/"
+    genome_ref_path = "/Users/latifa/GitHub/Phage-EnrichSeq/genomeCompare_module/"
     return genome_ref_path
 
 
@@ -33,3 +33,19 @@ def genome_compare_obj(default_kmer_len, genome_ref_path):
 
 
 def test_init():
+    # TODO: check that dna objects are added to the dnaList
+    pass
+
+
+def test_create_adjacency_matrix(genome_compare_obj):
+    ''' TODO:   1) check expected matrix values (with 3 phages)
+                2) what happens when there is some error with dna object? (e.g. no kmers/genome)
+    '''
+    expected = [[],[]]
+    actual = genome_compare_obj.create_adjacency_matrix()
+    assert expected == actual
+
+
+def test_prune_adj_matrix():
+    ''' TODO:   1) check that clusters returned contain the expected dna objects '''
+    pass
