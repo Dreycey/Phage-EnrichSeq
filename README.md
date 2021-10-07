@@ -24,12 +24,12 @@ bash kraken2Build.sh;
 ## Running EnrichSeq.
 * USAGE
 ```
-nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <path to fasta> --workdir <path to output directory> --toolpath <local global path to EnrichSeq repository> --dbdir <Path to the kracken DB> --threads <# of threads to use>
+nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <path to fasta> --workdir <path to output directory> --toolpath <local global path to EnrichSeq repository> --dbdir <Path to the kracken DB> --threads <# of threads to use> --genomedir <path to the directory containing genomes> 
 ```
 
 * EXAMPLE
 ```
-nextflow Nextflow/enrichseq.nf --read single --fasta readsimulator_module/simulatedgenomes_illumina.fa --workdir ./outdirectory --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads 4
+nextflow Nextflow/enrichseq.nf --read single --fasta simulated_test_filessimulate_genomes_2_1000000reads_illumina.fa --workdir ./outdirectory9 --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads  4 --genomedir kraken_module/ref_genomes/
 ```
 
 <br />
