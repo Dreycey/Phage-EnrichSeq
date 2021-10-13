@@ -2,6 +2,7 @@
 
 
 # directories to not commit 
+__pycache__/
 
 # files to not commit
 
