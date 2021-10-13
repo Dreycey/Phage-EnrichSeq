@@ -1,10 +1,10 @@
 #! usr/bin/python3
 """
-Description:
+DESCRIPTION:
     This script simulates a fasta file with different percentages of 
     nucleotides from a list of input genomes in a config file.
 
-Usage Example:
+USAGE:
     python simulate_reads.py -i simulate_genomes.config  -c 30 -o simulatedgenomes -t 4
 """
 # std library
@@ -19,6 +19,9 @@ import argparse
 import ntpath
 from typing import List, Optional, Tuple, Union
 import pandas as pd
+
+
+
 
 # PRINTING LOGO
 ## URL: https://patorjk.com/software/taag/#p=display&f=Stop&t=EnrichSeq%0AGenomeSIm
@@ -38,7 +41,6 @@ LOGO = (
 | \____/( (/ /| | | | |_| | | | ( (/ / _____) )| |_| | | |
  \_____/ \____)_| |_|\___/|_|_|_|\____|______(_____)_|_|_|
 """)
-print(LOGO)
 
 # Changing to directory of script.
 abspath = os.path.abspath(sys.argv[0])
@@ -182,9 +184,10 @@ class ReadSegmenter:
         num_reads_in_fasta = self.fasta2readcount(fasta_path)
         if (reads_for_genome > num_reads_in_fasta):
             ERROR_TEXT = f"There were not enough reads in the simulated"
-            ERROR_TEXT += f"sequences file, therefor the alloted number of"
-            ERROR_TEXT += f"reads is too much. Number of reads needed is {reads_for_genome}"
-            ERROR_TEXT += f"and the number of reads in the fasta is: {num_reads_in_fasta}"
+            ERROR_TEXT += f" sequences file, therefor the alloted number of"
+            ERROR_TEXT += f" reads is too much. Number of reads needed is {reads_for_genome}"
+            ERROR_TEXT += f" and the number of reads in the fasta is: {num_reads_in_fasta}"
+            ERROR_TEXT += f" delete the older files for the simulated genomes and rerun."
             raise FastaTooSmall(ERROR_TEXT)
 
     def fasta2readcount(self, fasta_path):

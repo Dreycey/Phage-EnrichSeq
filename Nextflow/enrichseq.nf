@@ -9,6 +9,7 @@ def usage() {
 	log.info '  --fasta		Path to the input FASTA file'
 	log.info '  --workdir	Path to the output working directory'
 	log.info "  --dbdir		Path to the classification databases"
+    log.info "  --genomedir Path to the genome directory, built running the Krake2Build.sh script"
 	log.info "  --threads	Number of threads to use (Default=1)"
 	log.info "  --log		Log file (Default=Don't save the log)"
 	log.info '  --help		Print this help message out'
@@ -40,6 +41,7 @@ logfile = file(params.log)
 fastafile = file(params.fasta)
 workingDir = file(params.workdir)
 databasesDir = file(params.dbdir)
+genomeDir = file(params.genomedir)
 
 BASE = fastafile.getName()
 THREADS = params.threads
@@ -49,6 +51,7 @@ megahitDir = file("$workingDir/$WORKFLOW/megahit")
 krakenDir = file("$workingDir/$WORKFLOW/kraken")
 brackenDir = file("$workingDir/$WORKFLOW/bracken")
 blastWorkingDir = file("$workingDir/$WORKFLOW/blast")
+mergeOverlapDir = file("$workingDir/$WORKFLOW/merge_overlap_filter")
 
 
 process Create_Working_Directories {
@@ -63,11 +66,13 @@ process Create_Working_Directories {
     if [ -d $krakenDir ]; then rm -rf $krakenDir; fi;
     if [ -d $brackenDir ]; then rm -rf $brackenDir; fi;
     if [ -d $blastWorkingDir ]; then rm -rf $blastWorkingDir; fi;
+    if [ -d $mergeOverlapDir ]; then rm -rf $mergeOverlapDir; fi;
 
     #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
     mkdir $blastWorkingDir
+    mkdir $mergeOverlapDir
     """
 }
 
@@ -147,16 +152,17 @@ process Run_Kraken {
 
 
 process Run_KrakenParser {
-    input: 
-    val krakenout from kraken
+   input: 
+   val krakenout from kraken
 
-    output:
-    stdout kraken_parser
+   output:
+   stdout kraken_parser
 
-    script:
-    """
-    python ${params.toolpath}/kraken_module/parseKraken.py ${krakenDir}/kraken_orig.report ${krakenDir}/taxid_file.txt ${krakenDir}/parsed_kraken_phages.txt
-    """
+   script:
+   """
+   python ${params.toolpath}/kraken_module/parseKraken.py ${krakenDir}/kraken_assembled.report \
+          ${krakenDir}/taxid_file.txt ${krakenDir}/parsed_kraken_phages.txt
+   """
 }
 
 process Run_Bracken {
@@ -167,13 +173,32 @@ process Run_Bracken {
 	stdout bracken
 
 	script:
-	"""
-	echo "Running Run_Bracken" > ${brackenDir}/bracken.log
+    """
+    echo "Running Run_Bracken" > ${brackenDir}/bracken.log
 	bash ${params.toolpath}/bracken_module/brackenBuild.sh
 	bash ${params.toolpath}/bracken_module/brackenRun.sh --krakendb=${databasesDir} \
 				--input=${krakenDir}/kraken_orig.report \
 				--out=${brackenDir}/bracken_run_orig \
 				--read=${params.readlength}
+	"""
+}
+
+process Run_MergeOverlap {
+	input:
+    val kraken_parse from kraken_parser
+
+	output:
+	stdout merge_overlap
+
+	script:    
+	"""
+	echo "Running the Merge Overlap Filter" > ${brackenDir}/bracken.log;
+	python ${params.toolpath}/mergeoverlap_filter_module/mergeoverlap.py \
+            --input ${krakenDir}/parsed_kraken_phages.txt \
+            --output_prefix ${mergeOverlapDir}/merge_overlap_out \
+            --genome_directory ${genomeDir} \
+            --fasta ${fastafile} \
+            --threads ${THREADS} 
 	"""
 }
 
