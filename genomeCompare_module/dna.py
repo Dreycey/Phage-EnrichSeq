@@ -46,7 +46,6 @@ class DNA:
         sequence = ""
         with open(fasta_path) as fasta_file:
             fasta_lines = fasta_file.readlines()
-            #fasta_lines = open(fasta_file).readlines()
             sequence_i = ""
             # If name is found (i.e. this is the correct file), get genome
             for counter, line in enumerate(fasta_lines):
@@ -101,4 +100,8 @@ class DNA:
             return (self.name == other.name and self.genome == other.genome)
         else:
             return False
+    
+
+    def __hash__(self):
+        return hash((self.name, self.genome))
 

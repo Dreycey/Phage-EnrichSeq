@@ -26,25 +26,34 @@ class GenomeCompare:
                 2D array of float values (jaccard indices)
         '''
         # update matrix values
-        for row in range(len(self.dnaList)):
-            for col in range(len(self.dnaList)):
-                self.adjacencyMatrix[row,col] = self.dnaList[row].calc_jaccard(self.dnaList[col])
-
+        for i in range(len(self.dnaList)):
+            for j in range(len(self.dnaList)):
+                self.adjacencyMatrix[i,j] = self.dnaList[i].calc_jaccard(self.dnaList[j])
 
 
     def prune_adj_matrix(self, threshold = 0.0):
         ''' 
             DESCRIPTION:
-                Retrieves DNA objects that are genetically similar 
+                Retrieves DNA objects that are genetically similar based on some threshold
             INPUT:
                 Threshold value between 0.0 and 1.0
             OUTPUT:
-                List of Sets. Sets represent clusters of similar DNA objects
+                A dictionary of all clusters (key: cluster name, value: list of dna objects in cluster). 
         '''
-        pass
+        clusters = {}
+        for i in range(len(self.dnaList)-1):
+            cluster = set()
+            cluster_name = "C_" + str(i+1)
+            for j in range(i+1,len(self.dnaList)):
+                if self.adjacencyMatrix[i,j] > threshold:
+                    cluster.add(self.dnaList[i])
+                    cluster.add(self.dnaList[j])
+                    clusters[cluster_name] = cluster
+        return clusters
     
-
+    
     def display_adjacency_matrix(self):
+        # TODO: make pretty
         if self.adjacencyMatrix == None:
             # TODO: raise exception
             print("Cannot compare --no DNA objects provided.")

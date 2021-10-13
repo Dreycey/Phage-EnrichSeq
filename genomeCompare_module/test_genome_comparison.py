@@ -46,6 +46,7 @@ def test_create_adjacency_matrix(genome_compare_obj):
     assert expected == actual
 
 
-def test_prune_adj_matrix():
+def test_prune_adj_matrix(genome_ref_path, default_kmer_len, genome_compare_obj):
     ''' TODO:   1) check that clusters returned contain the expected dna objects '''
-    pass
+    dict_ = {"C_1": [DNA("Blessica", genome_ref_path + "Blessica.fasta", default_kmer_len), DNA("Ryadel", genome_ref_path + "Ryadel.fasta", default_kmer_len)]}
+    assert genome_compare_obj.prune_adj_matrix(0.5) == dict_
