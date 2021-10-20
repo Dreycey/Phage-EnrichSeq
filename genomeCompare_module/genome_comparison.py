@@ -36,19 +36,29 @@ class GenomeCompare:
             DESCRIPTION:
                 Retrieves DNA objects that are genetically similar based on some threshold
             INPUT:
-                Threshold value between 0.0 and 1.0
+                Threshold value between 0.0 and 1.0 (default=0.0)
             OUTPUT:
                 A dictionary of all clusters (key: cluster name, value: list of dna objects in cluster). 
+                Clusters are represented by the set data structure. Can have a cluster of size=1.
         '''
         clusters = {}
-        for i in range(len(self.dnaList)-1):
-            cluster = set()
-            cluster_name = "C_" + str(i+1)
-            for j in range(i+1,len(self.dnaList)):
-                if self.adjacencyMatrix[i,j] > threshold:
-                    cluster.add(self.dnaList[i])
-                    cluster.add(self.dnaList[j])
-                    clusters[cluster_name] = cluster
+        cluster_num = 0
+        added_dna = set() # keep track of already clustered dna objects
+        for i in range(len(self.dnaList)):  
+            if self.dnaList[i] not in added_dna:
+                cluster = set() # initialize a new cluster
+                cluster_num += 1
+                cluster_name = "C_" + str(cluster_num)
+                cluster.add(self.dnaList[i]) # add current dna obj to the cluster set
+                added_dna.add(self.dnaList[i]) 
+            
+                for j in range(i,len(self.dnaList)):
+                    if self.adjacencyMatrix[i,j] > threshold and self.dnaList[j] not in added_dna:
+                        cluster.add(self.dnaList[j])
+                        added_dna.add(self.dnaList[j])
+                
+                clusters[cluster_name] = cluster # add the cluster(s) to the dictionary
+        
         return clusters
     
     
