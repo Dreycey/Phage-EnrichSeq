@@ -12,6 +12,7 @@
 
 # change to the correct directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$( dirname "${BASH_SOURCE[0]}" )" 
 
 function downloadRequiredFiles() {
   echo "Running downloadRequiredFiles()";
@@ -60,6 +61,7 @@ function reorganizeFiles() {
     tar -xf new_taxdump.tar.gz --directory ${dbDir}/taxonomy;
     rm new_taxdump.tar.gz;
   fi
+
   # downloading PhageDB genomes
   if [[ -f nucl_gb.accession2taxid.gz ]]; then
     gzip -d nucl_gb.accession2taxid.gz;
