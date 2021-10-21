@@ -17,6 +17,10 @@ OUTPUT:
 import sys
 import os
 from tqdm import tqdm
+from pathlib import Path
+
+
+
 
 def get_acc2tax_map(genome_directory):
     """
@@ -27,7 +31,9 @@ def get_acc2tax_map(genome_directory):
     accession_dict = {}
     for filename in os.listdir(genome_directory):
         # READ HEADER AND FIND TAX ID
-        with open(genome_directory+filename, "r") as fasta_opened:
+        print(f"        genome being reviwed: {filename}")
+        full_path = Path(genome_directory) / Path(filename)
+        with open(full_path, "r") as fasta_opened:
             file_lines = fasta_opened.readlines()
             accession_id = file_lines[0].split(" ")[0].strip(">")
             accession_dict[accession_id] = 0
@@ -67,16 +73,17 @@ def file2correctHeader(acc2taxid, genome_directory):
     """
     print("    Modifying each NCBI fiile in the genome specified directory")
     for filename in os.listdir(genome_directory):
+        full_path = Path(genome_directory) / Path(filename)
         # READ HEADER AND FIND TAX ID
-        with open(genome_directory+filename, "r") as fasta_opened:
+        with open(full_path, "r") as fasta_opened:
             file_lines = fasta_opened.readlines()
             accession_id = file_lines[0].split(" ")[0].strip(">")
             tax_id = acc2taxid[accession_id]
 
-        os.remove(genome_directory+filename) # DELETE FILE.
+        os.remove(full_path) # DELETE FILE.
 
         # MAKE NEW FILE WITH TAXD IN HEADER
-        with open(genome_directory+filename, "w") as fasta_opened:
+        with open(full_path, "w") as fasta_opened:
             header = file_lines[0].strip('\n')
             fasta_opened.write(f"{header} |kraken:taxid|{tax_id} \n")
             for line in file_lines[1:]:
