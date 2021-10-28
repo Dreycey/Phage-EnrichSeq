@@ -60,6 +60,6 @@ function simulate_pacbio {
 function main {
     simulate_illumina;
     #simulate_nanopore;
-    #simulate_pacbio;
+    simulate_pacbio;
 }
 main;
