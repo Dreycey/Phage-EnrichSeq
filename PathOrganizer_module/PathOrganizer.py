@@ -39,13 +39,15 @@ class PathOrganizer:
         """ This getter grabs a genome file based on the file name prefix """
         genome_path = None
         for genome_in_db in os.listdir(self.database_path):
-            if (int(self.get_fasta_taxid(genome_in_db)) == int(genome_taxid)):
+            full_path = Path(self.database_path) / Path(genome_in_db)
+            if (int(self.get_fasta_taxid(full_path)) == int(genome_taxid)):
                 if (genome_path == None):
-                    genome_path = Path(self.database_path) / Path(genome_in_db)
+                    genome_path = full_path
                 else:
-                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {genome_path}")
+                    continue # TODO: this takes the first genome, though DB should prevent duplicates.
+                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {full_path}")
         return genome_path
-    
+
     def get_fasta_taxid(self, genome_in_db):
         """
         parse an input fasta for the taxid.
