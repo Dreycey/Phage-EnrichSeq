@@ -29,7 +29,7 @@ class GenomeCompare:
         for i in range(len(self.dnaList)):
             for j in range(len(self.dnaList)):
                 self.adjacencyMatrix[i,j] = self.dnaList[i].calc_jaccard(self.dnaList[j])
-
+        return self.adjacencyMatrix
 
     def prune_adj_matrix(self, threshold = 0.0):
         ''' 
