@@ -194,7 +194,7 @@ process Run_MergeOverlap {
 	"""
 	echo "Running the Merge Overlap Filter" > ${brackenDir}/bracken.log;
 	python ${params.toolpath}/mergeoverlap_filter_module/mergeoverlap.py \
-            --input ${krakenDir}/parsed_kraken_phages.txt \
+            --input ${krakenDir}/taxid_file.txt \
             --output_prefix ${mergeOverlapDir}/merge_overlap_out \
             --genome_directory ${genomeDir} \
             --fasta ${fastafile} \

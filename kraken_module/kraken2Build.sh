@@ -12,6 +12,7 @@
 
 # change to the correct directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$( dirname "${BASH_SOURCE[0]}" )" 
 
 function downloadRequiredFiles() {
   echo "Running downloadRequiredFiles()";
@@ -41,9 +42,9 @@ function downloadRequiredFiles() {
     wget https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz;
   fi
 
-  if [[ ! -f ${dbDir}/taxonomy/nucl_wgs.accession2taxid && ! -f nucl_wgs.accession2taxid.gz ]]; then
+  if [[ ! -f ${dbDir}/taxonomy/nucl_gb.accession2taxid && ! -f nucl_gb.accession2taxid.gz ]]; then
     echo "Downloading accession to taxon ID conversion...";
-    wget https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz;
+    wget https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz;
   fi
 }
 
@@ -60,12 +61,16 @@ function reorganizeFiles() {
     tar -xf new_taxdump.tar.gz --directory ${dbDir}/taxonomy;
     rm new_taxdump.tar.gz;
   fi
+
   # downloading PhageDB genomes
-  if [[ -f nucl_wgs.accession2taxid.gz ]]; then
-    gzip -d nucl_wgs.accession2taxid.gz;
-    moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
+  if [[ -f nucl_gb.accession2taxid.gz ]]; then
+    gzip -d nucl_gb.accession2taxid.gz;
+    moveFile nucl_gb.accession2taxid ${dbDir}/taxonomy;
   fi
 
+  # Reformat the NCBI files to compatible with kraken (and PathOrganizer)
+  python ${DIR}/ncbi2krakenHeader.py ${dbDir}/taxonomy/nucl_gb.accession2taxid ${genomeDir}
+  
   # Reformat Action file to be compatible with kraken
   python ${DIR}/kraken_db_format.py ${dbDir}/taxonomy/names.dmp \
          Actinobacteriophages-All.fasta ${actinoOutFile};

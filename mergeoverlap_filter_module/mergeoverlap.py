@@ -18,6 +18,7 @@ TODO:
 """
 # std packages
 from abc import ABC, abstractmethod
+from pathlib import Path
 import sys
 from typing import Dict, Union, List, Tuple, Optional
 import csv
@@ -262,11 +263,10 @@ class GenomeTestSet:
     This class is used to test the a folder of simulated sequences
     """
     
-    def __init__(self, line_seperated_genomes,genome_directory):
+    def __init__(self, line_seperated_genomes, genome_directory):
         """ initialize all params """
         # input attributes
-        self.input_genomes = [genome_name.strip("\n").split(" ")[2] 
-                              for genome_name in open(line_seperated_genomes).readlines()]
+        self.input_taxids = [tax_id.strip("\n") for tax_id in open(line_seperated_genomes).readlines()]
         self.object_PathOrganizer = PathOrganizer(genome_directory)
         # primary attributes
         self.genomes = {} # this directory will hold all of the genomes
@@ -281,15 +281,15 @@ class GenomeTestSet:
     def __addGenomes(self):
         """ add genomes to to genomes attr """
         print("Creating indexes for minimap2")
-        for genome_to_grab in self.input_genomes:
-            print(f"genome name: {genome_to_grab}")
-            file_path = self.object_PathOrganizer.genome(genome_to_grab)
+        for genome_taxid in self.input_taxids:
+            print(f"genome NCBI tax id: {genome_taxid}")
+            file_path: Path = self.object_PathOrganizer.genome(genome_taxid)
             if file_path != None: # TODO: IF THIS IS NONE THEN THERE'S A PROBLEM FINDING GENOMES!!
-                self.genomes[genome_to_grab] = self.parseFasta(file_path)[1][0]
-                self.genomeMap[genome_to_grab] = MinimapMapperWithInfo(name=genome_to_grab,
-                                                            file_path=str(file_path))
+                self.genomes[genome_taxid] = self.parseFasta(file_path)[1][0]
+                self.genomeMap[genome_taxid] = MinimapMapperWithInfo(name=genome_taxid,
+                                                                     file_path=str(file_path))
             else:
-                print(f"FIX THIS: there's a problem finding the genome for {genome_to_grab}")
+                print(f"FIX THIS: there's a problem finding the genome for {genome_taxid}")
 
     @staticmethod
     def parseFasta(fasta_path):
@@ -570,16 +570,12 @@ def scatter_of_filtered(clusters, x_vector, y_vector, outfile):
             y = list(x_vector[row_ix, 1])[0]
             for i in range(len(x)):
                 plt.annotate(y_vector[row_ix[0][i]], (x[i], y[i]))
-    plt.show()
     plt.savefig(outfile, dpi=300)
     plt.close()
 
 def main():
     print("RUNNING THE MERGE OVERLAP FILTER")
     arguments = parseArgs(argv=sys.argv[1:])
-
-    #TESTING.
-    filtered_genomes = open(arguments.output_prefix+"_filtered_genomes.lsv", "w")
 
     # Running the algorithm.
     GENOME_DIR = arguments.genome_directory
@@ -604,8 +600,22 @@ def main():
                                         model=clusters, 
                                         name_list=y_vector)
     # add filtered genomes to output file. 
-    for genome_name in true_genomes:
-        filtered_genomes.write(genome_name + "\n")
+    with open(arguments.output_prefix+"_filtered_genomes.lsv", "w") as filtered_genomes:
+        for genome_name in true_genomes:
+            filtered_genomes.write(genome_name + "\n")
+
+    # use filtered genomes (recalcuting abundances affter filtering)
+    if os.path.exists(arguments.output_prefix+"_filtered_genomes.lsv"):
+        print("THE FILE EXISTS!!!!!!!! contents:")
+        with open(arguments.output_prefix+"_filtered_genomes.lsv", "r") as filtered_genomes:
+            print(filtered_genomes.readlines())
+
+
+    genomeTestObj2 = GenomeTestSet(line_seperated_genomes=Path(arguments.output_prefix+"_filtered_genomes.lsv"),
+                                   genome_directory=GENOME_DIR)
+    genomeTestObj2.checkSeqFile(arguments.fasta)
+    genomeTestObj2.plotResult("Estimated Abundances Using Raw Read Mapping", out=arguments.output_prefix+"_refined.png")
+    genomeTestObj2.saveResultAsCSV(arguments.output_prefix+"_refined.csv")
 
 if __name__ == "__main__":
     main()
