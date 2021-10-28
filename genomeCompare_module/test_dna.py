@@ -14,7 +14,7 @@ def default_kmer_len():
 
 @pytest.fixture
 def genome_ref_path():
-    genome_ref_path = "/Users/latifa/GitHub/Phage-EnrichSeq/jaccard_module/"
+    genome_ref_path = "/Users/latifa/GitHub/Phage-EnrichSeq/genomeCompare_module/"
     return genome_ref_path
 
 
@@ -41,7 +41,7 @@ def test_init(genome_ref_path, default_kmer_len):
     ''' Test constructor '''
     dna1 = DNA("D29", genome_ref_path + "D29.fasta", default_kmer_len)
     assert dna1.name == "D29"
-    assert dna1.fasta_file == Path("/Users/latifa/GitHub/Phage-EnrichSeq/jaccard_module/D29.fasta")
+    assert dna1.fasta_file == Path("/Users/latifa/GitHub/Phage-EnrichSeq/genomeCompare_module/D29.fasta")
     assert dna1.genome == ("TGCGGCCGAGCCATCCTGTACGGGTTTCCAAGCCGATCAGAAGCACGGGC"
                             "CGACGCTAGAGCGCCTCGCCCAGGCGCTGTGAGCCACCAGGAGCCACGAA"
                             "CTCGCGACCCACGGGGAGTTATACCCCCGGAATCGGCTACGGGCCATACA")
@@ -87,16 +87,15 @@ def test_calc_jaccard(test_dna_obj, compare_dna_obj):
     set2 = set(compare_dna_obj.kmers) # Ryadel
     intersection = len(set1.intersection(set2))
     union = len(set1.union(set2))
-    expected_jaccard_val = round(intersection / union, 4)
-    #expected_jaccard_val = 0.2857
+    expected_jaccard_val = round(intersection / union, 8)
 
     assert test_dna_obj.calc_jaccard(compare_dna_obj) == expected_jaccard_val
 
-@pytest.mark.notimplemented
+@mark.notimplemented
 def test_calc_minhash(test_dna_obj):
-    assert test_dna_obj.calc_minash()
+    assert test_dna_obj.calc_minash() == 0
 
 
-@pytest.mark.notwritten
+@mark.notwritten
 def test_compare_results(test_dna_obj):
     assert test_dna_obj.compare_results(1,1)
