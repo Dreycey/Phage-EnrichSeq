@@ -23,8 +23,6 @@ class DNA:
             kmer_len = g_len
         else:
             num_kmers = g_len - kmer_len + 1
-        #num_kmers = 1 if g_len < kmer_len else (g_len - kmer_len + 1)
-        # num_kmers = len(genome) - kmer_len + 1
 
         for i in range(num_kmers):
             kmer = genome[i:i + kmer_len]
@@ -48,7 +46,6 @@ class DNA:
         sequence = ""
         with open(fasta_path) as fasta_file:
             fasta_lines = fasta_file.readlines()
-            #fasta_lines = open(fasta_file).readlines()
             sequence_i = ""
             # If name is found (i.e. this is the correct file), get genome
             for counter, line in enumerate(fasta_lines):
@@ -59,20 +56,11 @@ class DNA:
                 elif line[0] != ">":
                     sequence += line.rstrip()
 
-            # if ">" in fasta_lines[0] and re.search(self.name, fasta_lines[0], re.IGNORECASE):
-            #     for line in fasta_lines:
-            #         if ">" not in line:
-            #             print(line)
-            #             genome += line.rstrip()
-            #             print(f'genome val in if statement: {genome}')
-            #         else:
-            #             break  
         return sequence
 
 
     def validate_file_extension(self, file) -> bool:
         if str(file).endswith((".fasta",".fa",".fna", ".fastq")):
-            #raise ValueError("Must be a FASTA or FASTQ file")
             return True
         else:
             return False
@@ -86,7 +74,7 @@ class DNA:
         intersection = len(a.intersection(b))
         union = len(a.union(b))
 
-        return round(intersection / union, 4)
+        return round(intersection / union, 8)
 
 
     def calc_minhash():
@@ -105,3 +93,15 @@ class DNA:
             Think of metric - percent diff.
         """
         return abs(jaccard - minhash)
+    
+
+    def __eq__(self, other):
+        if isinstance(other, DNA):
+            return (self.name == other.name and self.genome == other.genome)
+        else:
+            return False
+    
+
+    def __hash__(self):
+        return hash((self.name, self.genome))
+

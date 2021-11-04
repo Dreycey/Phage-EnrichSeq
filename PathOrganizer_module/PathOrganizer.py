@@ -31,18 +31,27 @@ class DuplicateGenomeError(PathErrors):
 class PathOrganizer:
     """ This data structure holds paths and retrieves information """
 
-    def __init__(self, database, output_directory):
+    def __init__(self, database):
         self.database_path: str = str(database)
-        self.output_path: Path = Path(output_directory)
 
     # @property
-    def genome(self, genome_file_prefix) -> Optional[Path]:
+    def genome(self, genome_taxid) -> Optional[Path]:
         """ This getter grabs a genome file based on the file name prefix """
         genome_path = None
         for genome_in_db in os.listdir(self.database_path):
-            if (genome_in_db == genome_file_prefix):
+            full_path = Path(self.database_path) / Path(genome_in_db)
+            if (int(self.get_fasta_taxid(full_path)) == int(genome_taxid)):
                 if (genome_path == None):
-                    genome_path = Path(self.database_path) / Path(genome_in_db)
+                    genome_path = full_path
                 else:
-                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {genome_path}")
+                    continue # TODO: this takes the first genome, though DB should prevent duplicates.
+                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {full_path}")
         return genome_path
+
+    def get_fasta_taxid(self, genome_in_db):
+        """
+        parse an input fasta for the taxid.
+        """
+        with open(genome_in_db) as fasta_file:
+            taxid = fasta_file.readline().split("|kraken:taxid|")[1].split(" ")[0]
+        return taxid

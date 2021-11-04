@@ -13,6 +13,7 @@
 
 # change to the correct directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$( dirname "${BASH_SOURCE[0]}" )" 
 
 ####
 # Description:
@@ -101,10 +102,11 @@ function reorganizeFiles() {
     tar -xf new_taxdump.tar.gz --directory ${dbDir}/taxonomy;
     rm new_taxdump.tar.gz;
   fi
+
   # downloading PhageDB genomes
-  if [[ -f nucl_wgs.accession2taxid.gz ]]; then
-    gzip -d nucl_wgs.accession2taxid.gz;
-    moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
+  if [[ -f nucl_gb.accession2taxid.gz ]]; then
+    gzip -d nucl_gb.accession2taxid.gz;
+    moveFile nucl_gb.accession2taxid ${dbDir}/taxonomy;
   fi
 
   # Reformat ActinoDB file to be compatible with kraken
