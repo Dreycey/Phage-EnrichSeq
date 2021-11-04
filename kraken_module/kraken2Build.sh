@@ -71,7 +71,7 @@ function wget_file() {
   while [[ ! -f ${downloaded_file} && ! -f ${final_file} ]]; do
     if [[ ! -f ${downloaded_file} && ! -f ${final_file} ]]; then
       # print out attempt number
-      echo "Downloading ${ftp_path}";
+      echo; echo "      Downloading ${ftp_path}"; echo;
       wget ${ftp_path};
     else;
       # TODO break while loop, print "Success and output message"
@@ -80,7 +80,10 @@ function wget_file() {
   done
 }
 
-
+####
+# Description:
+#      FIX DEF
+####
 function reorganizeFiles() {
   echo "Running reorganizeFiles()";
   
@@ -107,15 +110,23 @@ function reorganizeFiles() {
   rm Actinobacteriophages-All.fasta;
 }
 
+####
+# Description:
+#      FIX DEF
+####
 function moveFile() {
   local file_to_move=$1;
   local new_directory=$2;
-  echo "moving the file ${file_to_move} to ${new_directory}";
+  echo "    moving the file ${file_to_move} to ${new_directory}";
   if [[ -f ${file_to_move} ]]; then
     mv ${file_to_move} ${new_directory}
   fi
 }
 
+####
+# Description:
+#      FIX DEF
+####
 function addGenomesToDb() {
   echo "Running addGenomesToDb()";
   # arguments
@@ -126,6 +137,10 @@ function addGenomesToDb() {
        -print0 | xargs -0 -I{} -n1 kraken2-build --add-to-library {} --db ${dbDir};
 }
 
+####
+# Description:
+#      FIX DEF
+####
 function buildKrakenDb() {
   echo "Running buildKrakenDb()";
   # arguments
@@ -133,6 +148,10 @@ function buildKrakenDb() {
   kraken2-build --build --db ${dbDir};
 }
 
+####
+# Description:
+#      FIX DEF
+####
 function makeDirectory() {
   local directory_to_make=$1;
   echo "making directory for ${directory_to_make}"
@@ -141,14 +160,58 @@ function makeDirectory() {
   fi
 }
 
+####
+# Description:
+#      This method uses multifasta2single.py to create sub fasta files.
+# Errors:
+#      1. If python script missing
+#      2. If multifasta doesn't exist
+####
 function multifasta2fasta(){
   local multi_fasta_file=$1;
   local directory_for_fasta_files=$2;
-  echo "Turning ${multi_fasta_file} into multiple fasta files";
-  python ${DIR}/multifasta2single.py ${multi_fasta_file} ${directory_for_fasta_files};
-  rm ${multi_fasta_file};
+  local multifasta2fasta_script=multifasta2single.py
+  echo "Turning ${multi_fasta_file} into multiple fasta files, then deleting";
+  if [[ -f ${multifasta2fasta_script} ]]; then
+    if [[ -f ${multi_fasta_file} ]]; then
+      python ${DIR}/${multifasta2fasta_script} ${multi_fasta_file} ${directory_for_fasta_files};
+      rm ${multi_fasta_file}; #TODO: Should the multifasta be deleted?
+    else;
+      throw_fatal_error "${multifasta2fasta_script} is missing from ${DIR}";
+  else; # ensure this is the correct use of else
+    throw_fatal_error "${multi_fasta_file} is missing or not found!!!!";
+  fi
 }
 
+####
+# Description:
+#      This method throws a warning then continues.
+####
+function throw_warning() {
+  local warning_msg=$1
+  echo; echo "**WARNING:";
+  echo "${multifasta2fasta_script} is missing from ${DIR}";
+  echo;
+}
+
+####
+# Description:
+#      This method throws an error then exits.
+####
+function throw_fatal_error() {
+  local error_msg=$1
+  echo; echo "**ERROR:";
+  echo ${error_msg};
+  echo "Exiting";
+  exit 1; 
+}
+
+
+####
+####
+# Description: The main function controls the flow of the script.
+####
+####
 function main() {                                                               
   # input arguments                                                             
   if [[ -f ${DIR}/kraken_module.config ]]; then
