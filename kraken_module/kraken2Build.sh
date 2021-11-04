@@ -125,7 +125,14 @@ function moveFile() {
 
 ####
 # Description:
-#      FIX DEF
+#      This method adds genomes to the to-be-build krakenDB
+# Errors:
+#      1. If python kraken2-build missing
+#      2. If ${genomeDir}/ empty
+# Warnings:
+#      1. if file without find extensions are in ${genomeDir}/
+# TODO:
+#      1. add the correct error and warnings as above.
 ####
 function addGenomesToDb() {
   echo "Running addGenomesToDb()";
@@ -139,18 +146,20 @@ function addGenomesToDb() {
 
 ####
 # Description:
-#      FIX DEF
+#      This method calls on kraken2-build to create a directory.
+# Errors:
+#      1. If python kraken2-build missing
 ####
 function buildKrakenDb() {
   echo "Running buildKrakenDb()";
   # arguments
   local dbDir=$1;
-  kraken2-build --build --db ${dbDir};
+  kraken2-build --build --db ${dbDir}; # TODO: throw error if no kraken2-build
 }
 
 ####
 # Description:
-#      FIX DEF
+#      This method makes a directory if it does not exist.
 ####
 function makeDirectory() {
   local directory_to_make=$1;
