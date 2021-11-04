@@ -1,5 +1,4 @@
 #!/bin/bash
-# Build a kraken2 database
 
 #######
 # DESCRIPTION:
@@ -10,42 +9,71 @@
 #######
 
 
+
+
 # change to the correct directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-function downloadRequiredFiles() {
-  echo "Running downloadRequiredFiles()";
- 
-  #arguments
-  local dbDir=$1;
-
+####
+# Description:
+#      This function uses ncbi-genome-download to download all 
+#      phage genomess into an output genome direrctory.
+####
+function NCBIPhageGenomeDownload() {
+  local genomeDir=$1;
   # download NCBI phage genomes
-  if [[ ! -d refseq/viral ]]; then
-    echo "Downloading NCBI phage genomes...";
-    ncbi-genome-download  --formats fasta --assembly-level complete \
-                          --genera phage --fuzzy-genus viral --parallel 4 \
-                          --flat-output -o ${genomeDir}; 
-    # unzip the downloaded genomes
-    find ref_genomes/ -name '*.gz' -exec gzip -d {} +;
-  fi
+  while [[ ! -d refseq/viral ]]; do #TODO: ensure this is the right way to make while loop.
+    if [[ ! -d refseq/viral ]]; then
+      echo "Downloading NCBI phage genomes...";
+      #TODO: print out the attempt #
+      #TODO: If tries above 3, then exiit script and give advise for nternet connection
+      ncbi-genome-download  --formats fasta --assembly-level complete \
+                            --genera phage --fuzzy-genus viral --parallel 4 \
+                            --flat-output -o ${genomeDir}; 
+      # unzip the downloaded genomes
+      find ref_genomes/ -name '*.gz' -exec gzip -d {} +;
+    else 
+      # TODO break while loop, print "Success and output message"
+      break
+    fi
+  done
+}
 
+####
+# Description:
+#      This function calls wget_file() to obtain all ftp
+#      DB required files.
+####
+function DownloadFTPfiles() {
+  echo "Running DownloadFTPFiles()";
+  local dbDir=$1;
   # Download phagesDB all phages database
-  if [[ ! -f Actinobacteriophages-All.fasta ]]; then
-    echo "Downloading Actinobacteriophage genomes...";
-    wget https://phagesdb.org/media/Actinobacteriophages-All.fasta;
-  fi
-  
+  actino_ftp='https://phagesdb.org/media/Actinobacteriophages-All.fasta'
+  wget_file ${actino_ftp} Actinobacteriophages-All.fasta Actinobacteriophages-All.fasta
   # Download NCBI taxonomy
-  if [[ ! -f ${dbDir}/taxonomy/names.dmp && ! -f new_taxdump.tar.gz ]]; then 
-    echo "Downloading NCBI taxonomy...";
-    wget https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz;
-  fi
+  taxdump_ftp='https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz'
+  wget_file ${taxdump_ftp} new_taxdump.tar.gz ${dbDir}/taxonomy/names.dmp
+  # download accession to taxid for WGS
+  nucl_wgs_ftp='https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz'
+  wget_file ${nucl_wgs_ftp} nucl_wgs.accession2taxid.gz ${dbDir}/taxonomy/nucl_wgs.accession2taxid 
+}
 
-  if [[ ! -f ${dbDir}/taxonomy/nucl_wgs.accession2taxid && ! -f nucl_wgs.accession2taxid.gz ]]; then
-    echo "Downloading accession to taxon ID conversion...";
-    wget https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_wgs.accession2taxid.gz;
+####
+# Description:
+#      This function uses wget to obtain a file,
+#      and performs error handeling if the file
+#      is not corrrectly downloaded.
+####
+function wget_file() {
+  local ftp_path=$1;
+  local downloaded_file=$2;
+  local final_file=$3;
+  if [[ ! -f ${downloaded_file} && ! -f ${final_file} ]]; then
+    echo "Downloading ${ftp_path}";
+    wget ${ftp_path};
   fi
 }
+
 
 function reorganizeFiles() {
   echo "Running reorganizeFiles()";
@@ -117,26 +145,28 @@ function multifasta2fasta(){
 
 function main() {                                                               
   # input arguments                                                             
-  if [[ -f ${DIR}/kraken_module.config ]];
-  then
+  if [[ -f ${DIR}/kraken_module.config ]]; then
     source ${DIR}/kraken_module.config;
   else
     echo "The config file (kraken_module.config) is missing!";
     exit 1;
   fi
+
   # update arguments with full path
-  genomeDir=${DIR}/${genomeDir};
-  dbDir=${DIR}/${dbDir};
-  movedActinoOutFile=${genomeDir}/${actinoOutFile}
-  actinoOutFile=${DIR}/${actinoOutFile};
+  local genomeDir=${DIR}/${genomeDir};
+  local dbDir=${DIR}/${dbDir};
+  local movedActinoOutFile=${genomeDir}/${actinoOutFile}
+  local actinoOutFile=${DIR}/${actinoOutFile};
   echo $actinoOutFile;
+
   # run the script                                           
   if [[ ! -f ${dbDir}/taxo.k2d ]]; 
   then   
     makeDirectory ${genomeDir};
     makeDirectory ${dbDir};
-    makeDirectory ${dbDir}/taxonomy;                                      
-    downloadRequiredFiles;                                                      
+    makeDirectory ${dbDir}/taxonomy;
+    NCBIPhageGenomeDownload ${genomeDir};
+    DownloadFTPFiles ${dbDir};                                                
     reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};                   
     addGenomesToDb ${genomeDir} ${dbDir};                                       
     buildKrakenDb ${dbDir};
