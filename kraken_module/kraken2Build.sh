@@ -68,10 +68,16 @@ function wget_file() {
   local ftp_path=$1;
   local downloaded_file=$2;
   local final_file=$3;
-  if [[ ! -f ${downloaded_file} && ! -f ${final_file} ]]; then
-    echo "Downloading ${ftp_path}";
-    wget ${ftp_path};
-  fi
+  while [[ ! -f ${downloaded_file} && ! -f ${final_file} ]]; do
+    if [[ ! -f ${downloaded_file} && ! -f ${final_file} ]]; then
+      # print out attempt number
+      echo "Downloading ${ftp_path}";
+      wget ${ftp_path};
+    else;
+      # TODO break while loop, print "Success and output message"
+      break
+    fi
+  done
 }
 
 
