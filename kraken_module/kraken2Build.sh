@@ -18,6 +18,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Description:
 #      This function uses ncbi-genome-download to download all 
 #      phage genomess into an output genome direrctory.
+# TODO:
+#      1. add the correct error and warnings.
 ####
 function NCBIPhageGenomeDownload() {
   local genomeDir=$1;
@@ -63,6 +65,8 @@ function DownloadFTPfiles() {
 #      This function uses wget to obtain a file,
 #      and performs error handeling if the file
 #      is not corrrectly downloaded.
+# TODO:
+#      1. add the correct error and warnings.
 ####
 function wget_file() {
   local ftp_path=$1;
@@ -81,8 +85,8 @@ function wget_file() {
 }
 
 ####
-# Description:
-#      FIX DEF
+# TODO:
+#      1. split function up into sub functions w/ error handeling.
 ####
 function reorganizeFiles() {
   echo "Running reorganizeFiles()";
@@ -103,7 +107,7 @@ function reorganizeFiles() {
     moveFile nucl_wgs.accession2taxid ${dbDir}/taxonomy;
   fi
 
-  # Reformat Action file to be compatible with kraken
+  # Reformat ActinoDB file to be compatible with kraken
   python ${DIR}/kraken_db_format.py ${dbDir}/taxonomy/names.dmp \
          Actinobacteriophages-All.fasta ${actinoOutFile};
   moveFile ${actinoOutFile} ${genomeDir};
@@ -112,7 +116,14 @@ function reorganizeFiles() {
 
 ####
 # Description:
-#      FIX DEF
+#      Moves a file into a directory
+# Errors:
+#      1. If file empty
+#      2. If directory does not exist
+# Warnings:
+#      1. If directory already contains that file
+# TODO:
+#      1. add the correct error and warnings as above.
 ####
 function moveFile() {
   local file_to_move=$1;
