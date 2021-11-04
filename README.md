@@ -29,7 +29,7 @@ nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <
 
 * EXAMPLE
 ```
-nextflow Nextflow/enrichseq.nf --read single --fasta simulated_test_filessimulate_genomes_2_1000000reads_illumina.fa --workdir ./outdirectory9 --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads  4 --genomedir kraken_module/ref_genomes/
+nextflow Nextflow/enrichseq.nf --read single --fasta simulated_test_files/simulate_genomes_2_1000000reads_illumina.fa --workdir ./outdirectory --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads  4 --genomedir kraken_module/ref_genomes/
 ```
 
 <br />
