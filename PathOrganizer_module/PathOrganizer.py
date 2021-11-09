@@ -44,7 +44,6 @@ class PathOrganizer:
                 if (genome_path == None):
                     genome_path = full_path
                 else:
-                    continue # TODO: this takes the first genome, though DB should prevent duplicates.
                     raise DuplicateGenomeError(genome_path, f"Duplicate genome for {full_path}")
         return genome_path
 
