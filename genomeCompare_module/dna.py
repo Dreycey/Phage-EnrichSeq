@@ -1,15 +1,32 @@
 import sys
+import os
 import re
 import ntpath
 from typing import List
 from pathlib import Path
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(f"{current_path}/../PathOrganizer_module")
+from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
 
 class DNA:
-    def __init__(self, name, fasta_file, kmer_len):
-        ''' Initializes dna object with name, reference genome file, and kmer size '''
-        self.name: str = name
-        self.fasta_file: Path = Path(fasta_file) if self.validate_file_extension(fasta_file) else None
-        self.genome: str = self.fasta_to_genome(fasta_file) if self.fasta_file != None else None
+    ''' TODO: deal with taxid instead of names
+        1) constructor should have taxid only and use PathOrganizer to find the file path
+    '''
+    # def __init__(self, name, fasta_file, kmer_len):
+    #     ''' Initializes dna object with name, reference genome file, and kmer size '''
+    #     self.name: str = name
+    #     self.fasta_file: Path = Path(fasta_file) if self.validate_file_extension(fasta_file) else None
+    #     self.genome: str = self.fasta_to_genome(fasta_file) if self.fasta_file != None else None
+    #     self.kmers: List = self.create_kmers(self.genome, kmer_len) if self.genome != None else []
+
+    def __init__(self, taxid, genome_directory, kmer_len):
+        # self.name: str = name
+        self.taxid = taxid
+
+        # uses PathOrganizer module
+        self.pathOrganizerObj = PathOrganizer(genome_directory)
+        self.fasta_file: Path = self.pathOrganizerObj.genome(taxid)
+        self.genome: str = self.fasta_to_genome(self.fasta_file) if self.fasta_file != None else None
         self.kmers: List = self.create_kmers(self.genome, kmer_len) if self.genome != None else []
 
 
@@ -30,6 +47,7 @@ class DNA:
 
         return kmers
 
+
     # TODO: add multifasta logic
     def fasta_to_genome(self, fasta_path) -> str:
         ''' 
@@ -49,7 +67,7 @@ class DNA:
             sequence_i = ""
             # If name is found (i.e. this is the correct file), get genome
             for counter, line in enumerate(fasta_lines):
-                if line[0] == ">" and re.search(self.name, line, re.IGNORECASE):
+                if line[0] == ">" and re.search(str(self.taxid), line, re.IGNORECASE):
                     if (counter != 0):
                         sequence += (sequence_i.rstrip())
                         sequence_i = ""
@@ -97,11 +115,11 @@ class DNA:
 
     def __eq__(self, other):
         if isinstance(other, DNA):
-            return (self.name == other.name and self.genome == other.genome)
+            return (self.taxid == other.taxid and self.genome == other.genome)
         else:
             return False
     
 
     def __hash__(self):
-        return hash((self.name, self.genome))
+        return hash((self.taxid, self.genome))
 

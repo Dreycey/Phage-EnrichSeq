@@ -1,5 +1,7 @@
+import sys
 import numpy as np
 import pandas as pd
+import argparse
 from typing import List
 from dna import DNA
 from pathlib import Path
@@ -70,3 +72,52 @@ class GenomeCompare:
         else:
             print(pd.DataFrame(self.adjacencyMatrix))
 
+
+    def output_to_file(self, file_prefix):
+        '''
+        Prints cluster information to a csv file
+
+        INPUT:
+            Prefix for file to create
+        
+        OUTPUT:
+            CSV file name
+            CSV file example:
+                C_1, taxid1, taxid3
+                C_2, taxid2
+                C_3, taxid4, taxid5
+        '''
+        pass
+
+# Create an argparse.Namespace object from input args.
+def parseArgs(argv=None) -> argparse.Namespace:
+    '''
+    This method takes in the arguments from the command and performs
+    parsing.
+    INPUT: 
+        Array of input arguments
+    OUTPUT:
+        returns a argparse.Namespace object
+    '''
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group()
+    # group.add_argument("-v", "--verbose", action="store_true")
+    # parser.add_argument("-i", "--input", help="the input lsv file with phage names", required=True)
+    parser.add_argument("-o", "--output_prefix", help="the output file prefix", required=True)
+    # parser.add_argument("-f", "--fasta", help="input fasta path", required=True)
+    parser.add_argument("-g", "--genome_directory", help="path to the directory of genomes", required=True)
+    # parser.add_argument("-t", "--threads", help="number of threads", required=True)
+    return parser.parse_args(argv)
+
+
+def main():
+    ''' Main should take an LSV file as an argument and parse the taxids from it
+        to create DNA objects '''
+    print("Running Genome Comparison clustering...")
+    arguments = parseArgs(argv=sys.argv[1:])
+
+    GENOME_DIR = arguments.genome_directory
+
+
+if __name__ == "__main__":
+    main()
