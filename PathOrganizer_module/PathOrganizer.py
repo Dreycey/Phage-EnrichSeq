@@ -44,7 +44,7 @@ class PathOrganizer:
                 if (genome_path == None):
                     genome_path = full_path
                 else:
-                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {full_path}")
+                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {full_path}, rerun the DB Build script!!")
         return genome_path
 
     def get_fasta_taxid(self, genome_in_db):
