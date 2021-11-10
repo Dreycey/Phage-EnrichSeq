@@ -323,10 +323,10 @@ function run_PIPELINE() {
     downloadFTPFiles ${dbDir};
     NCBIPhageGenomeDownload ${genomeDir};                                                
     reorganizeFiles ${genomeDir} ${dbDir} ${actinoOutFile};                   
-    addGenomesToDb ${genomeDir} ${dbDir};                                       
-    buildKrakenDb ${dbDir};
     multifasta2fasta ${movedActinoOutFile} ${genomeDir};
     delete_duplicates ${genomeDir};
+    addGenomesToDb ${genomeDir} ${dbDir};                                       
+    buildKrakenDb ${dbDir};
 }
 
 ####
