@@ -53,7 +53,7 @@ def main():
     genome_dir_path = sys.argv[1]
 
     # get the paths to all genomes
-    full_genome_paths = [current_path+"/"+genome_dir_path+fasta_file 
+    full_genome_paths = [Path(genome_dir_path) / Path(fasta_file)
                          for fasta_file in os.listdir(genome_dir_path)]
 
     # obtain genomes to keep (keep the ones with longest genome.)
