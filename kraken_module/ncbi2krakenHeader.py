@@ -78,7 +78,11 @@ def file2correctHeader(acc2taxid, genome_directory):
         with open(full_path, "r") as fasta_opened:
             file_lines = fasta_opened.readlines()
             accession_id = file_lines[0].split(" ")[0].strip(">")
-            tax_id = acc2taxid[accession_id]
+            try:
+                tax_id = acc2taxid[accession_id]
+            except:
+                print(f"cant find mapping for: {accession_id}")
+                continue
 
         os.remove(full_path) # DELETE FILE.
 
