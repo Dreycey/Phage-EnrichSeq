@@ -16,11 +16,6 @@ from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
 
 
 class GenomeCompare:
-    # def __init__(self, dnaList):
-    #     ''' Initializes GenomeCompare object given a list of DNA objects '''
-    #     self.dnaList: List = dnaList # TODO: implement mechanism to prevent duplicates
-    #     self.adjacencyMatrix = np.zeros((len(dnaList), len(dnaList)), float)
-
     def __init__(self, inputfile, genome_dir, kmer_length = 20):
         self.dnaList: List = self.parse_input_file(inputfile, genome_dir, int(kmer_length))
         self.adjacencyMatrix = np.zeros((len(self.dnaList), len(self.dnaList)), float)
@@ -141,30 +136,6 @@ class GenomeCompare:
         # TODO: raise exception if empty?
         print(self.adjacencyMatrix)
 
-
-    # def output_to_file(self, file_prefix):
-    #     '''
-    #     DESCRIPTION:
-    #         Prints cluster information to a csv file
-
-    #     INPUT:
-    #         Prefix for file to create
-        
-    #     OUTPUT:
-    #         CSV file name
-    #         CSV file example:
-    #             C_1, taxid1, 
-    #             C_1, taxid3
-    #             C_2, taxid2
-    #             C_3, taxid4
-    #             C_3, taxid5
-    #     '''
-    #     file_out = file_prefix + ".csv"
-    #     with open(file_out, 'w') as csvfile:
-    #         writer = csv.writer(csvfile)
-    #         for key,value in self.clusters.items():
-    #             for dna in value:
-    #                 writer.writerow([key, dna.taxid])
 
     def output_to_file(self, file_path, isDNA=True):
         '''
