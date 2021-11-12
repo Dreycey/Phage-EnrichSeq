@@ -30,7 +30,7 @@ class DNA:
         self.kmers: List = self.create_kmers(self.genome, kmer_len) if self.genome != None else []
 
 
-    def create_kmers(self, genome, kmer_len = 20) -> List:
+    def create_kmers(self, genome, kmer_len) -> List:
         ''' Generates k-mers given a dna sequence and specified k-mer length'''
         kmers = []
         g_len = len(genome)
