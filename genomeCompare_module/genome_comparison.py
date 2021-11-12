@@ -25,6 +25,7 @@ class GenomeCompare:
         self.dnaList: List = self.parse_input_file(inputfile, genome_dir, int(kmer_length))
         self.adjacencyMatrix = np.zeros((len(self.dnaList), len(self.dnaList)), float)
         self.clusters: dict = {}
+        self.abundances: dict = {}
 
 
     def parse_input_file(self, inputfile, genome_dir, kmer_length):
@@ -101,6 +102,39 @@ class GenomeCompare:
         self.clusters = clusters
         return clusters
     
+
+    def estimate_abundances(self, inputfile):
+        '''
+        DESCRIPTION:
+
+
+        INPUT:
+            merge_overlap_filter/merge_overlap_out_refined.csv
+
+        OUTPUT:
+            dictionary (key: cluster name, value: relative abundance)
+
+        TODO: Improve time complexity
+        '''
+        print("Calculating cluster abundances...")
+        self.abundances = {}
+        with open(inputfile, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                taxid = int(row[0]) if row[0] != 'UNK' else str(row[0])
+                abundance = float(row[1])
+                if taxid == 'UNK':
+                    self.abundances[taxid] = abundance
+                    continue
+                for clusterName,dnaSet in self.clusters.items():
+                    for dnaObj in dnaSet:
+                        if dnaObj.taxid == taxid:
+                            if clusterName in self.abundances.keys():
+                                self.abundances[clusterName] += abundance
+                            else:
+                                self.abundances[clusterName] = abundance
+                       
+
     
     def display_adjacency_matrix(self):
         # TODO: make pretty
@@ -108,29 +142,56 @@ class GenomeCompare:
         print(self.adjacencyMatrix)
 
 
-    def output_to_file(self, file_prefix):
+    # def output_to_file(self, file_prefix):
+    #     '''
+    #     DESCRIPTION:
+    #         Prints cluster information to a csv file
+
+    #     INPUT:
+    #         Prefix for file to create
+        
+    #     OUTPUT:
+    #         CSV file name
+    #         CSV file example:
+    #             C_1, taxid1, 
+    #             C_1, taxid3
+    #             C_2, taxid2
+    #             C_3, taxid4
+    #             C_3, taxid5
+    #     '''
+    #     file_out = file_prefix + ".csv"
+    #     with open(file_out, 'w') as csvfile:
+    #         writer = csv.writer(csvfile)
+    #         for key,value in self.clusters.items():
+    #             for dna in value:
+    #                 writer.writerow([key, dna.taxid])
+
+    def output_to_file(self, file_path, isDNA=True):
         '''
         DESCRIPTION:
             Prints cluster information to a csv file
-
         INPUT:
             Prefix for file to create
-        
         OUTPUT:
             CSV file name
             CSV file example:
-                C_1, taxid1, 
+                C_1, taxid1,
                 C_1, taxid3
                 C_2, taxid2
                 C_3, taxid4
                 C_3, taxid5
         '''
-        file_out = file_prefix + ".csv"
+        input_dict = self.clusters if isDNA else self.abundances
+        # loop through object and save to CSV
+        file_out = file_path+"clusters.csv" if isDNA else file_path+"abundances.csv"
         with open(file_out, 'w') as csvfile:
             writer = csv.writer(csvfile)
-            for key,value in self.clusters.items():
-                for dna in value:
-                    writer.writerow([key, dna.taxid])
+            for key, value in input_dict.items():
+                if isDNA:
+                    for dna in value:
+                        writer.writerow([key, dna.taxid])
+                else:
+                    writer.writerow([key, value])
     
 
 # Create an argparse.Namespace object from input args.
@@ -148,7 +209,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     parser.add_argument("-i", "--input", help="the input lsv file from merge overlap", required=True)
-    parser.add_argument("-o", "--output_prefix", help="the output file prefix", required=True)
+    parser.add_argument("-o", "--output_dir", help="the output directory", required=True)
     parser.add_argument("-g", "--genome_directory", help="path to the directory of genomes", required=True)
     parser.add_argument("-k", "--kmer_length", help="desired k-mer length for comparison", required=False)
     parser.add_argument("-th", "--threshold", help="threshold value of similarity for pruning", required=True)
@@ -161,11 +222,14 @@ def main():
     print("Running Genome Comparison clustering...")
     arguments = parseArgs(argv=sys.argv[1:])
 
-    genomeCompareObj = GenomeCompare(arguments.input, arguments.genome_directory, arguments.kmer_length) 
+    genomeCompareObj = GenomeCompare(arguments.input + "merge_overlap_out_filtered_genomes.lsv", arguments.genome_directory, arguments.kmer_length) 
     genomeCompareObj.create_adjacency_matrix()
     genomeCompareObj.display_adjacency_matrix()
     genomeCompareObj.prune_adj_matrix(arguments.threshold)
-    genomeCompareObj.output_to_file(arguments.output_prefix)
+    genomeCompareObj.estimate_abundances(arguments.input + "merge_overlap_out_refined.csv")
+    genomeCompareObj.output_to_file(arguments.output_dir, True)
+    genomeCompareObj.output_to_file(arguments.output_dir, False)
+    
 
 
 if __name__ == "__main__":

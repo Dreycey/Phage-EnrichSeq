@@ -216,8 +216,8 @@ process Run_GenomeComparison {
 	"""
 	echo "Running the Genome Comparison module" > ${genomeCompareDir}/genomeCompare.log;
 	python ${params.toolpath}/genomeCompare_module/genome_comparison.py \
-            --input ${mergeOverlapDir}/merge_overlap_out_filtered_genomes.lsv \
-            --output_prefix ${genomeCompareDir}/clusters \
+            --input ${mergeOverlapDir}/ \
+            --output_dir ${genomeCompareDir}/ \
             --genome_directory ${genomeDir} \
             --kmer_length ${params.kmer_length} \
             --threshold ${params.clustering_threshold}

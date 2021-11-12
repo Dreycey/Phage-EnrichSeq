@@ -21,7 +21,7 @@ class DNA:
 
     def __init__(self, taxid, genome_directory, kmer_len):
         # self.name: str = name
-        self.taxid = taxid
+        self.taxid = int(taxid)
 
         # uses PathOrganizer module
         self.pathOrganizerObj = PathOrganizer(genome_directory)
