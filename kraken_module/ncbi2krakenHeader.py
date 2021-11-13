@@ -73,14 +73,14 @@ def file2correctHeader(acc2taxid, genome_directory):
         full_path = Path(genome_directory) / Path(filename)
         # READ HEADER AND FIND TAX ID
         with open(full_path, "r") as fasta_opened:
-            file_lines = fasta_opened.readlines()
-            accession_id = file_lines[0].split(" ")[0].strip(">")
+            first_line = fasta_opened.readline()
+            accession_id = first_line.split(" ")[0].strip(">")
+            if len(first_line.split("|kraken:taxid|")) > 1:
+                print(f"already exists for {full_path}")
+                continue
             try:
                 tax_id = acc2taxid[accession_id]
-                print(f"Found for {tax_id}")
             except:
-                print(f"cant find mapping for: {accession_id}")
-                # os.remove(full_path) # DELETE FILE.
                 continue
 
         os.remove(full_path) # DELETE FILE.
@@ -105,7 +105,7 @@ def main():
 
     # create mapping dictionary
     acceptable_names = get_acc2tax_map(genome_directory)
-    print("    Done!")
+    print("        Done!")
     acc2taxid = accession2taxid(genbank_accession_map, acceptable_names)
     print("    Done!")
     # modify each file in directory
