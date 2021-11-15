@@ -82,7 +82,10 @@ def file2correctHeader(acc2taxid, genome_directory):
             try:
                 tax_id = acc2taxid[accession_id]
             except:
+                print(f" Genome not NCBI-tax map NOT found: {accession_id}")
+                os.remove(full_path) # DELETE FILE.
                 continue
+
         os.remove(full_path) # DELETE FILE.
 
         # MAKE NEW FILE WITH TAXD IN HEADER
