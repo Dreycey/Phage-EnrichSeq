@@ -27,18 +27,6 @@ To ensure each module runs correctly, the following installation script needs to
 ```
 cd kraken_module;
 bash enrichseqDB_install.sh;
-cd ../;
-```
-
-*NOTE*: While the above is in the **kraken_module**, the information is needed for other modules.
-
-### Downloading Databases.
-To ensure each module runs correctly, the following installation script needs to be ran.
-
-* From the outermost EnrichSeq directory, run the following:
-```
-cd kraken_module;
-bash enrichseqDB_install.sh;
 ```
 
 *NOTE*: While the above is in the **kraken_module**, the information is needed for other modules.
