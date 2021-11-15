@@ -52,6 +52,7 @@ krakenDir = file("$workingDir/$WORKFLOW/kraken")
 brackenDir = file("$workingDir/$WORKFLOW/bracken")
 blastWorkingDir = file("$workingDir/$WORKFLOW/blast")
 mergeOverlapDir = file("$workingDir/$WORKFLOW/merge_overlap_filter")
+genomeCompareDir = file("$workingDir/$WORKFLOW/genome_comparison")
 
 
 process Create_Working_Directories {
@@ -67,12 +68,14 @@ process Create_Working_Directories {
     if [ -d $brackenDir ]; then rm -rf $brackenDir; fi;
     if [ -d $blastWorkingDir ]; then rm -rf $blastWorkingDir; fi;
     if [ -d $mergeOverlapDir ]; then rm -rf $mergeOverlapDir; fi;
+    if [ -d $genomeCompareDir ]; then rm -rf $genomeCompareDir; fi;
 
     #mkdir $megahitDir
     mkdir $krakenDir
     mkdir $brackenDir
     mkdir $blastWorkingDir
     mkdir $mergeOverlapDir
+    mkdir $genomeCompareDir
     """
 }
 
@@ -192,7 +195,7 @@ process Run_MergeOverlap {
 
 	script:    
 	"""
-	echo "Running the Merge Overlap Filter" > ${brackenDir}/bracken.log;
+	echo "Running the Merge Overlap Filter" > ${mergeOverlapDir}/mergeOverlap.log;
 	python ${params.toolpath}/mergeoverlap_filter_module/mergeoverlap.py \
             --input ${krakenDir}/taxid_file.txt \
             --output_prefix ${mergeOverlapDir}/merge_overlap_out \
@@ -202,6 +205,24 @@ process Run_MergeOverlap {
 	"""
 }
 
+process Run_GenomeComparison {
+	input:
+    val filter from merge_overlap
+
+	output:
+	stdout clusters
+
+	script:    
+	"""
+	echo "Running the Genome Comparison module" > ${genomeCompareDir}/genomeCompare.log;
+	python ${params.toolpath}/genomeCompare_module/genome_comparison.py \
+            --input ${mergeOverlapDir}/ \
+            --output_dir ${genomeCompareDir}/ \
+            --genome_directory ${genomeDir} \
+            --kmer_length ${params.kmer_length} \
+            --threshold ${params.clustering_threshold}
+	"""
+}
 /*
 process Run_BLAST {
         input:
@@ -232,4 +253,6 @@ megahit.subscribe { print "$it" }
 kraken.subscribe { print "$it" }
 
 bracken.subscribe { print "$it" }
+merge_overlap.subscribe { print "$it" }
+clusters.subscribe { print "$it" } 
 //blast.subscribe { print "$it" }
