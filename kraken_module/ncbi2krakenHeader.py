@@ -73,7 +73,8 @@ def file2correctHeader(acc2taxid, genome_directory):
         full_path = Path(genome_directory) / Path(filename)
         # READ HEADER AND FIND TAX ID
         with open(full_path, "r") as fasta_opened:
-            first_line = fasta_opened.readline()
+            file_lines = fasta_opened.readlines()
+            first_line = file_lines[0]
             accession_id = first_line.split(" ")[0].strip(">")
             if len(first_line.split("|kraken:taxid|")) > 1:
                 print(f"already exists for {full_path}")
@@ -82,7 +83,6 @@ def file2correctHeader(acc2taxid, genome_directory):
                 tax_id = acc2taxid[accession_id]
             except:
                 continue
-
         os.remove(full_path) # DELETE FILE.
 
         # MAKE NEW FILE WITH TAXD IN HEADER
