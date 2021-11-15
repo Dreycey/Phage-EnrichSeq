@@ -5,7 +5,7 @@ Finding phages for phage therapy using Enrichment followed by Differential Genom
 
 ## Getting Started.
 ### Activate enrichseq conda environment with pre-installed dependencies
-* To setup the ![conda](https://docs.conda.io/en/latest/miniconda.html) environment, use the following command once conda is installed locally. 
+* To setup the [conda](https://docs.conda.io/en/latest/miniconda.html) environment, use the following command once conda is installed locally. 
 ```
 conda env create -f environment.yml;
 ```
@@ -15,7 +15,7 @@ conda activate enrichseq;
 ```
 
 ### Download test data
-* Currently, the test genomic data is on ![git lfs](https://git-lfs.github.com/), so ensure this is working locally before running the following:
+* Currently, the test genomic data is on [git lfs](https://git-lfs.github.com/), so ensure this is working locally before running the following:
 ```
 cd simulated_test_files/; git lfs pull; cd ../;
 ```
