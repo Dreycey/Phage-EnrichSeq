@@ -21,7 +21,7 @@ cd simulated_test_files/; git lfs pull; cd ../;
 ```
 
 ### Downloading Databases.
-To ensure each module runs correctly, the following installation script needs to be ran.
+To ensure each module runs correctly, the following installation script needs to be ran. **THIS TAKE A WHILE, BE PREPARED TO WAIT AN HOUR FOR DOWNLOADING**
 
 * From the outermost EnrichSeq directory, run the following:
 ```
