@@ -31,14 +31,12 @@ def get_acc2tax_map(genome_directory):
     accession_dict = {}
     for filename in os.listdir(genome_directory):
         # READ HEADER AND FIND TAX ID
-        print(f"        genome being reviwed: {filename}")
         full_path = Path(genome_directory) / Path(filename)
         with open(full_path, "r") as fasta_opened:
-            file_lines = fasta_opened.readlines()
-            accession_id = file_lines[0].split(" ")[0].strip(">")
+            file_line = fasta_opened.readline()
+            accession_id = file_line.split(" ")[0].strip(">")
             accession_dict[accession_id] = 0
     return accession_dict
-
 
 def accession2taxid(genbank_file_path, accession_dict, delimiter="\t"):
     """
@@ -54,12 +52,11 @@ def accession2taxid(genbank_file_path, accession_dict, delimiter="\t"):
             line = gb_file.readline()
             # If line is empty then end of file reached
             if not line:
-                break;
+                break
             line = line.split(delimiter)
             accessonAndVersion = line[1]
             taxid = line[2]
             if accessonAndVersion in accession_dict.keys():
-                print("ACCESSION FOUND!")
                 accession2taxid[accessonAndVersion] = taxid
             counter += 1
             if (counter % 10000000) == 0:
@@ -71,14 +68,23 @@ def file2correctHeader(acc2taxid, genome_directory):
     modifes each genome in a directory, assumes is NCBI
     and adds taxid.
     """
-    print("    Modifying each NCBI fiile in the genome specified directory")
+    print("    Modifying each NCBI file in the genome specified directory")
     for filename in os.listdir(genome_directory):
         full_path = Path(genome_directory) / Path(filename)
         # READ HEADER AND FIND TAX ID
         with open(full_path, "r") as fasta_opened:
             file_lines = fasta_opened.readlines()
-            accession_id = file_lines[0].split(" ")[0].strip(">")
-            tax_id = acc2taxid[accession_id]
+            first_line = file_lines[0]
+            accession_id = first_line.split(" ")[0].strip(">")
+            if len(first_line.split("|kraken:taxid|")) > 1:
+                print(f"already exists for {full_path}")
+                continue
+            try:
+                tax_id = acc2taxid[accession_id]
+            except:
+                print(f" Genome not NCBI-tax map NOT found: {accession_id}")
+                os.remove(full_path) # DELETE FILE.
+                continue
 
         os.remove(full_path) # DELETE FILE.
 
@@ -102,7 +108,7 @@ def main():
 
     # create mapping dictionary
     acceptable_names = get_acc2tax_map(genome_directory)
-    print("    Done!")
+    print("        Done!")
     acc2taxid = accession2taxid(genbank_accession_map, acceptable_names)
     print("    Done!")
     # modify each file in directory

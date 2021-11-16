@@ -27,6 +27,16 @@ class DuplicateGenomeError(PathErrors):
         self.genome_name = genome_name
         self.message = message
 
+class HeaderError(PathErrors):
+    """
+    Exception raised if the file header is 
+    not correct.
+    """
+
+    def __init__(self, genome_name, message):
+        self.genome_name = genome_name
+        self.message = message
+
 # path storing class
 class PathOrganizer:
     """ This data structure holds paths and retrieves information """
@@ -44,8 +54,7 @@ class PathOrganizer:
                 if (genome_path == None):
                     genome_path = full_path
                 else:
-                    continue # TODO: this takes the first genome, though DB should prevent duplicates.
-                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {full_path}")
+                    raise DuplicateGenomeError(genome_path, f"Duplicate genome for {full_path}, rerun the DB Build script!!")
         return genome_path
 
     def get_fasta_taxid(self, genome_in_db):
@@ -53,5 +62,8 @@ class PathOrganizer:
         parse an input fasta for the taxid.
         """
         with open(genome_in_db) as fasta_file:
-            taxid = fasta_file.readline().split("|kraken:taxid|")[1].split(" ")[0]
+            try:
+                taxid = fasta_file.readline().split("|kraken:taxid|")[1].split(" ")[0]
+            except:
+                taxid = 0 
         return taxid

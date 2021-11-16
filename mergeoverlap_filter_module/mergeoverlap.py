@@ -35,8 +35,10 @@ from sklearn.mixture import GaussianMixture
 from numpy import unique
 from numpy import where
 # in house packages
-sys.path.append("/Users/dreyceyalbin/Desktop/Phage-EnrichSeq/PathOrganizer_module")
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(f"{current_path}/../PathOrganizer_module")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
+
 
 
 
