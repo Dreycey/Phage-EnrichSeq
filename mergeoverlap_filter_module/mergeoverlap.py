@@ -487,9 +487,10 @@ class GenomeTestSet:
         returns a csv that can be used in regression testing.
         """
         with open(csvout, 'w') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.resultDict.keys())
-                writer.writeheader()
-                writer.writerow(self.resultDict)
+                writer = csv.writer(csvfile)
+                #writer.writeheader()
+                for genome_name, abundance in self.resultDict.items():
+                    writer.writerow([genome_name, abundance])
 
     def print_minimap2output(self, out_prefix):
         """ prints output in minimap_out datastructure """
