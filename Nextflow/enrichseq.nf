@@ -6,7 +6,7 @@ def usage() {
     log.info ''
 	log.info 'Usage: nextflow run enrichseq.nf --read single --fasta /Path/to/infile.fasta --workdir /Path/to/working_directory --dbdir /Path/to/databases [--threads 4] [--log=/Path/to/run.log]'
 	log.read '  --read       Ready type (single / paired / long)'
-	log.info '  --fasta		Path to the input FASTA file'
+	log.info '  --fasta		Path to the input FASTA file (if paired, use prefix - A if A_1.fa and A_2.fa [MUST BE "_X.fa"])'
 	log.info '  --workdir	Path to the output working directory'
 	log.info "  --dbdir		Path to the classification databases"
     log.info "  --genomedir Path to the genome directory, built running the Krake2Build.sh script"
@@ -37,8 +37,20 @@ if (!params.dbdir) {
     usage()
 }
 
+// Get reads ready based on type
+if (params.read == 'single') {
+    println "Single end reads entered!"
+    fastafile = file(params.fasta)
+    fastafile_2 = file(params.fasta) // UNUSED IN THIS CASE.
+}
+else if (params.read == 'paired') {
+    println "Paired end reads entered!"
+    fastafile = file(params.fasta+'_1.fa')
+    fastafile_2 = file(params.fasta+'_2.fa')
+}
+
+// opening files for misc parameters
 logfile = file(params.log)
-fastafile = file(params.fasta)
 workingDir = file(params.workdir)
 databasesDir = file(params.dbdir)
 genomeDir = file(params.genomedir)
@@ -107,7 +119,8 @@ process Run_Megahit {
     script:
     """
     bash ${params.toolpath}/megahit_module/megahitRun.sh --read=${params.read} \
-        		  --input=${fastafile} \
+        		  --input1=${fastafile} \
+                  --input2=${fastafile_2} \
     			  --threads=${THREADS} \
     			  --out=${megahitDir}
     """
