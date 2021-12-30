@@ -16,7 +16,7 @@ from PathOrganizer import PathOrganizer as PathO, DuplicateGenomeError, InvalidQ
 @pytest.fixture
 def genome_testing_path():
     """ contains major paths """
-    return "./testing_files/"
+    return "./PathOrganizer_module/testing_files/"
 
 @pytest.fixture
 def object_PathOrganizer(genome_testing_path):
