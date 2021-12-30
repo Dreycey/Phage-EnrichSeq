@@ -15,9 +15,9 @@ import sys
 # Global Variables
 PATH = os.path.dirname(os.path.abspath(__file__))
 TEST_CONFIG = Path(PATH) / Path("simulate_genomes.config")
-FASTA_FILE = Path(PATH) / Path("simulatedgenomes_illumina.fa")
+FASTA_FILE = Path(PATH) / Path("simulated_test_reads_illumina.fa")
 TEST_FASTA = Path(PATH) / Path("test_fasta.fa")
-# Changing to directory of script.
+# # Changing to directory of script.
 os.chdir(PATH)
 
 config_object = GenomeTestSet(TEST_CONFIG)
