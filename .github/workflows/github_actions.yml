@@ -1,0 +1,19 @@
+name: enrichseq-cdci-actions
+on: [push]
+jobs:
+  basic-testing:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          environment-file: enrichseq.yml
+          activate-environment: enrichseq
+          auto-activate-base: false 
+      - name: conda env check
+        shell: bash -l {0}
+        run: ls $CONDA/envs/;
+             conda info --envs;
+      - name: run unit tests
+        shell: bash -l {0}
+        run: pytest PathOrganizer_module/*
