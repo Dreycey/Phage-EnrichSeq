@@ -16,4 +16,4 @@ jobs:
              conda info --envs;
       - name: run unit tests
         shell: bash -l {0}
-        run: pytest PathOrganizer_module/*
+        run: pytest PathOrganizer_module/
