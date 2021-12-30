@@ -17,6 +17,15 @@ import re
 class PathErrors(Exception):
     pass
 
+class InvalidQueryError(PathErrors):
+    """
+    Exception raised if the taxid query isn't 
+    able to be casted into an integer
+    """
+
+    def __init__(self, message):
+        self.message = message
+
 class DuplicateGenomeError(PathErrors):
     """
     Exception raised if there are more than one genome 
@@ -50,7 +59,15 @@ class PathOrganizer:
         genome_path = None
         for genome_in_db in os.listdir(self.database_path):
             full_path = Path(self.database_path) / Path(genome_in_db)
-            if (int(self.get_fasta_taxid(full_path)) == int(genome_taxid)):
+            try:
+                file_taxid = int(self.get_fasta_taxid(full_path))
+            except:
+                raise HeaderError(full_path, f"Header is not valid for genome: {full_path}")
+            try:
+                genome_id = int(genome_taxid)
+            except: 
+                raise InvalidQueryError(f"genome query id {genome_taxid} is not valid")
+            if (file_taxid == genome_id):
                 if (genome_path == None):
                     genome_path = full_path
                 else:
