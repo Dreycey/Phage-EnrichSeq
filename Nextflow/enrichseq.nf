@@ -6,7 +6,7 @@ def usage() {
     log.info ''
 	log.info 'Usage: nextflow run enrichseq.nf --read single --fasta /Path/to/infile.fasta --workdir /Path/to/working_directory --dbdir /Path/to/databases [--threads 4] [--log=/Path/to/run.log]'
 	log.read '  --read       Ready type (single / paired / long)'
-	log.info '  --fasta		Path to the input FASTA file (if paired, use prefix - A if A_1.fa and A_2.fa [MUST BE "_X.fa"])'
+	log.info '  --fasta		Path to the input FASTA file. If paired end reads, only use file prefix (i.e. before underscore)! Example: '--fasta fastaA' if 'fastaA_1.fa'/'fastaA_2.fa' [suffix must be "_{1/2}.fa"])'
 	log.info '  --workdir	Path to the output working directory'
 	log.info "  --dbdir		Path to the classification databases"
     log.info "  --genomedir Path to the genome directory, built running the Krake2Build.sh script"
