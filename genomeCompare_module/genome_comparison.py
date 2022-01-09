@@ -193,11 +193,31 @@ def main():
     print("Running Genome Comparison clustering...")
     arguments = parseArgs(argv=sys.argv[1:])
 
-    genomeCompareObj = GenomeCompare(arguments.input + "merge_overlap_out_filtered_genomes.lsv", arguments.genome_directory, arguments.kmer_length) 
+    # find out if single genome or more.
+    single_genome = False
+    if not os.path.exists(arguments.input + "merge_overlap_out_filtered_genomes.lsv"): single_genome = True
+
+    # instantiate clustering object.
+    if single_genome:
+        genomeCompareObj = GenomeCompare(arguments.input + "merge_overlap_out_genomes.lsv", 
+                                         arguments.genome_directory, 
+                                         arguments.kmer_length)
+    else:
+        genomeCompareObj = GenomeCompare(arguments.input + "merge_overlap_out_filtered_genomes.lsv", 
+                                         arguments.genome_directory, 
+                                         arguments.kmer_length)
+    # find related genomes.
     genomeCompareObj.create_adjacency_matrix()
     genomeCompareObj.display_adjacency_matrix()
     genomeCompareObj.prune_adj_matrix(arguments.threshold)
-    genomeCompareObj.estimate_abundances(arguments.input + "merge_overlap_out_refined.csv")
+
+    # get renewed abundances
+    if single_genome:
+        genomeCompareObj.estimate_abundances(arguments.input + "merge_overlap_out.csv")
+    else: 
+        genomeCompareObj.estimate_abundances(arguments.input + "merge_overlap_out_refined.csv")
+
+    # save information to output files
     genomeCompareObj.output_to_file(arguments.output_dir, True)
     genomeCompareObj.output_to_file(arguments.output_dir, False)
     

@@ -589,36 +589,44 @@ def main():
     genomeTestObj.print_minimap2output(arguments.output_prefix)
 
     # save the pickle output.
+    predicted_abundances = genomeTestObj.minimap_out
     with open(f'{arguments.output_prefix}_minimap_out.pickle', 'wb') as handle:
-        pickle.dump(genomeTestObj.minimap_out, handle)
+        pickle.dump(predicted_abundances, handle)
 
-    # use unsupervised model to obtain true genomes in sample
-    y_vector, x_vector = print_values_for_mappedinfo(genomeTestObj.minimap_out)
-    plot_scatter_plot(x_vector, y_vector, f"{arguments.output_prefix}_scatterplot.png")
-    clusters = GaussianMixModel().model_predict(x_vector)
-    scatter_of_filtered(clusters, x_vector, y_vector, f"{arguments.output_prefix}_clusters_scatterplot.png")
-    true_pos_genome = get_true_positive(y_vector, x_vector)
-    print(f"true positive genome: {true_pos_genome}")
-    true_genomes = get_filtered_genomes(true_positive_name=true_pos_genome, 
-                                        model=clusters, 
-                                        name_list=y_vector)
-    # add filtered genomes to output file. 
-    with open(arguments.output_prefix+"_filtered_genomes.lsv", "w") as filtered_genomes:
-        for genome_name in true_genomes:
-            filtered_genomes.write(genome_name + "\n")
+    # save to original genomes to LSV (note: reduntant with kraken lsv)
+    with open(arguments.output_prefix+"_genomes.lsv", "w") as genomes_csv:
+        for genome_name in predicted_abundances.keys():
+            genomes_csv.write(genome_name + "\n")
 
-    # use filtered genomes (recalcuting abundances affter filtering)
-    if os.path.exists(arguments.output_prefix+"_filtered_genomes.lsv"):
-        print("THE FILE EXISTS!!!!!!!! contents:")
-        with open(arguments.output_prefix+"_filtered_genomes.lsv", "r") as filtered_genomes:
-            print(filtered_genomes.readlines())
+    # if more than one genome, use GMM to see if really in sample
+    if len(predicted_abundances.keys()) > 2:
+        # use unsupervised model to obtain true genomes in sample
+        y_vector, x_vector = print_values_for_mappedinfo(genomeTestObj.minimap_out)
+        plot_scatter_plot(x_vector, y_vector, f"{arguments.output_prefix}_scatterplot.png")
+        clusters = GaussianMixModel().model_predict(x_vector)
+        scatter_of_filtered(clusters, x_vector, y_vector, f"{arguments.output_prefix}_clusters_scatterplot.png")
+        true_pos_genome = get_true_positive(y_vector, x_vector)
+        print(f"true positive genome: {true_pos_genome}")
+        true_genomes = get_filtered_genomes(true_positive_name=true_pos_genome, 
+                                            model=clusters, 
+                                            name_list=y_vector)
+        # add filtered genomes to output file. 
+        with open(arguments.output_prefix+"_filtered_genomes.lsv", "w") as filtered_genomes:
+            for genome_name in true_genomes:
+                filtered_genomes.write(genome_name + "\n")
+
+        # use filtered genomes (recalcuting abundances affter filtering)
+        if os.path.exists(arguments.output_prefix+"_filtered_genomes.lsv"):
+            print("THE FILE EXISTS!!!!!!!! contents:")
+            with open(arguments.output_prefix+"_filtered_genomes.lsv", "r") as filtered_genomes:
+                print(filtered_genomes.readlines())
 
 
-    genomeTestObj2 = GenomeTestSet(line_seperated_genomes=Path(arguments.output_prefix+"_filtered_genomes.lsv"),
-                                   genome_directory=GENOME_DIR)
-    genomeTestObj2.checkSeqFile(arguments.fasta)
-    genomeTestObj2.plotResult("Estimated Abundances Using Raw Read Mapping", out=arguments.output_prefix+"_refined.png")
-    genomeTestObj2.saveResultAsCSV(arguments.output_prefix+"_refined.csv")
+        genomeTestObj2 = GenomeTestSet(line_seperated_genomes=Path(arguments.output_prefix+"_filtered_genomes.lsv"),
+                                    genome_directory=GENOME_DIR)
+        genomeTestObj2.checkSeqFile(arguments.fasta)
+        genomeTestObj2.plotResult("Estimated Abundances Using Raw Read Mapping", out=arguments.output_prefix+"_refined.png")
+        genomeTestObj2.saveResultAsCSV(arguments.output_prefix+"_refined.csv")
 
 if __name__ == "__main__":
     main()
