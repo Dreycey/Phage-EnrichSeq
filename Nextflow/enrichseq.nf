@@ -65,6 +65,7 @@ brackenDir = file("$workingDir/$WORKFLOW/bracken")
 blastWorkingDir = file("$workingDir/$WORKFLOW/blast")
 mergeOverlapDir = file("$workingDir/$WORKFLOW/merge_overlap_filter")
 genomeCompareDir = file("$workingDir/$WORKFLOW/genome_comparison")
+outputDir = file("$workingDir/$WORKFLOW/output_files")
 
 
 process Create_Working_Directories {
@@ -81,6 +82,7 @@ process Create_Working_Directories {
     if [ -d $blastWorkingDir ]; then rm -rf $blastWorkingDir; fi;
     if [ -d $mergeOverlapDir ]; then rm -rf $mergeOverlapDir; fi;
     if [ -d $genomeCompareDir ]; then rm -rf $genomeCompareDir; fi;
+    if [ -d $outputDir ]; then rm -rf $outputDir; fi;
 
     #mkdir $megahitDir
     mkdir $krakenDir
@@ -88,6 +90,7 @@ process Create_Working_Directories {
     mkdir $blastWorkingDir
     mkdir $mergeOverlapDir
     mkdir $genomeCompareDir
+    mkdir $outputDir
     """
 }
 
@@ -259,6 +262,22 @@ process Run_BLAST {
 }
 */
 
+process Run_CombineOutput {
+    input:
+    val cluster_out from clusters
+
+    output:
+    stdout enrichseq_out
+
+    script:
+    """
+    echo "Consolidating output" > ${outputDir}/genomeCompare.log;
+    python ${params.toolpath}/output_module/combine_output.py \
+            --inputdir ${$workingDir}/${WORKFLOW} \
+            --outputdir ${outputDir}
+    """
+}
+
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
 megahit.subscribe { print "$it" }
@@ -268,4 +287,5 @@ kraken.subscribe { print "$it" }
 bracken.subscribe { print "$it" }
 merge_overlap.subscribe { print "$it" }
 clusters.subscribe { print "$it" } 
+enrichseq_out.subscribe { print "$it"}
 //blast.subscribe { print "$it" }
