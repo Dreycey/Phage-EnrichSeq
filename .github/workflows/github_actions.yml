@@ -1,5 +1,8 @@
 name: enrichseq-cdci-actions
-on: [push]
+on: 
+  pull_request:
+    branches:
+      - main
 jobs:
   basic-testing:
     runs-on: macos-latest
@@ -20,3 +23,6 @@ jobs:
       - name: run unit tests (ReadSimulator)
         shell: bash -l {0}
         run: pytest readsimulator_module/
+      - name: run unit tests (MergeOverlap)
+        shell: bash -l {0}
+        run: pytest mergeoverlap_filter_module/
