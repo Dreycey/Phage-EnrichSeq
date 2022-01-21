@@ -126,25 +126,6 @@ process Run_Megahit {
     """
 }
 
-
-// process Prep_Databases {
-// 	input:
-// 	val init from init
-
-// 	output:
-// 	stdout databases
-
-// 	script:
-// 	"""
-// 	if [[ ! -f ${databasesDir}/taxo.k2d ]]; then
-// 		bash ${params.toolpath}/kraken_module/kraken2Build.sh
-// 	else
-// 		echo "Kraken DB already exists" > ${krakenDir}/kraken.log
-// 	fi
-// 	"""
-// }
-
-
 process Run_Kraken {
 	input:
 	val megaout from megahit
@@ -236,28 +217,6 @@ process Run_GenomeComparison {
             --threshold ${params.clustering_threshold}
 	"""
 }
-/*
-process Run_BLAST {
-        input:
-        val blastdb from databases
-	val megaout from megahit         
-
-        output:
-        stdout blast
-
-        script:
-        """
-        if [[ ! -f ${params.toolpath}/blast_module/blastdb/outputMulti3.fa ]]; then
-                bash ${params.toolpath}/blast_module/blastBuild.sh
-        else
-                echo "Blast DB already exists" > ${blastWorkingDir}/blast.log
-        fi
-        bash ${params.toolpath}/blast_module/blastRun.sh --blastdb=${params.toolpath}/blast_module/blastdb/outputMulti3.fa \
-				 --queryfasta=${fastafile} \
-				 --out=${blastWorkingDir}/blastout.txt
-        """
-}
-*/
 
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
