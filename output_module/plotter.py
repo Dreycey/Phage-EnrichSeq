@@ -5,14 +5,6 @@ import csv
 import matplotlib.pyplot as plt
 current_path = os.path.dirname(os.path.abspath(__file__))
 
-'''
-TODO: Get output from:
-1. genome_comparison/clusters.csv
-2. genome_comparison/abundances.csv
-3. merge_overlap_filter/merge_overlap_out_refined.csv
-4. merge_overlap_filter/merge_overlap_out.csv
-
-'''
 
 def plot_piechart(labels: list, abundances: list, filename: str):
     '''
@@ -34,16 +26,6 @@ def plot_piechart(labels: list, abundances: list, filename: str):
     ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
     plt.savefig(filename)
-
-def plot_barchart():
-    '''
-    Plots a bar chart of relative abundances
-
-    INPUT:
-    
-    OUTPUT:
-        None. Displays a bar chart.
-    '''
 
 
 def parse_csv(file: str):
@@ -87,7 +69,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     '''
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
-    parser.add_argument("-d", "--inputdir", help="parent directory of modules containing all CSVs to parse", required=True)
+    parser.add_argument("-i", "--inputdir", help="parent directory of modules containing all CSVs to parse", required=True)
     parser.add_argument("-o", "--outputdir", help="desired location of all output files", required=True)
     return parser.parse_args(argv)
 
@@ -100,9 +82,6 @@ def main():
     # Display pie chart of cluster abundances
     plot_piechart(clusters, cluster_abund, arguments.outputdir + '/cluster_piechart.png')
 
-    # Display bar chart of cluster abundances --> is this necessary?
-
-    # TODO: can there be a single consolidated CSV file?
 
 
 

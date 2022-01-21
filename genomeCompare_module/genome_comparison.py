@@ -4,6 +4,7 @@ import csv
 import numpy as np
 import pandas as pd
 import argparse
+import matplotlib.pyplot as plt
 from typing import List
 from dna import DNA
 from pathlib import Path
@@ -132,9 +133,20 @@ class GenomeCompare:
 
     
     def display_adjacency_matrix(self):
-        # TODO: make pretty
         # TODO: raise exception if empty?
         print(self.adjacencyMatrix)
+
+
+    def _plot_matrix_heatmap(self, filename):
+        '''
+        DESCRIPTION:
+            private method to plot a heatmap of adjacencies
+        INPUT:
+            File name to save heatmap image
+        OUTPUT:
+            None. PNG file is created.
+        '''
+        raise NotImplementedError
 
 
     def output_to_file(self, file_path, isDNA=True):
