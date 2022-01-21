@@ -1,3 +1,4 @@
+![example workflow](https://github.com/Dreycey/Phage-EnrichSeq/actions/workflows/github_actions.yml/badge.svg)
 ![EnrichSeq](figures/EnrichSeq-LOGO.png)
 
 # Phage-EnrichSeq
