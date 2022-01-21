@@ -88,7 +88,7 @@ function wget_file() {
   local final_file=$3;
   if [[ ! -f ${downloaded_file} && ! -f ${final_file} ]]; then
     add_to_log "      Downloading ${ftp_path}";
-    wget --tries=25 ${ftp_path};
+    wget --tries=25 --no-check-certificate ${ftp_path};
     if [[ -f ${downloaded_file} ]]; then
       add_to_log "SUCCESS: wget_file() downloaded ${downloaded_file}";
     else
