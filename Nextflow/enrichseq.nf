@@ -61,8 +61,6 @@ WORKFLOW = "enrichseq"
 
 megahitDir = file("$workingDir/$WORKFLOW/megahit")
 krakenDir = file("$workingDir/$WORKFLOW/kraken")
-brackenDir = file("$workingDir/$WORKFLOW/bracken")
-blastWorkingDir = file("$workingDir/$WORKFLOW/blast")
 mergeOverlapDir = file("$workingDir/$WORKFLOW/merge_overlap_filter")
 genomeCompareDir = file("$workingDir/$WORKFLOW/genome_comparison")
 
@@ -77,15 +75,11 @@ process Create_Working_Directories {
 
     if [ -d $megahitDir ]; then rm -rf $megahitDir; fi;
     if [ -d $krakenDir ]; then rm -rf $krakenDir; fi;
-    if [ -d $brackenDir ]; then rm -rf $brackenDir; fi;
-    if [ -d $blastWorkingDir ]; then rm -rf $blastWorkingDir; fi;
     if [ -d $mergeOverlapDir ]; then rm -rf $mergeOverlapDir; fi;
     if [ -d $genomeCompareDir ]; then rm -rf $genomeCompareDir; fi;
 
     #mkdir $megahitDir
     mkdir $krakenDir
-    mkdir $brackenDir
-    mkdir $blastWorkingDir
     mkdir $mergeOverlapDir
     mkdir $genomeCompareDir
     """
@@ -162,23 +156,6 @@ process Run_KrakenParser {
    """
 }
 
-process Run_Bracken {
-	input:
-	val krakenout from kraken
-
-	output:
-	stdout bracken
-
-	script:
-    """
-    echo "Running Run_Bracken" > ${brackenDir}/bracken.log
-	bash ${params.toolpath}/bracken_module/brackenBuild.sh
-	bash ${params.toolpath}/bracken_module/brackenRun.sh --krakendb=${databasesDir} \
-				--input=${krakenDir}/kraken_orig.report \
-				--out=${brackenDir}/bracken_run_orig \
-				--read=${params.readlength}
-	"""
-}
 
 process Run_MergeOverlap {
 	input:
@@ -221,10 +198,6 @@ process Run_GenomeComparison {
 create.subscribe { print "$it" }
 init.subscribe { print "$it" }
 megahit.subscribe { print "$it" }
-//databases.subscribe { print "$it"}
 kraken.subscribe { print "$it" }
-
-bracken.subscribe { print "$it" }
 merge_overlap.subscribe { print "$it" }
 clusters.subscribe { print "$it" } 
-//blast.subscribe { print "$it" }
