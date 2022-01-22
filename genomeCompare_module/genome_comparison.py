@@ -166,7 +166,7 @@ class GenomeCompare:
         '''
         input_dict = self.clusters if isDNA else self.abundances
         # loop through object and save to CSV
-        file_out = file_path+"clusters.csv" if isDNA else file_path+"abundances.csv"
+        file_out = file_path+"cluster_members.csv" if isDNA else file_path+"cluster_abundances.csv"
         with open(file_out, 'w') as csvfile:
             writer = csv.writer(csvfile)
             for key, value in input_dict.items():
