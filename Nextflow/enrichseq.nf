@@ -123,7 +123,6 @@ process Run_Megahit {
     """
 }
 
-
 process Run_Kraken {
 	input:
 	val megaout from megahit
@@ -198,7 +197,6 @@ process Run_GenomeComparison {
             --threshold ${params.clustering_threshold}
 	"""
 }
-
 
 process Run_CombineOutput {
     input:

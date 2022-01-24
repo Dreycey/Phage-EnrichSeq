@@ -206,8 +206,8 @@ def main():
     arguments = parseArgs(argv=sys.argv[1:])
 
     # find out if single genome or more.
-    single_genome = False
-    if not os.path.exists(arguments.input + "merge_overlap_out_filtered_genomes.lsv"): single_genome = True
+    single_genome = True
+    #if not os.path.exists(arguments.input + "merge_overlap_out_genomes.lsv"): single_genome = True
 
     # instantiate clustering object.
     if single_genome:

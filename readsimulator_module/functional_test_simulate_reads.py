@@ -15,6 +15,7 @@ from abc import ABC, abstractmethod
 import sys
 from typing import Dict, List
 import csv
+from dataclasses import dataclass
 # non-std packages
 import mappy as mp
 import matplotlib.pyplot as plt
