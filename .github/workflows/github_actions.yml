@@ -42,10 +42,10 @@ jobs:
              conda info --envs;
       - name: run unit tests (PathOrganizer)
         shell: bash -l {0}
-        run: pytest PathOrganizer_module/
+        run: pytest src/modules/PathOrganizer_module/
       - name: run unit tests (ReadSimulator)
         shell: bash -l {0}
-        run: pytest readsimulator_module/
+        run: pytest src/modules/readsimulator_module/
       - name: run unit tests (MergeOverlap)
         shell: bash -l {0}
-        run: pytest mergeoverlap_filter_module/
+        run: pytest src/modules/mergeoverlap_filter_module/
