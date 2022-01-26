@@ -2,7 +2,7 @@
 ![EnrichSeq](figures/EnrichSeq-LOGO.png)
 
 # Phage-EnrichSeq
-Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
+Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification.
 
 ## Getting Started.
 ### Activate enrichseq conda environment with pre-installed dependencies
@@ -25,8 +25,9 @@ conda activate enrichseq;
 python3 EnrichSeq.py db_build
 ```
 
-
 ## Running EnrichSeq.
+Below are examples using single end and paired end reads. For further usage, please refer to the [EnrichSeq Wiki](https://github.com/Dreycey/Phage-EnrichSeq/wiki).
+
 * USAGE (single end reads)
 ```
 python3 EnrichSeq.py enrichseq -1 path/to/single_end_reads.fa -o ./out
