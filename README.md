@@ -6,40 +6,33 @@ Finding phages for phage therapy using Enrichment followed by Differential Genom
 
 ## Getting Started.
 ### Activate enrichseq conda environment with pre-installed dependencies
-* To setup the [conda](https://docs.conda.io/en/latest/miniconda.html) environment, use the following command once conda is installed locally. 
+* To setup the [conda](https://docs.conda.io/en/latest/miniconda.html) environment, use the following command once conda is installed locally.
+* for linux
 ```
-conda env create -f environment.yml;
+conda env create -f environment_linux.yml;
+```
+* for mac
+```
+conda env create -f environment_mac.yml;
 ```
 * To activate, use the following **always** before running EnrichSeq:
 ```
 conda activate enrichseq;
 ```
 
-### Download test data
-* Currently, the test genomic data is on [git lfs](https://git-lfs.github.com/), so ensure this is working locally before running the following:
+## Download DB
 ```
-cd simulated_test_files/; git lfs pull; cd ../;
+python3 EnrichSeq.py db_build
 ```
-
-### Downloading Databases.
-To ensure each module runs correctly, the following installation script needs to be ran. **THIS TAKE A WHILE, BE PREPARED TO WAIT AN HOUR FOR DOWNLOADING**
-
-* From the outermost EnrichSeq directory, run the following:
-```
-cd kraken_module;
-bash enrichseqDB_install.sh;
-```
-
-*NOTE*: While the above is in the **kraken_module**, the information is needed for other modules.
 
 
 ## Running EnrichSeq.
-* USAGE
+* USAGE (single end reads)
 ```
-nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <path to fasta> --workdir <path to output directory> --toolpath <local global path to EnrichSeq repository> --dbdir <Path to the kracken DB> --threads <# of threads to use> --genomedir <path to the directory containing genomes> 
+python3 EnrichSeq.py enrichseq -1 path/to/single_end_reads.fa -o ./out
 ```
 
-* EXAMPLE (this is an example test)
+* USAGE (paired end reads)
 ```
-nextflow Nextflow/enrichseq.nf --read single --fasta simulated_test_files/simulate_genomes_2_1000000reads_illumina.fa --workdir ./outdirectory --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads  4 --genomedir kraken_module/ref_genomes/
-``` 
+python3 EnrichSeq.py enrichseq -1 path/to/pair_1.fa -2 path/to/pair_2.fa -o ./out
+```
