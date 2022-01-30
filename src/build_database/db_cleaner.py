@@ -22,7 +22,7 @@ from tqdm import tqdm
 import multiprocessing as mp
 # in house packages
 current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(f"{current_path}/../PathOrganizer_module")
+sys.path.append(f"{current_path}/../modules/PathOrganizer_module")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
 
 
