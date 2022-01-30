@@ -79,7 +79,7 @@ def run_enrichseq(primary_args):
     if primary_args.kracken_db:
         CMD_list += ["--dbdir", primary_args.kracken_db]
     else:
-        CMD_list += ["--dbdir", "database/krackenDB/"]
+        CMD_list += ["--dbdir", "database/krakenDB/"]
     if primary_args.threads:
         CMD_list += ["--threads", primary_args.threads]
     else:
