@@ -30,10 +30,10 @@ Below are examples using single end and paired end reads. For further usage, ple
 
 * USAGE (single end reads)
 ```
-python3 EnrichSeq.py enrichseq -1 path/to/single_end_reads.fa -o ./out
+python3 EnrichSeq.py -1 examples/single_end_reads/simulated_test_reads_illumina.fa -o single_out_example
 ```
 
 * USAGE (paired end reads)
 ```
-python3 EnrichSeq.py enrichseq -1 path/to/pair_1.fa -2 path/to/pair_2.fa -o ./out
+python3 EnrichSeq.py -1 examples/paired_end_reads/paired_illumina_1.fa -2 examples/paired_end_reads/paired_illumina_2.fa -o paired_out
 ```
