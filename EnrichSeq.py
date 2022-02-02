@@ -70,8 +70,8 @@ def run_enrichseq(primary_args):
     CMD_list = ["nextflow", f"{CURR_PATH}/src/nextflow/enrichseq.nf"]
     if primary_args.input_2:
         CMD_list += ["--read", "paired"]
-        CMD_list += ["--1", primary_args.input_1]
-        CMD_list += ["--2", primary_args.input_2]
+        CMD_list += ["--fasta", primary_args.input_1]
+        CMD_list += ["--fasta_2", primary_args.input_2]
     else:
         CMD_list += ["--read", "single"]
         CMD_list += ["--fasta", primary_args.input_1]

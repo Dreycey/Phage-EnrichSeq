@@ -45,8 +45,8 @@ if (params.read == 'single') {
 }
 else if (params.read == 'paired') {
     println "Paired end reads entered!"
-    fastafile = file(params.fasta+'_1.fa')
-    fastafile_2 = file(params.fasta+'_2.fa')
+    fastafile = file(params.fasta)
+    fastafile_2 = file(params.fasta_2)
 }
 
 // opening files for misc parameters
