@@ -6,17 +6,19 @@ DESCRIPTION:
 # std packages
 # non-std packages
 import pytest
+import os
 from pathlib import Path
 # in-house package
 from PathOrganizer import PathOrganizer as PathO, DuplicateGenomeError, InvalidQueryError
 
 
-
+CURR_PATH = os.path.realpath(__file__)
+CURR_PATH = os.path.dirname(CURR_PATH)
 
 @pytest.fixture
 def genome_testing_path():
     """ contains major paths """
-    return "./PathOrganizer_module/testing_files/"
+    return f"{CURR_PATH}/testing_files/"
 
 @pytest.fixture
 def object_PathOrganizer(genome_testing_path):

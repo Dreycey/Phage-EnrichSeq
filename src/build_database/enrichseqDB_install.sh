@@ -65,7 +65,7 @@ function NCBIPhageGenomeDownload() {
       add_to_log "SUCCESS: genomes downloaded";
       # UNZIP GENOMES
       add_to_log "Unzipping the downloaded NCBI phage genomes...";
-      find ref_genomes/ -name '*.gz' -exec gzip -d {} +;
+      find ${genomeDir} -name '*.gz' -exec gzip -d {} +;
       add_to_log "SUCCESS: unzipping genomes worked";
     else 
       break
@@ -123,7 +123,7 @@ function reorganizeFiles() {
   fi
 
   # Reformat the NCBI files to compatible with kraken (and PathOrganizer)
-  python ${DIR}/ncbi2krakenHeader.py ${dbDir}/taxonomy/nucl_gb.accession2taxid ${genomeDir}
+  python ${DIR}/ncbi2krakenHeader.py ${dbDir}/taxonomy/nucl_gb.accession2taxid ${genomeDir};
   
   # Reformat ActinoDB file to be compatible with kraken
   python ${DIR}/kraken_db_format.py ${dbDir}/taxonomy/names.dmp \
@@ -335,8 +335,8 @@ function run_PIPELINE() {
 ####
 function main() {                                                               
   # input arguments                                                             
-  if [[ -f ${DIR}/kraken_module.config ]]; then
-    source ${DIR}/kraken_module.config;
+  if [[ -f ${DIR}/db_module.config ]]; then
+    source ${DIR}/db_module.config;
   else
     throw_fatal_error "The config file (kraken_module.config) is missing!";
   fi

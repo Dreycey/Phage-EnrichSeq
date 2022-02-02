@@ -2,44 +2,38 @@
 ![EnrichSeq](figures/EnrichSeq-LOGO.png)
 
 # Phage-EnrichSeq
-Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification
+Finding phages for phage therapy using Enrichment followed by Differential Genome Amplification.
 
 ## Getting Started.
 ### Activate enrichseq conda environment with pre-installed dependencies
-* To setup the [conda](https://docs.conda.io/en/latest/miniconda.html) environment, use the following command once conda is installed locally. 
+To setup the [conda](https://docs.conda.io/en/latest/miniconda.html) environment, use the following command once conda is installed locally.
+* for linux
 ```
-conda env create -f environment.yml;
+conda env create -f environment_linux.yml;
+```
+* for mac
+```
+conda env create -f environment_mac.yml;
 ```
 * To activate, use the following **always** before running EnrichSeq:
 ```
 conda activate enrichseq;
 ```
 
-### Download test data
-* Currently, the test genomic data is on [git lfs](https://git-lfs.github.com/), so ensure this is working locally before running the following:
+## Download DB
 ```
-cd simulated_test_files/; git lfs pull; cd ../;
+python3 EnrichSeq.py db_build
 ```
-
-### Downloading Databases.
-To ensure each module runs correctly, the following installation script needs to be ran. **THIS TAKE A WHILE, BE PREPARED TO WAIT AN HOUR FOR DOWNLOADING**
-
-* From the outermost EnrichSeq directory, run the following:
-```
-cd kraken_module;
-bash enrichseqDB_install.sh;
-```
-
-*NOTE*: While the above is in the **kraken_module**, the information is needed for other modules.
-
 
 ## Running EnrichSeq.
-* USAGE
+Below are examples using single end and paired end reads. For further usage, please refer to the [EnrichSeq Wiki](https://github.com/Dreycey/Phage-EnrichSeq/wiki).
+
+* USAGE (single end reads)
 ```
-nextflow Nextflow/enrichseq.nf --read <"single" or "paired" or "long"> --fasta <path to fasta> --workdir <path to output directory> --toolpath <local global path to EnrichSeq repository> --dbdir <Path to the kracken DB> --threads <# of threads to use> --genomedir <path to the directory containing genomes> 
+python3 EnrichSeq.py -1 examples/single_end_reads/simulated_test_reads_illumina.fa -o single_out_example
 ```
 
-* EXAMPLE (this is an example test)
+* USAGE (paired end reads)
 ```
-nextflow Nextflow/enrichseq.nf --read single --fasta simulated_test_files/simulate_genomes_2_1000000reads_illumina.fa --workdir ./outdirectory --toolpath ${PWD} --dbdir kraken_module/krakenDB --threads  4 --genomedir kraken_module/ref_genomes/
-``` 
+python3 EnrichSeq.py -1 examples/paired_end_reads/paired_illumina_1.fa -2 examples/paired_end_reads/paired_illumina_2.fa -o paired_out
+```
