@@ -87,7 +87,7 @@ def run_enrichseq(primary_args):
     if primary_args.genome_db:
         CMD_list += ["--genomedir", primary_args.genome_db]
     else:
-        CMD_list += ["--genomedir", "{CURR_PATH}/database/ref_genomes/"]
+        CMD_list += ["--genomedir", f"{CURR_PATH}/database/ref_genomes/"]
     CMD_list += ["--workdir", primary_args.output]
     out = utils.subproc_call(CMD_list)
     return out 
