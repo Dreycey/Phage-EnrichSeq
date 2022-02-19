@@ -1,8 +1,8 @@
 
 
 function test_enrichseq() {
-    tool_name="enrichseq";
-    file_suffix="fa";
+    tool_name="enrichseq2";
+    file_suffix=".fa";
     echo "TESTING ${tool_name}";
     for test_dir in ./tests/*; do
         if [[ -d $test_dir ]]; then
@@ -13,7 +13,7 @@ function test_enrichseq() {
                mkdir -p results/${tool_name}/${test_dir_name}/;
            	   python3 tools/Phage-EnrichSeq/EnrichSeq.py enrichseq \
                            -1 $file \
-                           -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}};
+                           -o results2/${tool_name}/${test_dir_name}/${basefile%${file_suffix}};
     	    done
     	fi
     done
@@ -33,7 +33,7 @@ function test_viromexplorer() {
            	   java -cp tools/FastViromeExplorer/bin FastViromeExplorer \
                                                         -1 $file \
                                                         -i tools/FastViromeExplorer/ncbi-virus-kallisto-index-k31.idx \
-                                                        -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}} \
+                                                        -o results2/${tool_name}/${test_dir_name}/${basefile%${file_suffix}} \
                                                         -l tools/FastViromeExplorer/ncbi-viruses-list.txt; 
     	    done
     	fi
@@ -41,7 +41,7 @@ function test_viromexplorer() {
 }
 
 function main() {
-    mkdir results/;
+    mkdir results2/;
     conda activate enrichseq;
     test_enrichseq;
     conda activate FastViromeExplorer;
