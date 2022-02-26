@@ -51,15 +51,14 @@ function test_kraken2() {
                basefile="$(basename -- $file)";
                test_dir_name="$(basename "${test_dir##*/}")";
                mkdir -p results/${tool_name}/${test_dir_name}/;
-               kraken2 --use-names --threads 4 --db ${dbDir} --report ${reportFile} ${inFasta} > ${krakenOutFile}
-           	   #java -cp tools/FastViromeExplorer/bin FastViromeExplorer \
-               #                                         -1 $file \
-               #                                         -i tools/FastViromeExplorer/ncbi-virus-kallisto-index-k31.idx \
-               #                                         -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}} \
-               #                                         -l tools/FastViromeExplorer/ncbi-viruses-list.txt; 
+               kraken2 --use-names --threads 4 --db tools/${tool_name}/minikraken2_v1_8GB filename.fastq.gz  \
+                        --report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}} \
+                        ${file}
+           	                
     	    done
     	fi
 }
+
 
 function main() {
     mkdir results/;
