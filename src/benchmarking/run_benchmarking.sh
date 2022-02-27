@@ -51,14 +51,35 @@ function test_kraken2() {
                basefile="$(basename -- $file)";
                test_dir_name="$(basename "${test_dir##*/}")";
                mkdir -p results/${tool_name}/${test_dir_name}/;
-               kraken2 --use-names --threads 4 --db tools/${tool_name}/minikraken2_v1_8GB filename.fastq.gz  \
-                        --report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}} \
-                        ${file}
+               kraken2 --use-names --threads 4 --db tools/${tool_name}/minikraken2_v2_8GB_201904_UPDATE \
+                        --report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report \
+                        ${file} > kraken2_benchmarking.log
            	                
     	    done
     	fi
+    done
 }
 
+
+function test_bracken() {
+    tool_name="Bracken";
+    file_suffix=".report";
+    echo "TESTING ${tool_name}";
+    for test_dir in ./tests/*; do
+        if [[ -d $test_dir ]]; then
+            for file in $test_dir/*${file_suffix}; do
+               echo; echo $file; echo;
+               basefile="$(basename -- $file)";
+               test_dir_name="$(basename "${test_dir##*/}")";
+               mkdir -p results/${tool_name}/${test_dir_name}/;
+               #kraken2 --use-names --threads 4 --db tools/${tool_name}/minikraken2_v1_8GB filename.fastq.gz  \
+                        #--report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}} \
+                        #${file}
+           	                
+    	    done
+    	fi
+    done
+}
 
 function main() {
     mkdir results/;
