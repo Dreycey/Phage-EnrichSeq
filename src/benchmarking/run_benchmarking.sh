@@ -63,6 +63,7 @@ function test_kraken2() {
 
 function test_bracken() {
     tool_name="Bracken";
+    dependency_tool_name="Kraken2";
     file_suffix=".report";
     echo "TESTING ${tool_name}";
     for test_dir in ./tests/*; do
@@ -72,9 +73,10 @@ function test_bracken() {
                basefile="$(basename -- $file)";
                test_dir_name="$(basename "${test_dir##*/}")";
                mkdir -p results/${tool_name}/${test_dir_name}/;
-               #kraken2 --use-names --threads 4 --db tools/${tool_name}/minikraken2_v1_8GB filename.fastq.gz  \
-                        #--report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}} \
-                        #${file}
+               bracken -d tools/${dependency_tool_name}/minikraken2_v2_8GB_201904_UPDATE \
+                        -i results/${dependency_tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report \
+                        -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.bracken \
+                        -r 100 -l 'S';
            	                
     	    done
     	fi
@@ -85,8 +87,8 @@ function main() {
     mkdir results/;
     conda activate enrichseq;
     #test_enrichseq;
-    test_kraken2;
-
+    #test_kraken2;
+    test_bracken;
     #conda activate FastViromeExplorer;
     #test_viromexplorer;
 }
