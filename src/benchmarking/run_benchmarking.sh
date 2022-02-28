@@ -75,9 +75,7 @@ function test_bracken() {
                mkdir -p results/${tool_name}/${test_dir_name}/;
                bracken -d tools/${dependency_tool_name}/minikraken2_v2_8GB_201904_UPDATE \
                         -i results/${dependency_tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report \
-                        -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.bracken \
-                        -r 100 -l 'S';
-           	                
+                        -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.bracken
     	    done
     	fi
     done
