@@ -13,7 +13,7 @@ function test_enrichseq() {
                mkdir -p results/${tool_name}/${test_dir_name}/;
            	   python3 tools/Phage-EnrichSeq/EnrichSeq.py enrichseq \
                            -1 $file \
-                           -o results2/${tool_name}/${test_dir_name}/${basefile%${file_suffix}};
+                           -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}};
     	    done
     	fi
     done
