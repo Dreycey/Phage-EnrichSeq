@@ -61,26 +61,6 @@ function test_kraken2() {
 }
 
 
-# function test_bracken() {
-#     tool_name="Bracken";
-#     dependency_tool_name="Kraken2";
-#     file_suffix=".report";
-#     echo "TESTING ${tool_name}";
-#     for test_dir in ./tests/*; do
-#         if [[ -d $test_dir ]]; then
-#             for file in $test_dir/*${file_suffix}; do
-#                echo; echo $file; echo;
-#                basefile="$(basename -- $file)";
-#                test_dir_name="$(basename "${test_dir##*/}")";
-#                mkdir -p results/${tool_name}/${test_dir_name}/;
-#                bracken -d tools/${dependency_tool_name}/minikraken2_v2_8GB_201904_UPDATE \
-#                         -i results/${dependency_tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report \
-#                         -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.bracken
-#     	    done
-#     	fi
-#     done
-# }
-
 function test_bracken() {
     tool_name="Bracken";
     dependency_tool_name="Kraken2";
@@ -106,10 +86,10 @@ function test_bracken() {
 }
 
 function main() {
-    mkdir results2/;
+    mkdir results/;
     conda activate enrichseq;
-    #test_enrichseq;
-    #test_kraken2;
+    test_enrichseq;
+    test_kraken2;
     test_bracken;
     #conda activate FastViromeExplorer;
     #test_viromexplorer;
