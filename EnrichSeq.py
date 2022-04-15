@@ -50,6 +50,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
     enrich_parser.add_argument("-o", "--output", help="the path to the output directory", required=True)
     enrich_parser.add_argument("-kdb", "--kracken_db", help="the path to the kraken database", required=False)
     enrich_parser.add_argument("-gdb", "--genome_db", help="the path to the phage genome directory", required=False)
+    enrich_parser.add_argument("-v", "--verbose", action="store_true", help="prints output figures and debug info", required=False)
     enrich_parser.add_argument("-t", "--threads", help="number of threads to use [Default 4]", required=False)
     return parser.parse_args(argv)
 
@@ -88,6 +89,8 @@ def run_enrichseq(primary_args):
         CMD_list += ["--genomedir", primary_args.genome_db]
     else:
         CMD_list += ["--genomedir", f"{CURR_PATH}/database/ref_genomes/"]
+    if primary_args.verbose:
+        CMD_list += ["--verbose", "True"]
     CMD_list += ["--workdir", primary_args.output]
     out = utils.subproc_call(CMD_list)
     return out 
