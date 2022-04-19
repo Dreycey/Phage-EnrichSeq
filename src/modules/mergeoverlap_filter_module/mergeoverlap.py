@@ -27,7 +27,7 @@ from numpy import where
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{current_path}/../PathOrganizer_module")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
-from unsupervised_refinement import TrueGenomeFinder, ClusteringModel, get_true_positive, get_filtered_genomes
+from ClusteringModel import TrueGenomeFinder, ClusteringModel, get_true_positive, get_filtered_genomes
 from GenomeMapper import GenomeMapper, MinimapMapperWithInfo, MinimapMapper
 
 
@@ -172,10 +172,10 @@ class GenomeTestSet:
             minimap_mapper: MinimapMapper = self.genomeMap[genome_name]
             read_maps_to_genome: bool = minimap_mapper.does_read_map(input_seq)
             if read_maps_to_genome:
-                if (genome_from == ""):
-                    return genome_name
+                if (genome_from == ""): # first genome with match wins
+                    genome_from = genome_name
                 else:
-                    return "MULTIPLE"
+                    return "UNK"
         if genome_from == "":  # if nothing, return UNK
             return "UNK"
         return genome_from
@@ -209,15 +209,11 @@ class GenomeTestSet:
                 2. % of genome with reads mapped
         """
         mergedSet = set()
-        #for genome_name in self.genomes.keys():
-        # run some type sorting algorithm
-
         #1. input
         mapped_reads = self.minimap_out[genome_name]["readmaps"] #[(50,120),(110,220),(150,200)]
         print(f"before merge overlap: {len(mapped_reads)}")
         #2. sort the reads by starting index
         sorted_mapped_reads = sorted(mapped_reads, key=lambda x: x[0])
-
         #3. merge overlapping regions
         p1 = 0 # pointer 1
         p2 = 1 # pointer 2
@@ -298,11 +294,11 @@ class GenomeTestSet:
     def save_features(self):
         """ this method saves the features of each genome"""
         for genomeName in self.minimap_out:
-            overlappMerge = self.overlapMerge(genomeName)
-            percenOverlap = self.calcGenomePercetage(genomeName, overlappMerge)
-            print(f"percent overlap: {percenOverlap}")
-            self.minimap_out[genomeName]["overlappMerge"] = overlappMerge
-            self.minimap_out[genomeName]["percenOverlap"] = percenOverlap       
+            overlapMerge = self.overlapMerge(genomeName)
+            percentOverlap = self.calcGenomePercetage(genomeName, overlapMerge)
+            print(f"percent overlap: {percentOverlap}")
+            self.minimap_out[genomeName]["overlapMerge"] = overlapMerge
+            self.minimap_out[genomeName]["percentOverlap"] = percentOverlap       
 
     def print_minimap2output(self, out_prefix):
         """ prints output in minimap_out datastructure """
@@ -340,13 +336,15 @@ def print_values_for_mappedinfo(dataset: Dict[str,Dict[str, Union[set, int, floa
         for metric in dataset[genome].keys(): 
             if metric in ['mapq', 'readmaps', 'readcount']:
                 print(f" {metric}: {np.average(dataset[genome][metric])}")
-                if metric == 'mapq':
+                if (metric == 'mapq'):
                     x_vector[index].append(np.average(dataset[genome][metric]))
-            elif metric == "overlappMerge":
+            elif metric == "overlapMerge":
                 print(f" {metric}: {len(dataset[genome][metric]) }")
+            elif metric == "percentOverlap":
+                print(f" {metric}: {dataset[genome][metric]}")
+                x_vector[index].append(dataset[genome][metric])                
             else:
                 print(f" {metric}: {dataset[genome][metric]}")
-                x_vector[index].append(dataset[genome][metric])
     return np.array(y_vector), np.array(x_vector)
 
 def plot_scatter_plot(x_vector, y_vector, outfile):
@@ -383,7 +381,6 @@ def scatter_of_filtered(clusters, x_vector, y_vector, outfile):
                 plt.annotate(y_vector[row_ix[0][i]], (x[i], y[i]))
     plt.savefig(outfile, dpi=300)
     plt.close()
-
 
 
 
