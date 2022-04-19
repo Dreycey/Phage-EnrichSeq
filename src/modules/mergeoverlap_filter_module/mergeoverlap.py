@@ -160,7 +160,7 @@ class GenomeTestSet:
         """ 
         INPUT 
             1. input read
-        OUTPUT
+        OUTPUT 
             which genome
             if 1. no genome matching, output 'UNK'.
                2. more than one, output 'MULTIPLE'.
