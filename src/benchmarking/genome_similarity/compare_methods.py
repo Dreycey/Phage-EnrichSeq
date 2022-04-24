@@ -6,15 +6,7 @@ DESCRIPTION:
     It is also used to test optimum k-mer sizes for jaccard index. 
 
 USAGE:
-    python compare_methods.py <Phage Name line-delimited file> <Multi Fasta file> <out file>
-
-EXAMPLE:
-
-TODO: 
-    1. Make sure the genomic mapping can be parrallized. 
-        1.A - see if threads can be used for individual mapping.
-    2. Look for dipps in coverage along the genome.
-        2.A - perhaps plot this as well! 
+    python compare_methods.py -d <path to reference genomes> -k1 maximum k-mer size -k2 increments
 """
 import os
 import sys
@@ -57,8 +49,8 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
     genome1_kmers = __create_kmers(__fasta_to_genome(genomeList[0]), kmerLength)
     genome2_kmers = __create_kmers(__fasta_to_genome(genomeList[2]), kmerLength)
 
-    # print(os.path.basename(genomeList[0]))
-    # print(os.path.basename(genomeList[2]))
+    #print(os.path.basename(genomeList[2]))
+    #print(os.path.basename(genomeList[2]))
 
     a = set(genome1_kmers)
     b = set(genome2_kmers)
@@ -96,7 +88,12 @@ def plot_kmer_effect(genomePair: list, maxKmerSize: int, increment: int):
             plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, k))
     
     kmer_df = pd.DataFrame.from_dict(plotting_dict)
-    sns.lineplot(data=kmer_df, x="K-mer Size", y="Jaccard Index", markers=True)
+    
+    fig, ax = plt.subplots()
+    sns.lineplot(data=kmer_df, x="K-mer Size", y="Jaccard Index", marker='o')
+    ax.set_xlim(1, maxKmerSize)
+    ax.set_ylim(0.0, 1.1)
+    #sns.relplot(data=kmer_df, x="K-mer Size", y="Jaccard Index", kind="line")
     filename = 'jaccard_vs_kmer-size.png'
     plt.savefig(filename)
     print(f'Line plot stored in {filename}')
