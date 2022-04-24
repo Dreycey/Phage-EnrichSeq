@@ -23,6 +23,7 @@ import argparse
 from pathlib import Path
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{current_path}/../../modules/genomeCompare_module")
@@ -51,13 +52,13 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
     Creates kmers out of the provided genomes to calculate the jaccard index between
     the sets of kmers, then outputs an adjacency matrix.
     '''
-    print(f"Calculating jaccard similarity index.")
+    #print(f"Calculating jaccard similarity index.")
     # TODO: change to random 2 genomes
     genome1_kmers = __create_kmers(__fasta_to_genome(genomeList[0]), kmerLength)
     genome2_kmers = __create_kmers(__fasta_to_genome(genomeList[2]), kmerLength)
 
-    print(os.path.basename(genomeList[0]))
-    print(os.path.basename(genomeList[2]))
+    # print(os.path.basename(genomeList[0]))
+    # print(os.path.basename(genomeList[2]))
 
     a = set(genome1_kmers)
     b = set(genome2_kmers)
@@ -88,8 +89,18 @@ def plot_kmer_effect(genomePair: list, maxKmerSize: int, increment: int):
     Plots the jaccard similarity between two genomes only when
     the kmer size is changed. 
     '''
-    for i in range()
-    return None
+    plotting_dict = {'K-mer Size': [], 'Jaccard Index': []}
+    for k in range(0, maxKmerSize, increment):
+        if k != 0:
+            plotting_dict['K-mer Size'].append(k)
+            plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, k))
+    
+    kmer_df = pd.DataFrame.from_dict(plotting_dict)
+    sns.lineplot(data=kmer_df, x="K-mer Size", y="Jaccard Index", markers=True)
+    filename = 'jaccard_vs_kmer-size.png'
+    plt.savefig(filename)
+    print(f'Line plot stored in {filename}')
+    
 
 
 # PRIVATE METHODS
@@ -134,7 +145,6 @@ def __fasta_to_genome(fasta_path) -> str:
                     sequence_i = ""
             elif line[0] != ">":
                 sequence += line.rstrip()
-    #print(f"First 20 nucleotides of genome: {sequence[:20]}")
     return sequence
 
 def __create_kmer_list(kmerMax: int, increments: int) -> list:
@@ -157,7 +167,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     parser.add_argument("-d", "--genome_directory", help="path to the directory of genomes", required=True)
-    parser.add_argument("-o", "--output_dir", help="the output directory", required=False)
+    #parser.add_argument("-o", "--output_dir", help="the output directory", required=False)
     parser.add_argument("-k1","--max_kmer_size", help="size (length) of kmers to create, or the max size", required=False)
     parser.add_argument("-k2", "--kmer_increments", help="amount to increment kmers by for kmer benchmarking", required=False)
     return parser.parse_args(argv)
@@ -165,8 +175,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
 def main():
     arguments = parseArgs(argv=sys.argv[1:])
     genomeList = extract_genome_paths(arguments.genome_directory)
-    print(f"Jaccard index: {run_jaccard(genomeList, 20)}")
-    plot_kmer_effect(genomeList, arguments.max_kmer_size, arguments.kmer_increments)
+    plot_kmer_effect(genomeList, int(arguments.max_kmer_size), int(arguments.kmer_increments))
 
 
 if __name__ == "__main__":
