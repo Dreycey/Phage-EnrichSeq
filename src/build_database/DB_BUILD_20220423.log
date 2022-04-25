@@ -1,0 +1,223 @@
+20220423-015155
+20220423-015155 RUNNING: makeDirectory()
+20220423-015155 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-015155 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-015155
+20220423-015155 RUNNING: makeDirectory()
+20220423-015155 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-015155 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-015155
+20220423-015155 RUNNING: makeDirectory()
+20220423-015155 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-015155 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-015155
+20220423-015155 RUNNING: downloadFTPFiles()
+20220423-015155
+20220423-015155 RUNNING: wget_file()
+20220423-015155 Downloading https://phagesdb.org/media/Actinobacteriophages-All.fasta
+20220423-015314 SUCCESS: wget_file() downloaded Actinobacteriophages-All.fasta
+20220423-015314
+20220423-015314 RUNNING: wget_file()
+20220423-015314 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+20220423-015342 SUCCESS: wget_file() downloaded new_taxdump.tar.gz
+20220423-015342
+20220423-015342 RUNNING: wget_file()
+20220423-015342 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz
+20220423-020154 SUCCESS: wget_file() downloaded nucl_gb.accession2taxid.gz
+20220423-020154
+20220423-020154 RUNNING: NCBIPhageGenomeDownload()
+20220423-020154 NOTE: This step takes a while ... (typically about 30 minutes)
+20220423-020154 Downloading NCBI phage genomes...
+20220423-020154 Attempt # 1
+20220423-022544 SUCCESS: genomes downloaded
+20220423-022544 Unzipping the downloaded NCBI phage genomes...
+20220423-022546 The genome directory (/Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes) already exists. If you'd like to rebuild, enter 'yes'
+20220423-022550
+20220423-022551 RUNNING: makeDirectory()
+20220423-022551 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-022551 **WARNING**: NOTE: makeDirectory() already made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-022551
+20220423-022551 RUNNING: makeDirectory()
+20220423-022551 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-022551 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-022551
+20220423-022551 RUNNING: makeDirectory()
+20220423-022551 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-022551 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-022551
+20220423-022551 RUNNING: downloadFTPFiles()
+20220423-022551
+20220423-022551 RUNNING: wget_file()
+20220423-022551 wget_file() already downloaded Actinobacteriophages-All.fasta
+20220423-022551
+20220423-022551 RUNNING: wget_file()
+20220423-022551 wget_file() already downloaded new_taxdump.tar.gz
+20220423-022551
+20220423-022551 RUNNING: wget_file()
+20220423-022551 wget_file() already downloaded nucl_gb.accession2taxid.gz
+20220423-022551
+20220423-022551 RUNNING: NCBIPhageGenomeDownload()
+20220423-022551 NOTE: This step takes a while ... (typically about 30 minutes)
+20220423-022551 **WARNING**: NCBIPhageGenomeDownload() /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes SHOULD BE deleted before rerunning the script! Delete this then try again.
+20220423-022623
+20220423-022623 RUNNING: moveFile()
+20220423-022623 moving the file to
+20220423-022623 SUCCESS: moveFile() nucl_gb.accession2taxid moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-111730
+20220423-111730 RUNNING: moveFile()
+20220423-111730 moving the file to
+20220423-111730 SUCCESS: moveFile() /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/actinoReformatted.fa moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-111730
+20220423-111730 RUNNING: multifasta2fasta()
+20220423-111730 Turning /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa into multiple fasta files, then deleting
+20220423-111736 SUCCESS: multifasta2fasta() finished creating fasta files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220423-111736 SUCCESS: multifasta2fasta() deleted /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220423-111736
+20220423-111736 RUNNING: delete_duplicates()
+20220423-111740 SUCCESS: delete_duplicates() deleted duplicate genomes in /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-111740
+20220423-111740 RUNNING: addGenomesToDb()
+20220423-113049 SUCCESS: addGenomesToDb() added DB files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-113049
+20220423-113049 RUNNING: buildKrakenDb()
+20220423-113401 SUCCESS: buildKrakenDb() added files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-114041
+20220423-114041 RUNNING: makeDirectory()
+20220423-114041 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-114041 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-114041
+20220423-114041 RUNNING: makeDirectory()
+20220423-114041 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-114041 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-114041
+20220423-114041 RUNNING: makeDirectory()
+20220423-114041 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-114041 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-114041
+20220423-114041 RUNNING: downloadFTPFiles()
+20220423-114041
+20220423-114041 RUNNING: wget_file()
+20220423-114041 Downloading https://phagesdb.org/media/Actinobacteriophages-All.fasta
+20220423-114106
+20220423-114106 RUNNING: makeDirectory()
+20220423-114106 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-114106 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-114106
+20220423-114106 RUNNING: makeDirectory()
+20220423-114106 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-114106 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-114106
+20220423-114106 RUNNING: makeDirectory()
+20220423-114106 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-114106 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-114106
+20220423-114106 RUNNING: downloadFTPFiles()
+20220423-114106
+20220423-114106 RUNNING: wget_file()
+20220423-114106 wget_file() already downloaded Actinobacteriophages-All.fasta
+20220423-114106
+20220423-114106 RUNNING: wget_file()
+20220423-114106 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+20220423-114237
+20220423-114237 RUNNING: makeDirectory()
+20220423-114237 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-114237 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-114237
+20220423-114237 RUNNING: makeDirectory()
+20220423-114237 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-114237 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-114237
+20220423-114237 RUNNING: makeDirectory()
+20220423-114237 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-114237 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-114237
+20220423-114237 RUNNING: downloadFTPFiles()
+20220423-114237
+20220423-114237 RUNNING: wget_file()
+20220423-114237 Downloading https://phagesdb.org/media/Actinobacteriophages-All.fasta
+20220423-114246 SUCCESS: wget_file() downloaded Actinobacteriophages-All.fasta
+20220423-114246
+20220423-114246 RUNNING: wget_file()
+20220423-114246 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+20220423-114251 SUCCESS: wget_file() downloaded new_taxdump.tar.gz
+20220423-114251
+20220423-114251 RUNNING: wget_file()
+20220423-114251 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz
+20220423-114401 SUCCESS: wget_file() downloaded nucl_gb.accession2taxid.gz
+20220423-114401
+20220423-114401 RUNNING: NCBIPhageGenomeDownload()
+20220423-114401 NOTE: This step takes a while ... (typically about 30 minutes)
+20220423-114401 Downloading NCBI phage genomes...
+20220423-114401 Attempt # 1
+20220423-115556 SUCCESS: genomes downloaded
+20220423-115556 Unzipping the downloaded NCBI phage genomes...
+20220423-115601 SUCCESS: unzipping genomes worked
+20220423-115633
+20220423-115633 RUNNING: moveFile()
+20220423-115633 moving the file to
+20220423-115633 SUCCESS: moveFile() nucl_gb.accession2taxid moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-121132
+20220423-121132 RUNNING: moveFile()
+20220423-121132 moving the file to
+20220423-121132 SUCCESS: moveFile() /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/actinoReformatted.fa moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-121132
+20220423-121132 RUNNING: multifasta2fasta()
+20220423-121132 Turning /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa into multiple fasta files, then deleting
+20220423-121137 SUCCESS: multifasta2fasta() finished creating fasta files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220423-121138 SUCCESS: multifasta2fasta() deleted /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220423-153721
+20220423-153721 RUNNING: makeDirectory()
+20220423-153721 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-153721 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-153721
+20220423-153721 RUNNING: makeDirectory()
+20220423-153721 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-153721 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220423-153721
+20220423-153721 RUNNING: makeDirectory()
+20220423-153721 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-153721 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-153721
+20220423-153721 RUNNING: downloadFTPFiles()
+20220423-153721
+20220423-153721 RUNNING: wget_file()
+20220423-153721 Downloading https://phagesdb.org/media/Actinobacteriophages-All.fasta
+20220423-153730 SUCCESS: wget_file() downloaded Actinobacteriophages-All.fasta
+20220423-153730
+20220423-153730 RUNNING: wget_file()
+20220423-153730 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+20220423-153735 SUCCESS: wget_file() downloaded new_taxdump.tar.gz
+20220423-153735
+20220423-153735 RUNNING: wget_file()
+20220423-153735 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz
+20220423-153845 SUCCESS: wget_file() downloaded nucl_gb.accession2taxid.gz
+20220423-153845
+20220423-153845 RUNNING: NCBIPhageGenomeDownload()
+20220423-153845 NOTE: This step takes a while ... (typically about 30 minutes)
+20220423-153845 Downloading NCBI phage genomes...
+20220423-153845 Attempt # 1
+20220423-155008 SUCCESS: genomes downloaded
+20220423-155008 Unzipping the downloaded NCBI phage genomes...
+20220423-155013 SUCCESS: unzipping genomes worked
+20220423-155047
+20220423-155047 RUNNING: moveFile()
+20220423-155047 moving the file to
+20220423-155047 SUCCESS: moveFile() nucl_gb.accession2taxid moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220423-160311
+20220423-160311 RUNNING: moveFile()
+20220423-160311 moving the file to
+20220423-160311 SUCCESS: moveFile() /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/actinoReformatted.fa moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-160311
+20220423-160311 RUNNING: multifasta2fasta()
+20220423-160311 Turning /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa into multiple fasta files, then deleting
+20220423-160317 SUCCESS: multifasta2fasta() finished creating fasta files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220423-160317 SUCCESS: multifasta2fasta() deleted /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220423-160317
+20220423-160317 RUNNING: delete_duplicates()
+20220423-160326 SUCCESS: delete_duplicates() deleted duplicate genomes in /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-160326
+20220423-160326 RUNNING: addGenomesToDb()
+20220423-162358 SUCCESS: addGenomesToDb() added DB files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220423-162358
+20220423-162358 RUNNING: buildKrakenDb()
+20220423-162814 SUCCESS: buildKrakenDb() added files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB

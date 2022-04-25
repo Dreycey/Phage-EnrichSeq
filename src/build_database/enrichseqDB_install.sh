@@ -173,7 +173,8 @@ function buildKrakenDb() {
   if ! [[ -x "$(command -v kraken2-build)" ]]; then 
     throw_fatal_error "kraken2-build is missing, make sure environment for enrichseq is used. Read the README.md";
   else 
-    kraken2-build --build --db ${dbDir};
+    #kraken2-build --build --db ${dbDir};
+    kraken2-build --build --db ${dbDir} --kmer-len 25 --minimizer-len 21 --minimizer-space 0;
     add_to_log "SUCCESS: buildKrakenDb() added files from ${dbDir}";
   fi
 }

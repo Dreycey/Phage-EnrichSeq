@@ -57,18 +57,28 @@ def main():
                          for fasta_file in os.listdir(genome_dir_path)]
 
     # obtain genomes to keep (keep the ones with longest genome.)
-    print("FINDING FIILES TO KEEP")
+    print("FINDING FILES TO KEEP")
     db_cleaner = DB_Duplicate_Cleaner(genome_dir_path)
     taxid2PathAndLength: Dict[int, List[str]] = {}
+    genome_count = {}
     for genome_path in tqdm(full_genome_paths): # O(N)
         tax_id = int(db_cleaner.get_fasta_taxid(genome_path))
         genome_length =  db_cleaner.get_genome_length(genome_path)
         if tax_id in taxid2PathAndLength.keys():
             original_length = taxid2PathAndLength[tax_id][1]
-            if genome_length > original_length:
+            # print(tax_id, genome_length)
+            genome_count[tax_id] += 1
+            # if tax_id == 102797:
+            #     print(genome_length)
+            if "GCF" == Path(genome_path).name[:3]:
+                # print("HEY GIRL GHEY")
                 taxid2PathAndLength[tax_id] = [genome_path, genome_length]
+
+            # if genome_length > original_length:
+            #     taxid2PathAndLength[tax_id] = [genome_path, genome_length]
         else:
             taxid2PathAndLength[tax_id] = [genome_path, genome_length]
+            genome_count[tax_id] = 1
 
     # get paths to keep 
     files_to_keep = {}
@@ -76,6 +86,13 @@ def main():
         path_of_genome = pathAndLength[0]
         files_to_keep[path_of_genome] = 1
 
+    delete = []
+    for key, val in genome_count.items():
+        if val < 3:
+            delete.insert(0, key)
+    for key in delete:
+        del genome_count[key]
+    print(genome_count)
     # delete files not in files_to_keep
     print("DELETNG DUPLICATE FILES")
     duplicate_count = 0

@@ -39,11 +39,22 @@ def multiFasta2fasta(multifasta_path):
 def addSeqsToFiles(output_directory, seq_names, sequences):
     """
     DESCRIPTION: takes sequence names, sequences, and add to output directory
+
+    Note:
+        This method has been updated to print out the fasta in line
+        segments of 80 nucleotides per line.
+
+        Additionally, genomes are now saved in files with no name breaks.
     """
     for seq_index, sequence_name in tqdm(enumerate(seq_names)):
-        full_path = Path(output_directory) / Path(sequence_name)
+        seq_name = sequence_name.split("|")[0].replace(",", "")
+        full_path = Path(output_directory) / Path("actinodb_" + seq_name)
         with open(full_path.with_suffix(".fna"), "w") as fasta_out:
-            fasta_out.write(">"+sequence_name + "\n" + sequences[seq_index])
+            fasta_out.write(">"+sequence_name + "\n" )
+            seqs = sequences[seq_index]
+            for i in range(0,len(seqs),80): # add nucleotides 80 bp per line.
+                end = min(i+80, len(seqs))
+                fasta_out.write(seqs[i:end] + "\n" )
 
 def main():
     if (len(sys.argv) != 3):

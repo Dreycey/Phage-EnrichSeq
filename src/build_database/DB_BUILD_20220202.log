@@ -1,0 +1,74 @@
+20220202-161112
+20220202-161112 RUNNING: makeDirectory()
+20220202-161112 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220202-161112 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220202-161112
+20220202-161112 RUNNING: makeDirectory()
+20220202-161112 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220202-161112 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220202-161112
+20220202-161112 RUNNING: makeDirectory()
+20220202-161112 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220202-161112 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220202-161112
+20220202-161112 RUNNING: downloadFTPFiles()
+20220202-161112
+20220202-161112 RUNNING: wget_file()
+20220202-161112 Downloading https://phagesdb.org/media/Actinobacteriophages-All.fasta
+20220202-161121 The DB (/Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB) already exists. If you'd like to rebuild, enter 'yes'
+20220202-161122 SUCCESS: deleted /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/
+20220202-161122
+20220202-161122 RUNNING: makeDirectory()
+20220202-161122 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220202-161122 **WARNING**: NOTE: makeDirectory() already made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220202-161122
+20220202-161122 RUNNING: makeDirectory()
+20220202-161122 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220202-161122 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB
+20220202-161122
+20220202-161122 RUNNING: makeDirectory()
+20220202-161122 making directory for /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220202-161122 SUCCESS: makeDirectory() made /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220202-161122
+20220202-161122 RUNNING: downloadFTPFiles()
+20220202-161122
+20220202-161122 RUNNING: wget_file()
+20220202-161122 wget_file() already downloaded Actinobacteriophages-All.fasta
+20220202-161122
+20220202-161122 RUNNING: wget_file()
+20220202-161122 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz
+20220202-161127 SUCCESS: wget_file() downloaded new_taxdump.tar.gz
+20220202-161127
+20220202-161127 RUNNING: wget_file()
+20220202-161127 Downloading https://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/nucl_gb.accession2taxid.gz
+20220202-161226 SUCCESS: wget_file() downloaded nucl_gb.accession2taxid.gz
+20220202-161226
+20220202-161226 RUNNING: NCBIPhageGenomeDownload()
+20220202-161226 NOTE: This step takes a while ... (typically about 30 minutes)
+20220202-161226 Downloading NCBI phage genomes...
+20220202-161226 Attempt # 1
+20220202-162234 SUCCESS: genomes downloaded
+20220202-162234 Unzipping the downloaded NCBI phage genomes...
+20220202-162237 SUCCESS: unzipping genomes worked
+20220202-162302
+20220202-162302 RUNNING: moveFile()
+20220202-162302 moving the file to
+20220202-162302 SUCCESS: moveFile() nucl_gb.accession2taxid moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB/taxonomy
+20220202-162616
+20220202-162616 RUNNING: moveFile()
+20220202-162616 moving the file to
+20220202-162616 SUCCESS: moveFile() /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/actinoReformatted.fa moved to /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220202-162616
+20220202-162616 RUNNING: multifasta2fasta()
+20220202-162616 Turning /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa into multiple fasta files, then deleting
+20220202-162616 SUCCESS: multifasta2fasta() finished creating fasta files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220202-162616 SUCCESS: multifasta2fasta() deleted /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes/actinoReformatted.fa
+20220202-162616
+20220202-162616 RUNNING: delete_duplicates()
+20220202-162620 SUCCESS: delete_duplicates() deleted duplicate genomes in /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220202-162620
+20220202-162620 RUNNING: addGenomesToDb()
+20220202-163635 SUCCESS: addGenomesToDb() added DB files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/ref_genomes
+20220202-163635
+20220202-163635 RUNNING: buildKrakenDb()
+20220202-163927 SUCCESS: buildKrakenDb() added files from /Users/dreyceyalbin/Desktop/Phage-EnrichSeq/src/build_database/../../database/krakenDB

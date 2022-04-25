@@ -7,14 +7,6 @@ DESCRIPTION:
 
 USAGE:
     python mergeoverlap.py <Phage Name line-delimited file> <Multi Fasta file> <out file>
-
-EXAMPLE:
-
-TODO: 
-    1. Make sure the genomic mapping can be parrallized. 
-        1.A - see if threads can be used for individual mapping.
-    2. Look for dipps in coverage along the genome.
-        2.A - perhaps plot this as well! 
 """
 # std packages
 from abc import ABC, abstractmethod
@@ -28,17 +20,15 @@ import numpy as np
 import pickle as pickle
 from matplotlib import pyplot
 # non-std packages
-import mappy as mp
 import matplotlib.pyplot as plt
-from sklearn.datasets import make_classification
-from sklearn.mixture import GaussianMixture
 from numpy import unique
 from numpy import where
 # in house packages
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{current_path}/../PathOrganizer_module")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
-
+from src.modules.mergeoverlap_filter_module.ClusteringModel import TrueGenomeFinder, ClusteringModel, get_true_positive, get_filtered_genomes
+from src.modules.mergeoverlap_filter_module.GenomeMapper import GenomeMapper, MinimapMapperWithInfo, MinimapMapper
 
 
 
@@ -68,197 +58,9 @@ def parseArgs(argv=None) -> argparse.Namespace:
     parser.add_argument("-o", "--output_prefix", help="the output file prefix", required=True)
     parser.add_argument("-f", "--fasta", help="input fasta path", required=True)
     parser.add_argument("-g", "--genome_directory", help="path to the directory of genomes", required=True)
+    parser.add_argument("-p", "--plot_results", help="plots extra results", action='store_true', required=False)
     parser.add_argument("-t", "--threads", help="number of threads", required=True)
     return parser.parse_args(argv)
-
-class TrueGenomeFinder(ABC):
-    """ This is the abstract class for the unsupervised genome finder """
-
-    @property
-    @abstractmethod
-    def model_name(self):
-        """ getter for model name (encapsulation) """
-        pass
-    
-    @property
-    @abstractmethod
-    def model(self):
-        """ This is the model for the unsupervised classification """
-        pass
-    
-    @abstractmethod
-    def model_predict(self, x_vector):
-        """
-        Sine the model clusters data, there's not necessarily 
-        a training set needed - it's practically just binary
-        clustering. 
-        """
-        pass
-
-class GaussianMixModel(TrueGenomeFinder):
-    """ This is the abstract class for the unsupervised genome finder """
-    
-    def __init__(self):
-        self._model = GaussianMixture(n_components=2)
-        self._model_name = "Gassiaun Mixture Model"
-
-    @property
-    def model(self):
-        """ This is the model for the unsupervised classification """
-        return self._model
-
-    @property
-    def model_name(self):
-        """ This is the model for the unsupervised classification """
-        return self._model_name
-    
-    def model_predict(self, x_vector):
-        """
-        Sine the model clusters data, there's not necessarily 
-        a training set needed - it's practically just binary
-        clustering. 
-        """
-        FIT_MODEL = self.model.fit(x_vector)
-        return FIT_MODEL.predict(x_vector)
-    
-def get_true_positive(name_list, x_vector) -> Optional[str]:
-    """
-    Description:
-        The goal for this method is to find a genome in the list of 
-        genomes that is likely to be a part of the true cluster of genomes
-        in the sample. An assumption used here is that the best genome will
-        have a high mapq average and a high mergeoverlap percentage. 
-    Input:
-        1. name_list
-        2. x_vector
-                [mapq, overlap percentage]
-    Output:
-        1. High probability candidate name (str)
-    """
-    max_score = 0
-    high_prob_genome = None
-    for row_number, values in enumerate(x_vector):
-        mapq = values[0]
-        overlap_percentage = values[1]
-        score = (mapq / 60) + overlap_percentage
-        print(score)
-        if score > max_score:
-            max_score = score
-            high_prob_genome = name_list[row_number]
-    return high_prob_genome
-    
-
-def get_filtered_genomes(true_positive_name, model,  name_list):
-    """
-    Description:
-        This method takes in a genome with the highest confidence 
-        of being true, and collects all other genomes in the same
-        bin. 
-    Input:
-        1. true_positive_name (str) - a name of a genome known to be true.
-        2. model - a vector of 0s and 1s inidicating the binary clusters
-                    NOTE: should have same order as the name list.
-        3. name_list (List[str]) - 
-    """
-    cluster = None
-    for index, name in enumerate(name_list):
-        if name == true_positive_name: 
-            cluster = model[index]
-    return [name_list[index] for index, val in enumerate(model) if val == cluster]
-
-class GenomeMapper(ABC):
-    """ This acts as an adapter for mapping reads to a genome """
-
-    def __init__(self, name):
-        self._genome_name = name
- 
-    @abstractmethod
-    def map_fasta_read(self, sequence):
-        """
-        this method is used to map an individual read.
-        """
-        pass
-
-    @property
-    def genome_name(self):
-        """
-        getter for the genome name. 
-        """
-        return self._genome_name
-
-    @genome_name.setter
-    def genome_name(self, new_name):
-        """ set the genome name. """
-        self._genome_name = new_name
-
-    @abstractmethod
-    def does_read_map(self, sequence) -> bool:
-        """
-        checks if the input read maps to the given genome.
-        """
-        pass 
-
-class MinimapMapperWithInfo(GenomeMapper):
-    """ mapping object adapter for minimap """
-
-    def __init__(self, name, file_path):
-        self._genome_name = name
-        self.index_object = mp.Aligner(file_path, best_n=1)
-        self.minimap_out = {}
-
-    def map_fasta_read(self, sequence):
-        """
-        this method is used to map an individual read.
-        """
-        #print("{}\t{}\t{}\t{}\t{}".format(hit.ctg, hit.r_st, hit.r_en, hit.mapq, hit.mlen))
-        return self.index_object.map(sequence)
-
-    def does_read_map(self, sequence) -> bool:
-        """
-        checks if the input read maps to the given genome.
-        if it does, get information about the mapped read. 
-        """
-        try:
-            first_result = next(self.map_fasta_read(sequence))
-            if self.genome_name in self.minimap_out:
-                self.minimap_out[self.genome_name]["mapq"].append(first_result.mapq)
-                #self.minimap_out[genomeName]["readmaps"].add((first_result.r_st, first_result.r_en))
-                self.minimap_out[self.genome_name]["readmaps"].append((first_result.r_st, first_result.r_en))
-                self.minimap_out[self.genome_name]["readcount"] += 1
-            else:
-                self.minimap_out[self.genome_name] = {} # create if first time
-                self.minimap_out[self.genome_name]["mapq"] = [first_result.mapq]
-                #self.minimap_out[genomeName]["readmaps"] = set((first_result.r_st, first_result.r_en))
-                self.minimap_out[self.genome_name]["readmaps"] = [(first_result.r_st, first_result.r_en)]
-                self.minimap_out[self.genome_name]["readcount"] = 1
-        except StopIteration:
-            return False
-        return True
-
-class MinimapMapper(GenomeMapper):
-    """ mapping object adapter for minimap """
-
-    def __init__(self, name, file_path):
-        self._genome_name = name
-        self.index_object = mp.Aligner(file_path, best_n=1)
-
-    def map_fasta_read(self, sequence):
-        """
-        this method is used to map an individual read.
-        """
-        #print("{}\t{}\t{}\t{}\t{}".format(hit.ctg, hit.r_st, hit.r_en, hit.mapq, hit.mlen))
-        return self.index_object.map(sequence)
-
-    def does_read_map(self, sequence) -> bool:
-        """
-        checks if the input read maps to the given genome.
-        """
-        try:
-            first_result = next(self.map_fasta_read(sequence))
-        except StopIteration:
-            return False
-        return True
-
 
 class GenomeTestSet:
     """
@@ -272,7 +74,8 @@ class GenomeTestSet:
         self.object_PathOrganizer = PathOrganizer(genome_directory)
         # primary attributes
         self.genomes = {} # this directory will hold all of the genomes
-        self.genomeMap: Dict[str, MinimapMapper] = {} # this dictionary hold minmap indexes
+        self.mappingAdapter = MinimapMapperWithInfo # pointer, instantiated per genome.
+        self.genomeMap: Dict[str, GenomeMapper] = {} # this dictionary hold minmap indexes
         self.simAbundance = {} # this dictionary hold simulated abundance amounts
         # add genomes
         self.__addGenomes()
@@ -288,7 +91,7 @@ class GenomeTestSet:
             file_path: Path = self.object_PathOrganizer.genome(genome_taxid)
             if file_path != None: # TODO: IF THIS IS NONE THEN THERE'S A PROBLEM FINDING GENOMES!!
                 self.genomes[genome_taxid] = self.parseFasta(file_path)[1][0]
-                self.genomeMap[genome_taxid] = MinimapMapperWithInfo(name=genome_taxid,
+                self.genomeMap[genome_taxid] = self.mappingAdapter(name=genome_taxid,
                                                                      file_path=str(file_path))
             else:
                 print(f"FIX THIS: there's a problem finding the genome for {genome_taxid}")
@@ -357,7 +160,7 @@ class GenomeTestSet:
         """ 
         INPUT 
             1. input read
-        OUTPUT
+        OUTPUT 
             which genome
             if 1. no genome matching, output 'UNK'.
                2. more than one, output 'MULTIPLE'.
@@ -369,10 +172,10 @@ class GenomeTestSet:
             minimap_mapper: MinimapMapper = self.genomeMap[genome_name]
             read_maps_to_genome: bool = minimap_mapper.does_read_map(input_seq)
             if read_maps_to_genome:
-                if (genome_from == ""):
+                if (genome_from == ""): # first genome with match wins
                     return genome_name
                 else:
-                    return "MULTIPLE"
+                    return "UNK"
         if genome_from == "":  # if nothing, return UNK
             return "UNK"
         return genome_from
@@ -406,15 +209,11 @@ class GenomeTestSet:
                 2. % of genome with reads mapped
         """
         mergedSet = set()
-        #for genome_name in self.genomes.keys():
-        # run some type sorting algorithm
-
         #1. input
         mapped_reads = self.minimap_out[genome_name]["readmaps"] #[(50,120),(110,220),(150,200)]
         print(f"before merge overlap: {len(mapped_reads)}")
         #2. sort the reads by starting index
         sorted_mapped_reads = sorted(mapped_reads, key=lambda x: x[0])
-
         #3. merge overlapping regions
         p1 = 0 # pointer 1
         p2 = 1 # pointer 2
@@ -492,6 +291,15 @@ class GenomeTestSet:
                 for genome_name, abundance in self.resultDict.items():
                     writer.writerow([genome_name, abundance])
 
+    def save_features(self):
+        """ this method saves the features of each genome"""
+        for genomeName in self.minimap_out:
+            overlapMerge = self.overlapMerge(genomeName)
+            percentOverlap = self.calcGenomePercetage(genomeName, overlapMerge)
+            print(f"percent overlap: {percentOverlap}")
+            self.minimap_out[genomeName]["overlapMerge"] = overlapMerge
+            self.minimap_out[genomeName]["percentOverlap"] = percentOverlap       
+
     def print_minimap2output(self, out_prefix):
         """ prints output in minimap_out datastructure """
         for genomeName in self.minimap_out:
@@ -504,11 +312,7 @@ class GenomeTestSet:
             plt.title(f"mapq Histogram for {genomeName}")
             plt.savefig(out_prefix+"_"+genomeName+".png", dpi=300)
             plt.clf()
-            overlappMerge = self.overlapMerge(genomeName)
-            percenOverlap = self.calcGenomePercetage(genomeName, overlappMerge)
-            print(f"percent overlap: {percenOverlap}")
-            self.minimap_out[genomeName]["overlappMerge"] = overlappMerge
-            self.minimap_out[genomeName]["percenOverlap"] = percenOverlap
+            self.save_features()
 
 def print_values_for_mappedinfo(dataset: Dict[str,Dict[str, Union[set, int, float]]]) -> Tuple[List[float]]:
     """ 
@@ -532,13 +336,15 @@ def print_values_for_mappedinfo(dataset: Dict[str,Dict[str, Union[set, int, floa
         for metric in dataset[genome].keys(): 
             if metric in ['mapq', 'readmaps', 'readcount']:
                 print(f" {metric}: {np.average(dataset[genome][metric])}")
-                if metric == 'mapq':
+                if (metric == 'mapq'):
                     x_vector[index].append(np.average(dataset[genome][metric]))
-            elif metric == "overlappMerge":
+            elif metric == "overlapMerge":
                 print(f" {metric}: {len(dataset[genome][metric]) }")
+            elif metric == "percentOverlap":
+                print(f" {metric}: {dataset[genome][metric]}")
+                x_vector[index].append(dataset[genome][metric])                
             else:
                 print(f" {metric}: {dataset[genome][metric]}")
-                x_vector[index].append(dataset[genome][metric])
     return np.array(y_vector), np.array(x_vector)
 
 def plot_scatter_plot(x_vector, y_vector, outfile):
@@ -576,6 +382,9 @@ def scatter_of_filtered(clusters, x_vector, y_vector, outfile):
     plt.savefig(outfile, dpi=300)
     plt.close()
 
+
+
+
 def main():
     print("RUNNING THE MERGE OVERLAP FILTER")
     arguments = parseArgs(argv=sys.argv[1:])
@@ -584,9 +393,13 @@ def main():
     GENOME_DIR = arguments.genome_directory
     genomeTestObj = GenomeTestSet(line_seperated_genomes=arguments.input, genome_directory=GENOME_DIR)
     genomeTestObj.checkSeqFile(arguments.fasta)
-    genomeTestObj.plotResult("Estimated Abundances Using Raw Read Mapping", out=arguments.output_prefix+".png")
     genomeTestObj.saveResultAsCSV(arguments.output_prefix+".csv")
-    genomeTestObj.print_minimap2output(arguments.output_prefix)
+    
+    if (arguments.plot_results):
+        genomeTestObj.plotResult("Estimated Abundances Using Raw Read Mapping", out=arguments.output_prefix+".png")
+        genomeTestObj.print_minimap2output(arguments.output_prefix)
+    else:
+        genomeTestObj.save_features()
 
     # save the pickle output.
     predicted_abundances = genomeTestObj.minimap_out
@@ -602,9 +415,10 @@ def main():
     if len(predicted_abundances.keys()) > 2:
         # use unsupervised model to obtain true genomes in sample
         y_vector, x_vector = print_values_for_mappedinfo(genomeTestObj.minimap_out)
-        plot_scatter_plot(x_vector, y_vector, f"{arguments.output_prefix}_scatterplot.png")
-        clusters = GaussianMixModel().model_predict(x_vector)
-        scatter_of_filtered(clusters, x_vector, y_vector, f"{arguments.output_prefix}_clusters_scatterplot.png")
+        clusters = ClusteringModel().model_predict(x_vector)
+        # if (arguments.plot_results):
+        #     plot_scatter_plot(x_vector, y_vector, f"{arguments.output_prefix}_scatterplot.png")
+        #     scatter_of_filtered(clusters, x_vector, y_vector, f"{arguments.output_prefix}_clusters_scatterplot.png")
         true_pos_genome = get_true_positive(y_vector, x_vector)
         print(f"true positive genome: {true_pos_genome}")
         true_genomes = get_filtered_genomes(true_positive_name=true_pos_genome, 
@@ -625,8 +439,12 @@ def main():
         genomeTestObj2 = GenomeTestSet(line_seperated_genomes=Path(arguments.output_prefix+"_filtered_genomes.lsv"),
                                     genome_directory=GENOME_DIR)
         genomeTestObj2.checkSeqFile(arguments.fasta)
-        genomeTestObj2.plotResult("Estimated Abundances Using Raw Read Mapping", out=arguments.output_prefix+"_refined.png")
         genomeTestObj2.saveResultAsCSV(arguments.output_prefix+"_refined.csv")
+        if (arguments.plot_results):
+            plot_scatter_plot(x_vector, y_vector, f"{arguments.output_prefix}_scatterplot.png")
+            scatter_of_filtered(clusters, x_vector, y_vector, f"{arguments.output_prefix}_clusters_scatterplot.png")
+            genomeTestObj2.plotResult("Estimated Abundances Using Raw Read Mapping", 
+                                      out=arguments.output_prefix+"_refined.png")
 
 if __name__ == "__main__":
     main()

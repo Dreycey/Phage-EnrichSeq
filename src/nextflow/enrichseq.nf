@@ -6,6 +6,7 @@ def usage() {
     log.info ''
 	log.info 'Usage: nextflow run enrichseq.nf --read single --fasta /Path/to/infile.fasta --workdir /Path/to/working_directory --dbdir /Path/to/databases [--threads 4] [--log=/Path/to/run.log]'
 	log.read '  --read       Ready type (single / paired / long)'
+    log.read '  --verbose   Give output figures and debug print statements'
 	log.info '  --fasta		Path to the input FASTA file. If paired end reads, only use file prefix (i.e. before underscore)! Example: '--fasta fastaA' if 'fastaA_1.fa'/'fastaA_2.fa' [suffix must be "_{1/2}.fa"])'
 	log.info '  --workdir	Path to the output working directory'
 	log.info "  --dbdir		Path to the classification databases"
@@ -47,6 +48,14 @@ else if (params.read == 'paired') {
     println "Paired end reads entered!"
     fastafile = file(params.fasta)
     fastafile_2 = file(params.fasta_2)
+}
+
+// if verbose
+if (params.verbose) {
+    plotMergeOverlapResults = '--plot_results'
+}
+else {
+    plotMergeOverlapResults = ''
 }
 
 // opening files for misc parameters
@@ -175,6 +184,7 @@ process Run_MergeOverlap {
             --output_prefix ${mergeOverlapDir}/merge_overlap_out \
             --genome_directory ${genomeDir} \
             --fasta ${fastafile} \
+            ${plotMergeOverlapResults} \
             --threads ${THREADS} 
 	"""
 }
