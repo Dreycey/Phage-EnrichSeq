@@ -173,7 +173,7 @@ class GenomeTestSet:
             read_maps_to_genome: bool = minimap_mapper.does_read_map(input_seq)
             if read_maps_to_genome:
                 if (genome_from == ""): # first genome with match wins
-                    genome_from = genome_name
+                    return genome_name
                 else:
                     return "UNK"
         if genome_from == "":  # if nothing, return UNK
