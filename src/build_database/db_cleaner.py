@@ -68,12 +68,10 @@ def main():
             original_length = taxid2PathAndLength[tax_id][1]
             # print(tax_id, genome_length)
             genome_count[tax_id] += 1
-            # if tax_id == 102797:
-            #     print(genome_length)
             if "GCF" == Path(genome_path).name[:3]:
-                # print("HEY GIRL GHEY")
                 taxid2PathAndLength[tax_id] = [genome_path, genome_length]
 
+            # uncomment the below if selecting for the largest genome, if duplicates
             # if genome_length > original_length:
             #     taxid2PathAndLength[tax_id] = [genome_path, genome_length]
         else:
