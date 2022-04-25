@@ -15,6 +15,7 @@ import argparse
 from pathlib import Path
 import pandas as pd
 import seaborn as sns
+import altair as alt
 import matplotlib.pyplot as plt
 
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -83,19 +84,32 @@ def plot_kmer_effect(genomePair: list, maxKmerSize: int, increment: int):
     '''
     plotting_dict = {'K-mer Size': [], 'Jaccard Index': []}
     for k in range(0, maxKmerSize, increment):
-        if k != 0:
+        #if k != 0:
             plotting_dict['K-mer Size'].append(k)
             plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, k))
     
     kmer_df = pd.DataFrame.from_dict(plotting_dict)
     
-    fig, ax = plt.subplots()
-    sns.lineplot(data=kmer_df, x="K-mer Size", y="Jaccard Index", marker='o')
-    ax.set_xlim(1, maxKmerSize)
-    ax.set_ylim(0.0, 1.1)
-    #sns.relplot(data=kmer_df, x="K-mer Size", y="Jaccard Index", kind="line")
+    ## SEABORN PLOT
+    # fig, ax = plt.subplots()
+    # sns.lineplot(data=kmer_df, x="K-mer Size", y="Jaccard Index", marker='o')
+    # ax.set_xlim(1, maxKmerSize)
+    # ax.set_ylim(0.0, 1.1)
+    # filename = 'jaccard_vs_kmer-size.png'
+    # plt.savefig(filename)
+    # print(f'Line plot stored in {filename}')
+
+    ## ALTAIR PLOT
+    chart = alt.Chart(kmer_df).mark_line(
+        point=True
+    ).encode(
+        x='K-mer Size:Q',
+        #alt.X('K-Mer Size:Q',scale=alt.Scale(domain=(0, maxKmerSize))),
+        y='Jaccard Index:Q'
+        #alt.Y('Jaccard Index:Q', scale=alt.Scale(domain=(0, 1.1),clamp=True))
+    ).properties(width=500)
     filename = 'jaccard_vs_kmer-size.png'
-    plt.savefig(filename)
+    chart.save(filename)
     print(f'Line plot stored in {filename}')
     
 
@@ -143,11 +157,6 @@ def __fasta_to_genome(fasta_path) -> str:
             elif line[0] != ">":
                 sequence += line.rstrip()
     return sequence
-
-def __create_kmer_list(kmerMax: int, increments: int) -> list:
-    kmerSizeList = []
-
-    return kmerSizeList
 
 
 def parseArgs(argv=None) -> argparse.Namespace:
