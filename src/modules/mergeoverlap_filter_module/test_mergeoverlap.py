@@ -10,8 +10,8 @@ import os
 import pytest
 from pathlib import Path
 # in house packages
-from mergeoverlap import GenomeTestSet
-
+from src.modules.mergeoverlap_filter_module.mergeoverlap import GenomeTestSet
+ 
 
 
 
@@ -56,7 +56,6 @@ def test_singlegenome():
 
     for taxid, abundance in singleGenomeTest.truth.value:
         assert abs(results[taxid] - abundance) < 0.10
-
     
 def test_multiplegenomes():
     """
