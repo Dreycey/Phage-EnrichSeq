@@ -6,8 +6,12 @@ co=ompare karaken to merge overlap
 Usage:
 python compare.py <simulated_fasta> <CSV>
 """
+from pathlib import Path
 import sys
 import json 
+
+
+
 
 def make_dir():
     ncbi2taxid = "database_prev/krakenDB/seqid2taxid.map"
@@ -52,18 +56,15 @@ def parse_simulated_fasta(fasta_path):
                 if ncbi_id in dictionary:
                     name = dictionary[line[1:].split("|")[0].split("-")[0]]
                 else:
-                    print(f"DICT DOES NOT HAVE NAME {ncbi_id}")
-                    #exit(1)
-                    name = "unk"
+                    file_name = line[1:].split("|")[-1].strip("\n")
+                    path = Path("database_changingKraken/ref_genomes/" + file_name)
+                    name = open(path).readline().split("kraken:taxid|")[1].strip("\n").replace(" ", "")
                 # increment abundance level per read count
                 if name in abundances['taxid_abundance']:
                     abundances['taxid_abundance'][name] += 1
                 else:
                     abundances['taxid_abundance'][name] = 1
                 total_counts += 1
-                # print update
-                if (total_counts % 1000000 == 0):
-                    print(f"{total_counts} lines parsed")
             line = fasta_opened.readline()
             
     #turn counts into abundances - normalize
@@ -84,21 +85,30 @@ def parse_file(file_in, delim=""):
             name_list[split_on_delim] = 1
     return name_list
 
-def compare_dictionaries(l1, l2):
+def compare_dictionaries(true_dict, predicted_tax_dict):
     """ count differences """
-    count = 0
-    print(l1, l2)
-    for name in l1.keys():
-        if name not in l2:
-            count += 1
-            print(name)
-    print(f"this many false negatives {count}")
-    print(f"truth is {len(l1.keys())} and we ound {len(l2.keys())}")
-    count = 0  
-    for name in l2.keys():
-        if name not in l1:
-            count += 1
-    print(f"this many false positives {count}")
+
+    print("\n\nMETRICS: \n")
+    TrueNumber = len(true_dict.keys())
+    print(f"True of genomes is {TrueNumber} and we found {len(predicted_tax_dict.keys())}")
+    FN = 0
+    FN_List = []
+    for name in true_dict.keys():
+        if name not in predicted_tax_dict:
+            FN += 1
+            FN_List.append(name)
+    print(f"There are this many false negatives: {FN}")
+    #print(f"list of false negatives: {','.join(FN_List)}")
+    FP = 0  
+    for name in predicted_tax_dict.keys():
+        if name not in true_dict:
+            FP += 1
+    TP = len(predicted_tax_dict.keys()) - FP
+    print(f"There are this many false positives: {FP}")
+    precision = TP / (TP + FP)
+    print(f"Precision: {round(precision,2)}")
+    recall = TP / (TP + FN)
+    print(f"Recall: {round(recall,2)}")
 
 if __name__ == "__main__":
 
@@ -111,5 +121,4 @@ if __name__ == "__main__":
 
     d1=parse_simulated_fasta(file1)['taxid_abundance']
     d2=parse_file(file2, delim=",")
-    print("BEFORE")
     compare_dictionaries(d1, d2)
