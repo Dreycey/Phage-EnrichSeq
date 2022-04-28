@@ -32,7 +32,6 @@ def parseArgs(argv=None) -> argparse.Namespace:
         returns a argparse.Namespace object
     '''
     parser = argparse.ArgumentParser(description=__doc__)
-    group = parser.add_mutually_exclusive_group()
     parser.add_argument("-q", "--query", help="query genome file", required=True)
     parser.add_argument("-r","--reference", help="reference genome file", required=True)
     parser.add_argument("-o", "--output_prefix", help="output prefix for report directory", required=False)

@@ -171,7 +171,6 @@ def parseArgs(argv=None) -> argparse.Namespace:
         returns a argparse.Namespace object
     '''
     parser = argparse.ArgumentParser(description=__doc__)
-    group = parser.add_mutually_exclusive_group()
     parser.add_argument("-d", "--genome_directory", help="path to the directory of genomes", required=True)
     #parser.add_argument("-o", "--output_dir", help="the output directory", required=False)
     parser.add_argument("-k1","--max_kmer_size", help="size (length) of kmers to create, or the max size", required=False)
