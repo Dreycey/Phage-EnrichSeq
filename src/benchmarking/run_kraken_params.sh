@@ -1,11 +1,10 @@
 usage() {
-    echo; echo "Usage: bash $0 --input=simulatedgenomes_illumina.fa --refdir=database/ref_genomes/ --kmer_length=35 --min_length=31 --seed=7 --assembly=y"
+    echo; echo "Usage: bash $0 --input=simulatedgenomes_illumina.fa --refdir=database/ref_genomes/ --kmer_length=35 --min_length=31 --seed=7"
     echo "  --input           Path to the in fasta file"
     echo "  --refdir          Path to the kraken2 database created using the config and kraken2Build.sh"
     echo "  --kmer_length     Size of kmers to create (for database build)"
     echo "  --min_length      Length of minimizer (for database build)"
     echo "  --seed            Spaced seeds size (for database build)"
-    echo "  --assembly        y or n (with assembly or without)"
     echo "  -h, --help  Print this help message out"; echo;
     exit 1;
 }
@@ -13,6 +12,10 @@ usage() {
 
 function buildDatabase() {
      local dbDir=$1;
+     local refdir=$2;
+     local kmer_length=$3;
+     local min_length=$4;
+     local seed=$5;
      # Flag options are the parameters
      echo "Building the database using kraken2-build"
      # Add-to-library must already be complete. How to check this?
@@ -59,12 +62,10 @@ function main() {
      echo $kmerLength;
      echo $minimizerLength;
      echo $seed;
-     echo $assembly;
      local dbDir='krakenParamDB';
 
-     buildDatabase; ## Which params to pass?
-     if [[ ${assembly} == 'y' ]]; then
-          runMegahit ${};
+     buildDatabase ${dbDir}; ## Which params to pass?
+     runMegahit ${};
      runKraken2 ${dbDir} ${inFasta} ${kmerLength} ${minimizerLength} ${seed};
 }
 
