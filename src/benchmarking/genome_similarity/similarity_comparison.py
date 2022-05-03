@@ -57,8 +57,8 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
 
     intersection = len(a.intersection(b))
     union = len(a.union(b))
-
-    return round(intersection / union, 8)
+    
+    return round((intersection / union)*100, 4)
 
 
 def run_dnadiff(genomeList: list, outputdir: str):
@@ -66,6 +66,7 @@ def run_dnadiff(genomeList: list, outputdir: str):
     #subprocess.run(['python', commandPath, '-q', genomeList[0], '-r', genomeList[2]]) 
     subprocess.run(['dnadiff', '-p', Path(outputdir)/Path('dnadiff_out'), genomeList[1], genomeList[2]])
     return Path(outputdir + '/dnadiff_out.report')
+
 
 def parse_dnadiff(dnadiff_outdir: str) -> float:
     # AlignedBases           67551(92.97%)        67410(94.32%)
@@ -197,7 +198,8 @@ def main():
     plot_kmer_effect(genomeList, int(arguments.max_kmer_size), int(arguments.kmer_increments))
     #print(run_dnadiff(genomeList, arguments.output_dir))
     dnadiff_val = parse_dnadiff(run_dnadiff(genomeList, arguments.output_dir))
-    print(dnadiff_val)
+    print(f'dnadiff = {dnadiff_val}')
+    print(f'jaccard = {run_jaccard(genomeList, int(arguments.max_kmer_size))}')
 
 
 if __name__ == "__main__":
