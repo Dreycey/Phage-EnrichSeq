@@ -65,7 +65,8 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
 
 def run_dnadiff(commandPath: Path, genomeList: list):
     print('Running dnadiff')
-    subprocess.run(['python', commandPath, '-q', genomeList[0], '-r', genomeList[2]]) 
+    #subprocess.run(['python', commandPath, '-q', genomeList[0], '-r', genomeList[2]]) 
+    subprocess.run(['dnadiff', genomeList[0], genomeList[2]])
 
 
 def parse_dnadiff():
