@@ -12,6 +12,7 @@ import os
 import sys
 import re
 import argparse
+import subprocess
 from pathlib import Path
 import pandas as pd
 import seaborn as sns
@@ -62,12 +63,14 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
     return round(intersection / union, 8)
 
 
-def run_dnadiff(genomes_directory: Path):
-    return None
+def run_dnadiff(commandPath: Path, genomeList: list):
+    print('Running dnadiff')
+    subprocess.run(['python', commandPath, '-q', genomeList[0], '-r', genomeList[2]]) 
 
 
 def parse_dnadiff():
     return None
+
 
 
 def plot_method_comparison():
