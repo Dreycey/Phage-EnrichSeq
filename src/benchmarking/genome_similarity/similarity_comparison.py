@@ -20,14 +20,12 @@ import altair as alt
 import matplotlib.pyplot as plt
 
 current_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(f"{current_path}/../../modules/genomeCompare_module")
-#from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
-from dna import DNA
+#sys.path.append(f"{current_path}/../../modules/genomeCompare_module")
 
 # Changing to directory of script.
-abspath = os.path.abspath(sys.argv[0])
-dname = os.path.dirname(abspath)
-os.chdir(dname)
+#abspath = os.path.abspath(sys.argv[0])
+#dname = os.path.dirname(abspath)
+#os.chdir(dname)
 
 # GLOBALS.
 PATH = os.path.dirname(os.path.abspath(__file__))
@@ -48,7 +46,7 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
     '''
     #print(f"Calculating jaccard similarity index.")
     # TODO: change to random 2 genomes
-    genome1_kmers = __create_kmers(__fasta_to_genome(genomeList[0]), kmerLength)
+    genome1_kmers = __create_kmers(__fasta_to_genome(genomeList[1]), kmerLength)
     genome2_kmers = __create_kmers(__fasta_to_genome(genomeList[2]), kmerLength)
 
     #print(os.path.basename(genomeList[2]))
@@ -63,14 +61,26 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
     return round(intersection / union, 8)
 
 
-def run_dnadiff(commandPath: Path, genomeList: list):
+def run_dnadiff(genomeList: list, outputdir: str):
     print('Running dnadiff')
     #subprocess.run(['python', commandPath, '-q', genomeList[0], '-r', genomeList[2]]) 
-    subprocess.run(['dnadiff', genomeList[0], genomeList[2]])
+    subprocess.run(['dnadiff', '-p', Path(outputdir)/Path('dnadiff_out'), genomeList[1], genomeList[2]])
+    return Path(outputdir + '/dnadiff_out.report')
 
-
-def parse_dnadiff():
-    return None
+def parse_dnadiff(dnadiff_outdir: str) -> float:
+    # AlignedBases           67551(92.97%)        67410(94.32%)
+    similarity=-1.0
+    with open(dnadiff_outdir) as dnadiff_file:
+        for line in dnadiff_file:
+            if 'AlignedBases' in line:
+                #re.search(str(self.taxid), line, re.IGNORECASE).group(1)
+                val1 = line.rstrip().split()[1]
+                val2 = line.rstrip().split()[2]
+                num1 = float(val1[val1.find("(")+1:val1.find(")")].strip('%'))
+                num2 = float(val2[val2.find("(")+1:val2.find(")")].strip('%'))
+                similarity = (num1 + num2) / 2
+                 
+    return similarity
 
 
 
@@ -81,7 +91,7 @@ def plot_method_comparison():
     return None
 
 
-def plot_kmer_effect(genomePair: list, maxKmerSize: int, increment: int):
+def plot_kmer_effect(genomePair: list, maxKmerSize=30, increment=1):
     '''
     Plots the jaccard similarity between two genomes only when
     the kmer size is changed. 
@@ -176,7 +186,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
     '''
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-d", "--genome_directory", help="path to the directory of genomes", required=True)
-    #parser.add_argument("-o", "--output_dir", help="the output directory", required=False)
+    parser.add_argument("-o", "--output_dir", help="the output directory", required=True)
     parser.add_argument("-k1","--max_kmer_size", help="size (length) of kmers to create, or the max size", required=False)
     parser.add_argument("-k2", "--kmer_increments", help="amount to increment kmers by for kmer benchmarking", required=False)
     return parser.parse_args(argv)
@@ -185,6 +195,9 @@ def main():
     arguments = parseArgs(argv=sys.argv[1:])
     genomeList = extract_genome_paths(arguments.genome_directory)
     plot_kmer_effect(genomeList, int(arguments.max_kmer_size), int(arguments.kmer_increments))
+    #print(run_dnadiff(genomeList, arguments.output_dir))
+    dnadiff_val = parse_dnadiff(run_dnadiff(genomeList, arguments.output_dir))
+    print(dnadiff_val)
 
 
 if __name__ == "__main__":
