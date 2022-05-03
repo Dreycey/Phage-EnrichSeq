@@ -4,20 +4,24 @@ DESCRIPTION:
     Python wrapper for dnadiff
 
 USAGE:
-    python dnadiff_wrapper.py -q <query fasta file> -r <reference fasta file>
+    python dnadiff_wrapper.py -q <query fasta file> -r <reference fasta file> -o <output directory prefix: OPTIONAL>
 """
 
 import os
 import sys
+import shutil
 import subprocess
 import argparse
 
 
 
-def call_dnadiff(query: str, reference: str, outfile: str):
-    #cmd = 'dnadiff'
-    #os.system(cmd)
-    subprocess.run(['dnadiff', query, reference])
+def call_dnadiff(query: str, reference: str, outdir='dnadiff_out'):
+    if os.path.exists(outdir):
+         print('in true')
+         shutil.rmtree(outdir)
+    os.makedirs(outdir)
+    outpath = outdir + '/dnadiff_out'
+    subprocess.run(['dnadiff', query, reference, '-p', outpath])
 
 
 def parseArgs(argv=None) -> argparse.Namespace:
