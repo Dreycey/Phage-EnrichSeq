@@ -1,5 +1,0 @@
-/gpfs/summit/scratch/dral3008/benchmarking_enrichseq/TOOLS/Phage-EnrichSeq/src/benchmarking/genome_similarity/testing_genomes/Ryadel.fasta /gpfs/summit/scratch/dral3008/benchmarking_enrichseq/TOOLS/Phage-EnrichSeq/src/benchmarking/genome_similarity/testing_genomes/Blessica.fasta
-NUCMER
->Mycobacterium Mycobacterium 150 150
-1 150 1 150 1 1 0
-0

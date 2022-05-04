@@ -28,7 +28,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 #os.chdir(dname)
 
 # GLOBALS.
-PATH = os.path.dirname(os.path.abspath(__file__))
+#PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 def extract_genome_paths(genomes_directory: Path) -> list:
@@ -39,19 +39,30 @@ def extract_genome_paths(genomes_directory: Path) -> list:
 
     return genomeList
 
-def run_jaccard(genomeList: list, kmerLength: int) -> float:
+
+def populate_genome_dict(genomes_directory: Path) -> dict:
+    print(f'Populating genome dictionary from: {genomes_directory}')
+    genomeDict = {}
+    for genome_filename in os.listdir(genomes_directory):
+        genomeDict[genome_filename] = __fasta_to_genome(Path(genomes_directory)/Path(genome_filename))
+
+    return genomeDict
+
+
+def run_jaccard(genomePair: list, kmerLength=35) -> float:
     '''
     Creates kmers out of the provided genomes to calculate the jaccard index between
-    the sets of kmers, then outputs an adjacency matrix.
+    the sets of kmers
+
+    INPUT:
+        genomePair: list of (2) genomes
     '''
-    #print(f"Calculating jaccard similarity index.")
-    # TODO: change to random 2 genomes
-    genome1_kmers = __create_kmers(__fasta_to_genome(genomeList[1]), kmerLength)
-    genome2_kmers = __create_kmers(__fasta_to_genome(genomeList[2]), kmerLength)
-
-    #print(os.path.basename(genomeList[2]))
-    #print(os.path.basename(genomeList[2]))
-
+    kmerLength=int(kmerLength)
+    #genome1_kmers = __create_kmers(__fasta_to_genome(genomeList[0]), kmerLength)
+    #genome2_kmers = __create_kmers(__fasta_to_genome(genomeList[1]), kmerLength)
+    genome1_kmers = __create_kmers(genomePair[0], kmerLength)
+    genome2_kmers = __create_kmers(genomePair[1], kmerLength)
+    
     a = set(genome1_kmers)
     b = set(genome2_kmers)
 
@@ -61,35 +72,68 @@ def run_jaccard(genomeList: list, kmerLength: int) -> float:
     return round((intersection / union)*100, 4)
 
 
-def run_dnadiff(genomeList: list, outputdir: str):
+def run_dnadiff(genomePair: list, outputdir: str):
     print('Running dnadiff')
     #subprocess.run(['python', commandPath, '-q', genomeList[0], '-r', genomeList[2]]) 
-    subprocess.run(['dnadiff', '-p', Path(outputdir)/Path('dnadiff_out'), genomeList[1], genomeList[2]])
+    subprocess.run(['dnadiff', '-p', Path(outputdir)/Path('dnadiff_out'), genomePair[0], genomePair[1]])
     return Path(outputdir + '/dnadiff_out.report')
 
 
 def parse_dnadiff(dnadiff_outdir: str) -> float:
-    # AlignedBases           67551(92.97%)        67410(94.32%)
     similarity=-1.0
     with open(dnadiff_outdir) as dnadiff_file:
         for line in dnadiff_file:
-            if 'AlignedBases' in line:
+            if 'AvgIdentity' in line:
                 #re.search(str(self.taxid), line, re.IGNORECASE).group(1)
-                val1 = line.rstrip().split()[1]
-                val2 = line.rstrip().split()[2]
-                num1 = float(val1[val1.find("(")+1:val1.find(")")].strip('%'))
-                num2 = float(val2[val2.find("(")+1:val2.find(")")].strip('%'))
-                similarity = (num1 + num2) / 2
-                 
+                #val1 = line.rstrip().split()[1]
+                #val2 = line.rstrip().split()[2]
+                #num1 = float(val1[val1.find("(")+1:val1.find(")")].strip('%'))
+                #num2 = float(val2[val2.find("(")+1:val2.find(")")].strip('%'))
+                #similarity = (num1 + num2) / 2
+                similarity = line.rstrip().split()[1]
+                break; # only first occurrence
     return similarity
 
 
 
-def plot_method_comparison():
+def plot_method_comparison(genomeList: list):
     '''
     dnadiff vs jaccard scatter plot
     '''
-    return None
+    pass
+
+def plot_simulated_percentages(genomeDict: dict, original_filename: str, kmer: int, outputDir: str):
+    '''
+    Plots jaccard index vs. simulated percentages.
+    
+    INPUT:
+        genomeDict: dictionary of genomes to conduct pairwise comparisons on, including the original
+            [<filename> : <genome str>]
+        original_filename: the filename (i.e. dictionary key) of the original, or reference genome to compare with
+        simPercentages: list of float values that represent percentage of similarity simulated 
+    '''
+    #plotting_dict = {'Simulated Percentage': simPercentages:.sort(), 'Jaccard Index': []}
+    plotting_dict = {'Simulated Percentage': [], 'Jaccard Index': []}
+    genomePair = [genomeDict[original_filename], None]
+    for key,val in genomeDict.items():
+        percent_str = re.sub('\D', '', key)
+        print(f'percent_str = {percent_str}')
+        print(f'key = {key}')
+        genomePair[1] = genomeDict[key]
+        plotting_dict['Simulated Percentage'].append(float(percent_str))
+        plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, kmer))
+
+    simPercent_df = pd.DataFrame.from_dict(plotting_dict)
+           
+    #ALTAIR PLOT
+    chart = alt.Chart(simPercent_df).mark_circle(size=60).encode(
+        x='Simulated Percentage:Q',
+        y='Jaccard Index:Q',
+    )       
+    filename = outputDir + 'jaccard_vs_simulated_' + str(kmer) + '-mer.png'
+    chart.save(filename)
+    print(f'Line plot stored in {filename}')   
+
 
 
 def plot_kmer_effect(genomePair: list, maxKmerSize=30, increment=1):
@@ -160,17 +204,18 @@ def __fasta_to_genome(fasta_path) -> str:
             Genome in string format
     '''
     sequence = ""
+    print(f'File: {fasta_path}')
     with open(fasta_path) as fasta_file:
         fasta_lines = fasta_file.readlines()
         sequence_i = ""
-        # If name is found (i.e. this is the correct file), get genome
         for counter, line in enumerate(fasta_lines):
-            if line[0] == ">": #and re.search(str(self.taxid), line, re.IGNORECASE):
+            if line[0] == ">": 
                 if (counter != 0):
                     sequence += (sequence_i.rstrip())
                     sequence_i = ""
             elif line[0] != ">":
                 sequence += line.rstrip()
+    print(sequence[:21])
     return sequence
 
 
@@ -195,12 +240,13 @@ def parseArgs(argv=None) -> argparse.Namespace:
 def main():
     arguments = parseArgs(argv=sys.argv[1:])
     genomeList = extract_genome_paths(arguments.genome_directory)
-    plot_kmer_effect(genomeList, int(arguments.max_kmer_size), int(arguments.kmer_increments))
+    #plot_kmer_effect(genomeList, int(arguments.max_kmer_size), int(arguments.kmer_increments))
     #print(run_dnadiff(genomeList, arguments.output_dir))
     dnadiff_val = parse_dnadiff(run_dnadiff(genomeList, arguments.output_dir))
     print(f'dnadiff = {dnadiff_val}')
-    print(f'jaccard = {run_jaccard(genomeList, int(arguments.max_kmer_size))}')
-
+    #print(f'jaccard = {run_jaccard(genomeList, int(arguments.max_kmer_size))}')
+    genomeDict = populate_genome_dict(arguments.genome_directory)
+    plot_simulated_percentages(genomeDict, 'genome_100.fa', [20,40], arguments.max_kmer_size)
 
 if __name__ == "__main__":
     main()
