@@ -31,20 +31,30 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 #PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-def extract_genome_paths(genomes_directory: Path) -> list:
-    print(f"Extracting genome paths from: {genomes_directory}")
-    genomeList = []
-    for genome_fasta in os.listdir(genomes_directory):
-        genomeList.append(Path(genomes_directory) / Path(genome_fasta))
+# def extract_genome_paths(genomes_directory: Path) -> list:
+#     print(f"Extracting genome paths from: {genomes_directory}")
+#     genomeList = []
+#     for genome_fasta in os.listdir(genomes_directory):
+#         genomeList.append(Path(genomes_directory) / Path(genome_fasta))
 
-    return genomeList
+#     return genomeList
+
+
+def extract_genome_path(genomes_directory: Path, filename: str) -> list:
+    print(f"Extracting genome paths from: {genomes_directory}")
+
+    return Path(genomes_directory) / Path(filename)
 
 
 def populate_genome_dict(genomes_directory: Path) -> dict:
+    '''
+    Dictionary: [ fullpath : genome str]
+    '''
     print(f'Populating genome dictionary from: {genomes_directory}')
     genomeDict = {}
     for genome_filename in os.listdir(genomes_directory):
-        genomeDict[genome_filename] = __fasta_to_genome(Path(genomes_directory)/Path(genome_filename))
+        fullpath = Path(genomes_directory) / Path(genome_filename)
+        genomeDict[fullpath] = __fasta_to_genome(fullpath)
 
     return genomeDict
 
@@ -58,10 +68,10 @@ def run_jaccard(genomePair: list, kmerLength=35) -> float:
         genomePair: list of (2) genomes
     '''
     kmerLength=int(kmerLength)
-    #genome1_kmers = __create_kmers(__fasta_to_genome(genomeList[0]), kmerLength)
-    #genome2_kmers = __create_kmers(__fasta_to_genome(genomeList[1]), kmerLength)
-    genome1_kmers = __create_kmers(genomePair[0], kmerLength)
-    genome2_kmers = __create_kmers(genomePair[1], kmerLength)
+    genome1_kmers = __create_kmers(__fasta_to_genome(genomePair[0]), kmerLength)
+    genome2_kmers = __create_kmers(__fasta_to_genome(genomePair[1]), kmerLength)
+    #genome1_kmers = __create_kmers(genomePair[0], kmerLength)
+    #genome2_kmers = __create_kmers(genomePair[1], kmerLength)
     
     a = set(genome1_kmers)
     b = set(genome2_kmers)
@@ -102,7 +112,8 @@ def plot_method_comparison(genomeList: list):
     '''
     pass
 
-def plot_simulated_percentages(genomeDict: dict, original_filename: str, kmer: int, outputDir: str):
+
+def plot_simulated_percentages(genomes_directory: Path, original_filename: str, kmer: int, increment: int, outputDir: str):
     '''
     Plots jaccard index vs. simulated percentages.
     
@@ -110,25 +121,32 @@ def plot_simulated_percentages(genomeDict: dict, original_filename: str, kmer: i
         genomeDict: dictionary of genomes to conduct pairwise comparisons on, including the original
             [<filename> : <genome str>]
         original_filename: the filename (i.e. dictionary key) of the original, or reference genome to compare with
-        simPercentages: list of float values that represent percentage of similarity simulated 
+        kmer: kmer length for jaccard sets
+        outputDir: location to store plot
     '''
-    #plotting_dict = {'Simulated Percentage': simPercentages:.sort(), 'Jaccard Index': []}
-    plotting_dict = {'Simulated Percentage': [], 'Jaccard Index': []}
-    genomePair = [genomeDict[original_filename], None]
-    for key,val in genomeDict.items():
-        percent_str = re.sub('\D', '', key)
-        print(f'percent_str = {percent_str}')
-        print(f'key = {key}')
-        genomePair[1] = genomeDict[key]
-        plotting_dict['Simulated Percentage'].append(float(percent_str))
-        plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, kmer))
+    print('PLOTTING JACCARD VS. SIMULATED')
+    plotting_dict = {'Simulated Percentage': [], 'Jaccard Index': [], 'K-mer Length': []}
+    genomeDict = populate_genome_dict(genomes_directory)
+   
+    genomePair = [ extract_genome_path(genomes_directory, original_filename), None]
+
+    for k in range(0,int(kmer),int(increment)):
+        for key in genomeDict.keys():
+            percent_str = re.sub('\D', '', str(key))
+            genomePair[1] = key
+            plotting_dict['Simulated Percentage'].append(float(percent_str))
+            jaccard = run_jaccard(genomePair, k)
+            plotting_dict['Jaccard Index'].append(jaccard)
+            plotting_dict['K-mer Length'].append(k)
 
     simPercent_df = pd.DataFrame.from_dict(plotting_dict)
+    print(simPercent_df)
            
     #ALTAIR PLOT
-    chart = alt.Chart(simPercent_df).mark_circle(size=60).encode(
+    chart = alt.Chart(simPercent_df).mark_line(point=True).encode(
         x='Simulated Percentage:Q',
         y='Jaccard Index:Q',
+        color='K-mer Length:N'
     )       
     filename = outputDir + 'jaccard_vs_simulated_' + str(kmer) + '-mer.png'
     chart.save(filename)
@@ -239,14 +257,14 @@ def parseArgs(argv=None) -> argparse.Namespace:
 
 def main():
     arguments = parseArgs(argv=sys.argv[1:])
-    genomeList = extract_genome_paths(arguments.genome_directory)
+    #genomePair = extract_genome_paths(arguments.genome_directory)
     #plot_kmer_effect(genomeList, int(arguments.max_kmer_size), int(arguments.kmer_increments))
     #print(run_dnadiff(genomeList, arguments.output_dir))
-    dnadiff_val = parse_dnadiff(run_dnadiff(genomeList, arguments.output_dir))
-    print(f'dnadiff = {dnadiff_val}')
+    #dnadiff_val = parse_dnadiff(run_dnadiff(genomeList, arguments.output_dir))
+    #print(f'dnadiff = {dnadiff_val}')
     #print(f'jaccard = {run_jaccard(genomeList, int(arguments.max_kmer_size))}')
-    genomeDict = populate_genome_dict(arguments.genome_directory)
-    plot_simulated_percentages(genomeDict, 'genome_100.fa', [20,40], arguments.max_kmer_size)
+    #genomeDict = populate_genome_dict(arguments.genome_directory)
+    plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', arguments.max_kmer_size,arguments.kmer_increments, arguments.output_dir)
 
 if __name__ == "__main__":
     main()
