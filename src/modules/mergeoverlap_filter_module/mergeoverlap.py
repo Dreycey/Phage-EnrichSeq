@@ -26,6 +26,7 @@ from numpy import where
 # in house packages
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{current_path}/../PathOrganizer_module")
+sys.path.append(f"{current_path}")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
 from ClusteringModel import TrueGenomeFinder, ClusteringModel, get_true_positive, get_filtered_genomes
 from GenomeMapper import GenomeMapper, MinimapMapperWithInfo, MinimapMapper
