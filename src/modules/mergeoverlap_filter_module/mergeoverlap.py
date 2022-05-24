@@ -27,8 +27,8 @@ from numpy import where
 current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{current_path}/../PathOrganizer_module")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
-from src.modules.mergeoverlap_filter_module.ClusteringModel import TrueGenomeFinder, ClusteringModel, get_true_positive, get_filtered_genomes
-from src.modules.mergeoverlap_filter_module.GenomeMapper import GenomeMapper, MinimapMapperWithInfo, MinimapMapper
+from ClusteringModel import TrueGenomeFinder, ClusteringModel, get_true_positive, get_filtered_genomes
+from GenomeMapper import GenomeMapper, MinimapMapperWithInfo, MinimapMapper
 
 
 
