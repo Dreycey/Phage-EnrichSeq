@@ -132,15 +132,24 @@ def run_dnadiff(genomePair: list, outputdir: str):
 
 
 
-def plot_method_comparison(genomes_directory: Path, kmerLength: int, outputDir: str):
+def plot_method_comparison(genomesDirectory: Path, kmerLength: int, outputDir: str):
     '''
     dnadiff vs jaccard scatter plot
+
+    INPUT:
+        genomesDirectory: directory from which to obtain all genomes to compare
+        kmerLength: k-mer length for jaccard calculation based on k-mer set comparisons
+        outputDir: where to save dnadiff files and plots
+
+    OUTPUT:
+        None. Show or save plots.
+
     '''
     print('Comparing dnadiff vs. Jaccard index')
     compareDict = {'genome pair': [], 'jaccard value': [], 'dnadiff value': [], 'jaccard time': [], 'dnadiff time':[], 'speed factor':[]}
     
     # Create genome pairs from dictionary
-    genomeDict = populate_genome_dict(genomes_directory)
+    genomeDict = populate_genome_dict(genomesDirectory)
     
     # create pairs from dictionary
     genomePairs = list(combinations(genomeDict.keys(), 2))
@@ -180,9 +189,9 @@ def plot_method_comparison(genomes_directory: Path, kmerLength: int, outputDir: 
             scale=alt.Scale(domain=[0, 100])),
         color='genome pair:N'
     ).show()
-    # filename = outputDir + 'jaccard_vs_dnadiff_' + str(kmerLength) + '-mer.png'
+    # filename = outputDir + 'dnadiff_vs_dnadiff_' + str(kmerLength) + '-mer.png'
     # chart.save(filename)
-    # print(f'Line plot stored in {filename}') 
+    # print(f'Scatterplot stored in {filename}') 
 
 
 def plot_simulated_percentages(genomes_directory: Path, original_filename: str, kmer_min: int, kmer_max: int, increment: int, outputDir: str):
