@@ -13,7 +13,9 @@ import sys
 import re
 import argparse
 import subprocess
+import time
 from pathlib import Path
+from itertools import combinations
 import pandas as pd
 import seaborn as sns
 import altair as alt
@@ -78,7 +80,7 @@ def populate_genome_dict(genomes_directory: Path) -> dict:
     print(f'Populating genome dictionary from: {genomes_directory}')
     genomeDict = {}
     for genome_filename in os.listdir(genomes_directory):
-        if genome_filename.endswith('fa'):
+        if genome_filename.endswith('fa') or genome_filename.endswith('fna') or genome_filename.endswith('fasta'):
             fullpath = Path(genomes_directory) / Path(genome_filename)
             genomeDict[fullpath] = __fasta_to_genome(fullpath)
 
@@ -109,12 +111,9 @@ def run_jaccard(genomePair: list, kmerLength=35) -> float:
 def run_dnadiff(genomePair: list, outputdir: str):
     print('Running dnadiff')
     subprocess.run(['dnadiff', '-p', Path(outputdir)/Path('dnadiff_out'), genomePair[0], genomePair[1]])
-    return Path(outputdir + '/dnadiff_out.report')
-
-
-def parse_dnadiff(dnadiff_outdir: str) -> float:
+    #return Path(outputdir + '/dnadiff_out.report')
     similarity=-1.0
-    with open(dnadiff_outdir) as dnadiff_file:
+    with open(outputdir+ '/dnadiff_out.report') as dnadiff_file:
         for line in dnadiff_file:
             if 'AvgIdentity' in line:
                 similarity = line.rstrip().split()[1]
@@ -122,12 +121,68 @@ def parse_dnadiff(dnadiff_outdir: str) -> float:
     return similarity
 
 
+# def parse_dnadiff(dnadiff_outdir: str) -> float:
+#     similarity=-1.0
+#     with open(dnadiff_outdir) as dnadiff_file:
+#         for line in dnadiff_file:
+#             if 'AvgIdentity' in line:
+#                 similarity = line.rstrip().split()[1]
+#                 break; # only first occurrence
+#     return similarity
 
-def plot_method_comparison(genomePair: list, outputdir: str):
+
+
+def plot_method_comparison(genomes_directory: Path, kmerLength: int, outputDir: str):
     '''
     dnadiff vs jaccard scatter plot
     '''
     print('Comparing dnadiff vs. Jaccard index')
+    compareDict = {'genome pair': [], 'jaccard value': [], 'dnadiff value': [], 'jaccard time': [], 'dnadiff time':[], 'speed factor':[]}
+    
+    # Create genome pairs from dictionary
+    genomeDict = populate_genome_dict(genomes_directory)
+    
+    # create pairs from dictionary
+    genomePairs = list(combinations(genomeDict.keys(), 2))
+
+    # run jaccard and dnadiff for all pairs
+    for num, pair in enumerate(genomePairs):
+        compareDict['genome pair'].append(num+1)
+
+        # run dnadiff
+        startTime = time.time()
+        dnadiffVal = run_dnadiff(pair, outputDir)
+        dnadiffTime = time.time() - startTime
+        compareDict['dnadiff value'].append(dnadiffVal)
+
+        # run jaccard
+        startTime = time.time()
+        jaccardVal = run_jaccard(pair, kmerLength)
+        jaccardTime = time.time() - startTime
+        compareDict['jaccard value'].append(jaccardVal)
+
+
+        # append runtimes and calculate speed factor
+        compareDict['jaccard time'].append(jaccardTime)
+        compareDict['dnadiff time'].append(dnadiffTime)
+        compareDict['speed factor'].append(1/(jaccardTime/dnadiffTime))
+
+    # Display table
+    compare_df = pd.DataFrame.from_dict(compareDict)
+    print(compare_df)
+
+    # Plot dnadiff vs. jaccard vals
+    chart = alt.Chart(compare_df).mark_circle(size=70).encode(
+        alt.X('jaccard value:Q',
+            scale=alt.Scale(domain=[0, 100])
+        ),
+        alt.Y('dnadiff value:Q',
+            scale=alt.Scale(domain=[0, 100])),
+        color='genome pair:N'
+    ).show()
+    # filename = outputDir + 'jaccard_vs_dnadiff_' + str(kmerLength) + '-mer.png'
+    # chart.save(filename)
+    # print(f'Line plot stored in {filename}') 
 
 
 def plot_simulated_percentages(genomes_directory: Path, original_filename: str, kmer_min: int, kmer_max: int, increment: int, outputDir: str):
@@ -219,7 +274,8 @@ def parseArgs(argv=None) -> argparse.Namespace:
 
 def main():
     arguments = parseArgs(argv=sys.argv[1:])
-    plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
+    #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
+    plot_method_comparison(arguments.genome_directory, 8, arguments.output_dir)
 
 if __name__ == "__main__":
     main()
