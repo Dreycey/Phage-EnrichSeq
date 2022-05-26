@@ -44,8 +44,8 @@ class TrueGenomeFinder(ABC):
         """
         pass
 
-class ClusteringModel(TrueGenomeFinder):
-    """ This is the clustering model class for the unsupervised genome finder """
+class KMeansClustering(TrueGenomeFinder):
+    """ This is the Kmeans clustering model class for the unsupervised genome finder """
     
     def __init__(self):
         self._model = KMeans(n_clusters=2)
@@ -69,7 +69,33 @@ class ClusteringModel(TrueGenomeFinder):
         """
         FIT_MODEL = self.model.fit(x_vector)
         return FIT_MODEL.predict(x_vector)
+
+class GMM(TrueGenomeFinder):
+    """ This is the GMM clustering model class for the unsupervised genome finder """
     
+    def __init__(self):
+        self._model = GaussianMixture(n_components=2)
+        self._model_name = "Gassiaun Mixture Model"
+
+    @property
+    def model(self):
+        """ This is the model for the unsupervised classification """
+        return self._model
+
+    @property
+    def model_name(self):
+        """ This is the model for the unsupervised classification """
+        return self._model_name
+    
+    def model_predict(self, x_vector):
+        """
+        Sine the model clusters data, there's not necessarily 
+        a training set needed - it's practically just binary
+        clustering. 
+        """
+        FIT_MODEL = self.model.fit(x_vector)
+        return FIT_MODEL.predict(x_vector)
+
 def get_true_positive(name_list, x_vector) -> Optional[str]:
     """
     Description:
