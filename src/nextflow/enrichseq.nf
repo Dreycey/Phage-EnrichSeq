@@ -7,6 +7,7 @@ def usage() {
 	log.info 'Usage: nextflow run enrichseq.nf --read single --fasta /Path/to/infile.fasta --workdir /Path/to/working_directory --dbdir /Path/to/databases [--threads 4] [--log=/Path/to/run.log]'
 	log.read '  --read       Ready type (single / paired / long)'
     log.read '  --verbose   Give output figures and debug print statements'
+    log.read '  --use_gmm   Use the Gaussian Mixture Model during Merge Overlap'
 	log.info '  --fasta		Path to the input FASTA file. If paired end reads, only use file prefix (i.e. before underscore)! Example: '--fasta fastaA' if 'fastaA_1.fa'/'fastaA_2.fa' [suffix must be "_{1/2}.fa"])'
 	log.info '  --workdir	Path to the output working directory'
 	log.info "  --dbdir		Path to the classification databases"
@@ -56,6 +57,14 @@ if (params.verbose) {
 }
 else {
     plotMergeOverlapResults = ''
+}
+
+// if GMM specified
+if (params.use_gmm) {
+    use_gmm_MO = '--use_gmm'
+}
+else {
+    use_gmm_MO = ''
 }
 
 // opening files for misc parameters
@@ -185,6 +194,7 @@ process Run_MergeOverlap {
             --genome_directory ${genomeDir} \
             --fasta ${fastafile} \
             ${plotMergeOverlapResults} \
+            ${use_gmm_MO} \
             --threads ${THREADS} 
 	"""
 }

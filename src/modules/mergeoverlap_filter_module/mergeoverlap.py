@@ -28,7 +28,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(f"{current_path}/../PathOrganizer_module")
 sys.path.append(f"{current_path}")
 from PathOrganizer import PathOrganizer, PathErrors, DuplicateGenomeError
-from ClusteringModel import TrueGenomeFinder, ClusteringModel, get_true_positive, get_filtered_genomes
+from ClusteringModel import TrueGenomeFinder, GMM, KMeansClustering, get_true_positive, get_filtered_genomes
 from GenomeMapper import GenomeMapper, MinimapMapperWithInfo, MinimapMapper
 
 
@@ -59,7 +59,8 @@ def parseArgs(argv=None) -> argparse.Namespace:
     parser.add_argument("-o", "--output_prefix", help="the output file prefix", required=True)
     parser.add_argument("-f", "--fasta", help="input fasta path", required=True)
     parser.add_argument("-g", "--genome_directory", help="path to the directory of genomes", required=True)
-    parser.add_argument("-p", "--plot_results", help="plots extra results", action='store_true', required=False)
+    parser.add_argument("-c", "--use_gmm", help="uses Gaussian Mixture Model for clustering", action='store_false', required=False)
+    parser.add_argument("-p", "--plot_results", help="plots extra results", action='store_false', required=False)
     parser.add_argument("-t", "--threads", help="number of threads", required=True)
     return parser.parse_args(argv)
 
@@ -416,7 +417,10 @@ def main():
     if len(predicted_abundances.keys()) > 2:
         # use unsupervised model to obtain true genomes in sample
         y_vector, x_vector = print_values_for_mappedinfo(genomeTestObj.minimap_out)
-        clusters = ClusteringModel().model_predict(x_vector)
+        if arguments.use_gmm:
+            clusters = GMM().model_predict(x_vector)
+        else:
+            clusters = KMeansClustering().model_predict(x_vector)
         # if (arguments.plot_results):
         #     plot_scatter_plot(x_vector, y_vector, f"{arguments.output_prefix}_scatterplot.png")
         #     scatter_of_filtered(clusters, x_vector, y_vector, f"{arguments.output_prefix}_clusters_scatterplot.png")
