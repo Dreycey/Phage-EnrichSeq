@@ -83,6 +83,8 @@ def populate_genome_dict(genomes_directory: Path) -> dict:
         if genome_filename.endswith('fa') or genome_filename.endswith('fna') or genome_filename.endswith('fasta'):
             fullpath = Path(genomes_directory) / Path(genome_filename)
             genomeDict[fullpath] = __fasta_to_genome(fullpath)
+            if len(genomeDict) == 10:
+                break
 
     return genomeDict
 
