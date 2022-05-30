@@ -16,6 +16,7 @@ import subprocess
 import time
 from pathlib import Path
 from itertools import combinations
+from venv import create
 import pandas as pd
 import seaborn as sns
 import altair as alt
@@ -83,8 +84,6 @@ def populate_genome_dict(genomes_directory: Path) -> dict:
         if genome_filename.endswith('fa') or genome_filename.endswith('fna') or genome_filename.endswith('fasta'):
             fullpath = Path(genomes_directory) / Path(genome_filename)
             genomeDict[fullpath] = __fasta_to_genome(fullpath)
-            if len(genomeDict) == 10:
-                break
 
     return genomeDict
 
@@ -132,7 +131,22 @@ def run_dnadiff(genomePair: list, outputDir: str):
 #                 break; # only first occurrence
 #     return similarity
 
+def create_genome_pairs(genomeDict: dict):
+    genomePairs = []
+    count = 0
+    for key  in genomeDict.keys():
+        pair = [None, None]
+        if int(re.sub('\D', '', str(key.name))) is not 100:
+            count += 1
+            pair[1] = key
+            genomePairs.append(pair)
+        else:
+            file100 = key
 
+    for p in genomePairs:
+        p[0] = file100
+
+    return genomePairs
 
 def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
     '''
@@ -151,7 +165,8 @@ def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
     compareDict = {'genome pair': [], 'jaccard value': [], 'dnadiff value': [], 'jaccard time': [], 'dnadiff time':[], 'speed factor':[]}
     
     # create pairs from dictionary
-    genomePairs = list(combinations(genomeDict.keys(), 2))
+    #genomePairs = list(combinations(genomeDict.keys(), 2))
+    genomePairs = create_genome_pairs(genomeDict)
 
     # run jaccard and dnadiff for all pairs
     for num, pair in enumerate(genomePairs):
@@ -242,10 +257,12 @@ def plot_dnadiff_vs_simulated(genomeDict: dict, outputDir: str):
     print('PLOTTING DNADIFF VS. SIMULATED')
 
     plotting_dict = {'Simulated ANI': [], 'dnadiff ANI': []}
+    genomePair = [None, None]
+
     # First genome in pair is always the one with 100 in the name
     for key in genomeDict.keys():
         if int(re.sub('\D', '', str(key.name))) is 100:
-            genomePair = [key, None]
+            genomePair[0] = key
 
     for key in genomeDict.keys():
         # remove anything  that isn't a number
@@ -257,17 +274,18 @@ def plot_dnadiff_vs_simulated(genomeDict: dict, outputDir: str):
         plotting_dict['dnadiff ANI'].append(dnadiffVal)
 
     # Display table
-    dnadiff_df = pd.DataFrame.from_dict(plotting_dict)
+    dnadiff_df = pd.DataFrame.from_dict(plotting_dict).sort_values(by='Simulated ANI')
     print(dnadiff_df)
 
     # Plot dnadiff vs. jaccard vals
-    chart = alt.Chart(dnadiff_df.sort_values('Simulated ANI')).mark_circle(size=70).encode(
+    chart = alt.Chart(dnadiff_df).mark_circle(size=70).encode(
         alt.X('Simulated ANI:Q',
             scale=alt.Scale(zero=True)
         ),
         alt.Y('dnadiff ANI:Q',
-            scale=alt.Scale(zero=True))
-    ).properties(width=700).show()
+            scale=alt.Scale(zero=True)),
+        tooltip=['Simulated ANI', 'dnadiff ANI']
+    ).properties(width=650).show()
 
 
 def plot_kmer_effect(genomePair: list, maxKmerSize=30, increment=1):
@@ -318,8 +336,8 @@ def main():
     arguments = parseArgs(argv=sys.argv[1:])
     #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
     genomeDict = populate_genome_dict(arguments.genome_directory)
-    #plot_method_comparison(genomeDict, 8, arguments.output_dir)
-    plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
+    plot_method_comparison(genomeDict, 8, arguments.output_dir)
+    #plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
 
 if __name__ == "__main__":
     main()

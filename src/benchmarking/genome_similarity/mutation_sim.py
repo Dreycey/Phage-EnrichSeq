@@ -22,7 +22,7 @@ def openFasta(fasta_path):
                 fasta_name = fasta_line.strip("\n").strip(">")
                 fasta_seq = ""
             else:
-                fasta_seq += fasta_line.strip("\n").strip(" ")
+                fasta_seq += fasta_line.strip("\n").strip(" ").strip("\t")
             fastaName2Seq[fasta_name] = fasta_seq
             fasta_line = opened_fasta.readline()
             line_counter += 0
