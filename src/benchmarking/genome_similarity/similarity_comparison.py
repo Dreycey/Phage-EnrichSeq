@@ -110,12 +110,12 @@ def run_jaccard(genomePair: list, kmerLength=35) -> float:
     return round((intersection / union)*100, 4)
 
 
-def run_dnadiff(genomePair: list, outputdir: str):
+def run_dnadiff(genomePair: list, outputDir: str):
     print('Running dnadiff')
-    subprocess.run(['dnadiff', '-p', Path(outputdir)/Path('dnadiff_out'), genomePair[0], genomePair[1]])
+    subprocess.run(['dnadiff', '-p', Path(outputDir)/Path('dnadiff_out'), genomePair[0], genomePair[1]])
     #return Path(outputdir + '/dnadiff_out.report')
     similarity=-1.0
-    with open(outputdir+ '/dnadiff_out.report') as dnadiff_file:
+    with open(outputDir+ '/dnadiff_out.report') as dnadiff_file:
         for line in dnadiff_file:
             if 'AvgIdentity' in line:
                 similarity = line.rstrip().split()[1]
@@ -134,12 +134,12 @@ def run_dnadiff(genomePair: list, outputdir: str):
 
 
 
-def plot_method_comparison(genomesDirectory: Path, kmerLength: int, outputDir: str):
+def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
     '''
     dnadiff vs jaccard scatter plot
 
     INPUT:
-        genomesDirectory: directory from which to obtain all genomes to compare
+        genomeDict: dictionary of genomes (must be pre-populated)
         kmerLength: k-mer length for jaccard calculation based on k-mer set comparisons
         outputDir: where to save dnadiff files and plots
 
@@ -149,9 +149,6 @@ def plot_method_comparison(genomesDirectory: Path, kmerLength: int, outputDir: s
     '''
     print('Comparing dnadiff vs. Jaccard index')
     compareDict = {'genome pair': [], 'jaccard value': [], 'dnadiff value': [], 'jaccard time': [], 'dnadiff time':[], 'speed factor':[]}
-    
-    # Create genome pairs from dictionary
-    genomeDict = populate_genome_dict(genomesDirectory)
     
     # create pairs from dictionary
     genomePairs = list(combinations(genomeDict.keys(), 2))
@@ -238,6 +235,40 @@ def plot_simulated_percentages(genomes_directory: Path, original_filename: str, 
     print(f'Line plot stored in {filename}')   
 
 
+def plot_dnadiff_vs_simulated(genomeDict: dict, outputDir: str):
+    '''
+    Plots dnadiff ANI value vs. simulated ANI.
+    '''
+    print('PLOTTING DNADIFF VS. SIMULATED')
+
+    plotting_dict = {'Simulated ANI': [], 'dnadiff ANI': []}
+    # First genome in pair is always the one with 100 in the name
+    for key in genomeDict.keys():
+        if int(re.sub('\D', '', str(key.name))) is 100:
+            genomePair = [key, None]
+
+    for key in genomeDict.keys():
+        # remove anything  that isn't a number
+        simANI = re.sub('\D', '', str(key.name))
+        genomePair[1] = key
+            
+        plotting_dict['Simulated ANI'].append(simANI)
+        dnadiffVal = run_dnadiff(genomePair, outputDir)
+        plotting_dict['dnadiff ANI'].append(dnadiffVal)
+
+    # Display table
+    dnadiff_df = pd.DataFrame.from_dict(plotting_dict)
+    print(dnadiff_df)
+
+    # Plot dnadiff vs. jaccard vals
+    chart = alt.Chart(dnadiff_df.sort_values('Simulated ANI')).mark_circle(size=70).encode(
+        alt.X('Simulated ANI:Q',
+            scale=alt.Scale(zero=True)
+        ),
+        alt.Y('dnadiff ANI:Q',
+            scale=alt.Scale(zero=True))
+    ).properties(width=700).show()
+
 
 def plot_kmer_effect(genomePair: list, maxKmerSize=30, increment=1):
     '''
@@ -286,7 +317,9 @@ def parseArgs(argv=None) -> argparse.Namespace:
 def main():
     arguments = parseArgs(argv=sys.argv[1:])
     #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
-    plot_method_comparison(arguments.genome_directory, 8, arguments.output_dir)
+    genomeDict = populate_genome_dict(arguments.genome_directory)
+    #plot_method_comparison(genomeDict, 8, arguments.output_dir)
+    plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
 
 if __name__ == "__main__":
     main()
