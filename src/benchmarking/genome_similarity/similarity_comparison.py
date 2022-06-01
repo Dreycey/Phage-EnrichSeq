@@ -87,6 +87,14 @@ def populate_genome_dict(genomes_directory: Path) -> dict:
 
     return genomeDict
 
+def find_pair(genomeDict: dict, genomeA: str, genomeB: str):
+    genomePair = []
+    for genPath in genomeDict.keys():
+        if genomeA in str(genPath) or genomeB in str(genPath):
+            genomePair.append(genPath)
+    print(genomePair)
+    return genomePair
+
 
 def run_jaccard(genomePair: list, kmerLength=35) -> float:
     '''
@@ -132,6 +140,10 @@ def run_dnadiff(genomePair: list, outputDir: str):
 #     return similarity
 
 def create_genome_pairs(genomeDict: dict):
+    '''
+    Creates specific genome pairs for simulated similarity. First genome is always 
+    the unchanged FASTA file (original), and the second is the simulated FASTA. 
+    '''
     genomePairs = []
     #count = 0
     for key in genomeDict.keys():
@@ -147,6 +159,14 @@ def create_genome_pairs(genomeDict: dict):
         p[0] = file100
 
     return genomePairs
+
+
+def create_random_pairs(genomeDict: dict):
+    '''
+    Creates and returns a random list of genome pairs given a dictionary of genomes. 
+    '''
+    pass
+
 
 def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
     '''
@@ -207,6 +227,37 @@ def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
     # filename = outputDir + 'dnadiff_vs_dnadiff_' + str(kmerLength) + '-mer.png'
     # chart.save(filename)
     # print(f'Scatterplot stored in {filename}') 
+
+
+def plot_runtime(genomePair: list, kmers: list, outputDir: str):
+# def plot_runtime(genomeDict: dict, kmers: list, outputDir: str):
+#     # TODO calculate average
+    plotting_dict = {'Method': [], 'k-mer length': [], 'Runtime(s)': []}
+    for k in kmers:
+        plotting_dict['k-mer length'].append(k)
+        # Run and time jaccard
+        plotting_dict['Method'].append('Jaccard')
+        startTime = time.time()
+        run_jaccard(genomePair, k)
+        jaccardTime = time.time() - startTime
+        plotting_dict['Runtime(s)'].append(jaccardTime)
+
+        plotting_dict['k-mer length'].append(k)
+        # Run and time dnadiff
+        plotting_dict['Method'].append('dnadiff')
+        startTime = time.time()
+        run_dnadiff(genomePair, outputDir)
+        dnadiffTime = time.time() - startTime
+        plotting_dict['Runtime(s)'].append(dnadiffTime)
+
+    # PLOTTING
+    runtime_df = pd.DataFrame.from_dict(plotting_dict)
+    print(runtime_df)
+    alt.Chart(runtime_df).mark_bar().encode(
+        x='k-mer length:O',
+        y='Runtime(s):Q',
+        color='Method:N'
+).properties(width=400).show()
 
 def plot_comparison_with_kmers(genomeDict: dict, kmers: list, outputDir: str):
     '''
@@ -363,7 +414,8 @@ def main():
     genomeDict = populate_genome_dict(arguments.genome_directory)
     #plot_method_comparison(genomeDict, 6, arguments.output_dir)
     #plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
-    plot_comparison_with_kmers(genomeDict, [6,7,8,9,10], arguments.output_dir)
+    #plot_comparison_with_kmers(genomeDict, [6,7,8,9,10], arguments.output_dir)
+    plot_runtime(genomePair=find_pair(genomeDict, 'Blessica', 'D29'),kmers=[6,7,8,9,10],outputDir=arguments.output_dir)
 
 if __name__ == "__main__":
     main()
