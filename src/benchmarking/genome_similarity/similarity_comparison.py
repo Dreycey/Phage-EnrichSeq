@@ -133,11 +133,11 @@ def run_dnadiff(genomePair: list, outputDir: str):
 
 def create_genome_pairs(genomeDict: dict):
     genomePairs = []
-    count = 0
-    for key  in genomeDict.keys():
+    #count = 0
+    for key in genomeDict.keys():
         pair = [None, None]
         if int(re.sub('\D', '', str(key.name))) is not 100:
-            count += 1
+            #count += 1
             pair[1] = key
             genomePairs.append(pair)
         else:
@@ -201,12 +201,37 @@ def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
         ),
         alt.Y('dnadiff value:Q',
             scale=alt.Scale(domain=[0, 100])),
-        color='genome pair:N'
+        color='genome pair:N',
+        tooltip=['jaccard value', 'dnadiff value']
     ).show()
     # filename = outputDir + 'dnadiff_vs_dnadiff_' + str(kmerLength) + '-mer.png'
     # chart.save(filename)
     # print(f'Scatterplot stored in {filename}') 
 
+def plot_comparison_with_kmers(genomeDict: dict, kmers: list, outputDir: str):
+    '''
+    Dnadiff vs Jaccard plot for multiple k-mer values 
+    '''
+    plotting_dict = {'kmer length': [], 'jaccard value': [], 'dnadiff value': []}
+    genomePairs = create_genome_pairs(genomeDict)
+    # Calculations
+    for k in kmers:
+        for pair in genomePairs:
+            plotting_dict['kmer length'].append(k)
+            plotting_dict['jaccard value'].append(run_jaccard(pair, k))
+            plotting_dict['dnadiff value'].append(run_dnadiff(pair, outputDir))
+
+    # Plotting
+    compare_df = pd.DataFrame.from_dict(plotting_dict)
+    chart = alt.Chart(compare_df).mark_circle(size=70).encode(
+        alt.X('jaccard value:Q',
+            scale=alt.Scale(domain=[0, 100])
+        ),
+        alt.Y('dnadiff value:Q',
+            scale=alt.Scale(domain=[0, 100])),
+        color='kmer length:N',
+        tooltip=['jaccard value', 'dnadiff value']
+    ).show()
 
 def plot_simulated_percentages(genomes_directory: Path, original_filename: str, kmer_min: int, kmer_max: int, increment: int, outputDir: str):
     '''
@@ -336,8 +361,9 @@ def main():
     arguments = parseArgs(argv=sys.argv[1:])
     #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
     genomeDict = populate_genome_dict(arguments.genome_directory)
-    plot_method_comparison(genomeDict, 8, arguments.output_dir)
+    #plot_method_comparison(genomeDict, 6, arguments.output_dir)
     #plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
+    plot_comparison_with_kmers(genomeDict, [6,7,8,9,10], arguments.output_dir)
 
 if __name__ == "__main__":
     main()
