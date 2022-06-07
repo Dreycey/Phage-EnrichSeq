@@ -14,6 +14,7 @@ import re
 import argparse
 import subprocess
 import time
+import random
 from pathlib import Path
 from itertools import combinations
 from venv import create
@@ -84,6 +85,8 @@ def populate_genome_dict(genomes_directory: Path) -> dict:
         if genome_filename.endswith('fa') or genome_filename.endswith('fna') or genome_filename.endswith('fasta'):
             fullpath = Path(genomes_directory) / Path(genome_filename)
             genomeDict[fullpath] = __fasta_to_genome(fullpath)
+            if len(genomeDict) == 35:
+                break
 
     return genomeDict
 
@@ -165,7 +168,10 @@ def create_random_pairs(genomeDict: dict):
     '''
     Creates and returns a random list of genome pairs given a dictionary of genomes. 
     '''
-    pass
+    done = []
+    genomePairs = []
+
+    return genomePairs
 
 
 def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
@@ -230,8 +236,8 @@ def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
 
 
 def plot_runtime(genomePair: list, kmers: list, outputDir: str):
-# def plot_runtime(genomeDict: dict, kmers: list, outputDir: str):
-#     # TODO calculate average
+
+#   # TODO calculate average
     plotting_dict = {'Method': [], 'k-mer length': [], 'Runtime(s)': []}
     for k in kmers:
         plotting_dict['k-mer length'].append(k)
@@ -274,7 +280,7 @@ def plot_comparison_with_kmers(genomeDict: dict, kmers: list, outputDir: str):
 
     # Plotting
     compare_df = pd.DataFrame.from_dict(plotting_dict)
-    chart = alt.Chart(compare_df).mark_circle(size=70).encode(
+    chart = alt.Chart(compare_df).mark_circle(size=50).encode(
         alt.X('jaccard value:Q',
             scale=alt.Scale(domain=[0, 100])
         ),
@@ -320,10 +326,10 @@ def plot_simulated_percentages(genomes_directory: Path, original_filename: str, 
         ),
         y='Jaccard Index:Q',
         color='K-mer Length:N'
-    )       
-    filename = outputDir + 'jaccard_vs_simulated_' + str(kmer_max) + '-mer.png'
-    chart.save(filename)
-    print(f'Line plot stored in {filename}')   
+    ).properties(width=700).show()      
+    # filename = outputDir + 'jaccard_vs_simulated_' + str(kmer_max) + '-mer.png'
+    # chart.save(filename)
+    # print(f'Line plot stored in {filename}')   
 
 
 def plot_dnadiff_vs_simulated(genomeDict: dict, outputDir: str):
@@ -412,10 +418,11 @@ def main():
     arguments = parseArgs(argv=sys.argv[1:])
     #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
     genomeDict = populate_genome_dict(arguments.genome_directory)
+    plot_simulated_percentages(arguments.genome_directory, 'genA_100ANI.fa', 5, 12, 1, arguments.output_dir)
     #plot_method_comparison(genomeDict, 6, arguments.output_dir)
     #plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
     #plot_comparison_with_kmers(genomeDict, [6,7,8,9,10], arguments.output_dir)
-    plot_runtime(genomePair=find_pair(genomeDict, 'Blessica', 'D29'),kmers=[6,7,8,9,10],outputDir=arguments.output_dir)
+    #plot_runtime(genomePair=find_pair(genomeDict, 'Blessica', 'D29'),kmers=[6,7,8,9,10],outputDir=arguments.output_dir)
 
 if __name__ == "__main__":
     main()
