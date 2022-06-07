@@ -219,6 +219,7 @@ def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
     # Display table
     compare_df = pd.DataFrame.from_dict(compareDict)
     print(compare_df)
+    compare_df.to_csv(Path(outputDir)/Path('dnadiff_vs_jaccard.csv'), sep='\t', encoding='utf-8', index=False)
 
     # Plot dnadiff vs. jaccard vals
     chart = alt.Chart(compare_df).mark_circle(size=70).encode(
@@ -258,6 +259,8 @@ def plot_runtime(genomePair: list, kmers: list, outputDir: str):
 
     # PLOTTING
     runtime_df = pd.DataFrame.from_dict(plotting_dict)
+    runtime_df.to_csv(Path(outputDir)/Path('runtimes.csv'), sep='\t', encoding='utf-8', index=False)
+    
     print(runtime_df)
     alt.Chart(runtime_df).mark_bar().encode(
         x='k-mer length:O',
@@ -280,6 +283,8 @@ def plot_comparison_with_kmers(genomeDict: dict, kmers: list, outputDir: str):
 
     # Plotting
     compare_df = pd.DataFrame.from_dict(plotting_dict)
+    compare_df.to_csv(Path(outputDir)/Path('multiple_kmers_comparison.csv'), sep='\t', encoding='utf-8', index=False)
+
     chart = alt.Chart(compare_df).mark_circle(size=50).encode(
         alt.X('jaccard value:Q',
             scale=alt.Scale(domain=[0, 100])
@@ -318,6 +323,7 @@ def plot_simulated_percentages(genomes_directory: Path, original_filename: str, 
 
     simPercent_df = pd.DataFrame.from_dict(plotting_dict)
     print(simPercent_df)
+    simPercent_df.to_csv(Path(outputDir)/Path('jaccard_vs_simulated.csv'), sep='\t', encoding='utf-8', index=False)
            
     #ALTAIR PLOT
     chart = alt.Chart(simPercent_df).mark_line(point=True).encode(
@@ -358,9 +364,10 @@ def plot_dnadiff_vs_simulated(genomeDict: dict, outputDir: str):
     # Display table
     dnadiff_df = pd.DataFrame.from_dict(plotting_dict).sort_values(by='Simulated ANI')
     print(dnadiff_df)
+    dnadiff_df.to_csv(Path(outputDir)/Path('dnadiff_vs_simulated.csv'), sep='\t', encoding='utf-8', index=False)
 
     # Plot dnadiff vs. jaccard vals
-    chart = alt.Chart(dnadiff_df).mark_circle(size=70).encode(
+    chart = alt.Chart(dnadiff_df).mark_circle(size=60).encode(
         alt.X('Simulated ANI:Q',
             scale=alt.Scale(zero=True)
         ),
@@ -418,9 +425,9 @@ def main():
     arguments = parseArgs(argv=sys.argv[1:])
     #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
     genomeDict = populate_genome_dict(arguments.genome_directory)
-    plot_simulated_percentages(arguments.genome_directory, 'genA_100ANI.fa', 5, 12, 1, arguments.output_dir)
+    #plot_simulated_percentages(arguments.genome_directory, 'genA_100ANI.fa', 5, 12, 1, arguments.output_dir)
     #plot_method_comparison(genomeDict, 6, arguments.output_dir)
-    #plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
+    plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
     #plot_comparison_with_kmers(genomeDict, [6,7,8,9,10], arguments.output_dir)
     #plot_runtime(genomePair=find_pair(genomeDict, 'Blessica', 'D29'),kmers=[6,7,8,9,10],outputDir=arguments.output_dir)
 
