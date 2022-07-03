@@ -272,27 +272,27 @@ def plot_comparison_with_kmers(genomeDict: dict, kmers: list, outputDir: str):
     '''
     Dnadiff vs Jaccard plot for multiple k-mer values 
     '''
-    plotting_dict = {'kmer length': [], 'jaccard value': [], 'dnadiff value': []}
+    plotting_dict = {'k-mer Length': [], 'Jaccard Value': [], 'dnadiff Value': []}
     genomePairs = create_genome_pairs(genomeDict)
     # Calculations
     for k in kmers:
         for pair in genomePairs:
-            plotting_dict['kmer length'].append(k)
-            plotting_dict['jaccard value'].append(run_jaccard(pair, k))
-            plotting_dict['dnadiff value'].append(run_dnadiff(pair, outputDir))
+            plotting_dict['k-mer Length'].append(k)
+            plotting_dict['Jaccard Value'].append(run_jaccard(pair, k))
+            plotting_dict['dnadiff Value'].append(run_dnadiff(pair, outputDir))
 
     # Plotting
     compare_df = pd.DataFrame.from_dict(plotting_dict)
-    compare_df.to_csv(Path(outputDir)/Path('multiple_kmers_comparison.csv'), sep='\t', encoding='utf-8', index=False)
+    compare_df.to_csv(Path(outputDir)/Path('multiple_kmers_comparison.csv'), sep=',', encoding='utf-8', index=False)
 
     chart = alt.Chart(compare_df).mark_circle(size=50).encode(
-        alt.X('jaccard value:Q',
+        alt.X('Jaccard Value:Q',
             scale=alt.Scale(domain=[0, 100])
         ),
-        alt.Y('dnadiff value:Q',
+        alt.Y('dnadiff Value:Q',
             scale=alt.Scale(domain=[0, 100])),
-        color='kmer length:N',
-        tooltip=['jaccard value', 'dnadiff value']
+        color='k-mer Length:N',
+        tooltip=['Jaccard Value', 'dnadiff Value']
     ).show()
 
 def plot_simulated_percentages(genomes_directory: Path, original_filename: str, kmer_min: int, kmer_max: int, increment: int, outputDir: str):
@@ -323,7 +323,7 @@ def plot_simulated_percentages(genomes_directory: Path, original_filename: str, 
 
     simPercent_df = pd.DataFrame.from_dict(plotting_dict)
     print(simPercent_df)
-    simPercent_df.to_csv(Path(outputDir)/Path('jaccard_vs_simulated.csv'), sep='\t', encoding='utf-8', index=False)
+    simPercent_df.to_csv(Path(outputDir)/Path('jaccard_vs_simulated.csv'), sep=',', encoding='utf-8', index=False)
            
     #ALTAIR PLOT
     chart = alt.Chart(simPercent_df).mark_line(point=True).encode(
@@ -377,31 +377,19 @@ def plot_dnadiff_vs_simulated(genomeDict: dict, outputDir: str):
     ).properties(width=650).show()
 
 
-def plot_kmer_effect(genomePair: list, maxKmerSize=30, increment=1):
+def measure_kmer_effect(genomePair: list, outputDir,maxKmerSize=30, increment=1):
     '''
     Plots the jaccard similarity between two genomes only when
     the kmer size is changed. 
     '''
-    plotting_dict = {'K-mer Size': [], 'Jaccard Index': []}
-    for k in range(0, maxKmerSize, increment):
+    plotting_dict = {'K-mer Length': [], 'Jaccard Index': []}
+    for k in range(1, maxKmerSize, increment):
         #if k != 0:
-            plotting_dict['K-mer Size'].append(k)
+            plotting_dict['K-mer Length'].append(k)
             plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, k))
     
     kmer_df = pd.DataFrame.from_dict(plotting_dict)
-
-    ## ALTAIR PLOT
-    chart = alt.Chart(kmer_df).mark_line(
-        point=True
-    ).encode(
-        #x='K-mer Size:Q',
-        alt.X('K-Mer Size:Q',scale=alt.Scale(zero=True)),
-        y='Jaccard Index:Q'
-        #alt.Y('Jaccard Index:Q', scale=alt.Scale(domain=(0, 1.1),clamp=True))
-    ).properties(width=500)
-    filename = 'jaccard_vs_kmer-size.png'
-    chart.save(filename)
-    print(f'Line plot stored in {filename}')
+    kmer_df.to_csv(Path(outputDir)/Path('kmer_effect.csv'), sep=',', encoding='utf-8', index=False)
     
 
 
@@ -425,11 +413,13 @@ def main():
     arguments = parseArgs(argv=sys.argv[1:])
     #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
     genomeDict = populate_genome_dict(arguments.genome_directory)
-    #plot_simulated_percentages(arguments.genome_directory, 'genA_100ANI.fa', 5, 12, 1, arguments.output_dir)
+    #plot_simulated_percentages(arguments.genome_directory, 'Blessica_100ANI.fa', 5, 12, 1, arguments.output_dir)
     #plot_method_comparison(genomeDict, 6, arguments.output_dir)
-    plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
-    #plot_comparison_with_kmers(genomeDict, [6,7,8,9,10], arguments.output_dir)
+    #plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
+    plot_comparison_with_kmers(genomeDict, [5,6,7,8,9,10,11,12], arguments.output_dir)
     #plot_runtime(genomePair=find_pair(genomeDict, 'Blessica', 'D29'),kmers=[6,7,8,9,10],outputDir=arguments.output_dir)
+    #measure_kmer_effect(['database/ref_genomes//GCF_002597525.1_ASM259752v1_genomic.fna','database/ref_genomes//GCF_000924875.1_ViralProj266644_genomic.fna'], arguments.output_dir,26, 1)
+    #measure_kmer_effect(['database/ref_genomes//actinodb_Mycobacterium_phage_Blessica.fna','database/ref_genomes//GCF_003366735.1_ASM336673v1_genomic.fna'], arguments.output_dir,26, 1)
 
 if __name__ == "__main__":
     main()
