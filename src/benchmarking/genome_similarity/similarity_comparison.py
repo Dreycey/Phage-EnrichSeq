@@ -132,16 +132,6 @@ def run_dnadiff(genomePair: list, outputDir: str):
                 break; # only first occurrence
     return similarity
 
-
-# def parse_dnadiff(dnadiff_outdir: str) -> float:
-#     similarity=-1.0
-#     with open(dnadiff_outdir) as dnadiff_file:
-#         for line in dnadiff_file:
-#             if 'AvgIdentity' in line:
-#                 similarity = line.rstrip().split()[1]
-#                 break; # only first occurrence
-#     return similarity
-
 def create_genome_pairs(genomeDict: dict):
     '''
     Creates specific genome pairs for simulated similarity. First genome is always 
@@ -160,16 +150,6 @@ def create_genome_pairs(genomeDict: dict):
 
     for p in genomePairs:
         p[0] = file100
-
-    return genomePairs
-
-
-def create_random_pairs(genomeDict: dict):
-    '''
-    Creates and returns a random list of genome pairs given a dictionary of genomes. 
-    '''
-    done = []
-    genomePairs = []
 
     return genomePairs
 
@@ -231,9 +211,6 @@ def plot_method_comparison(genomeDict: dict, kmerLength: int, outputDir: str):
         color='genome pair:N',
         tooltip=['jaccard value', 'dnadiff value']
     ).show()
-    # filename = outputDir + 'dnadiff_vs_dnadiff_' + str(kmerLength) + '-mer.png'
-    # chart.save(filename)
-    # print(f'Scatterplot stored in {filename}') 
 
 
 def plot_runtime(genomePair: list, kmers: list, outputDir: str):
@@ -307,7 +284,7 @@ def plot_simulated_percentages(genomes_directory: Path, original_filename: str, 
         outputDir: location to store plot
     '''
     print('PLOTTING JACCARD VS. SIMULATED')
-    plotting_dict = {'Simulated Percentage': [], 'Jaccard Index': [], 'K-mer Length': []}
+    plotting_dict = {'Simulated Percentage': [], 'Jaccard Index': [], 'k-mer Length': []}
     genomeDict = populate_genome_dict(genomes_directory) # All fasta files in a directory
    
     genomePair = [ extract_genome_path(genomes_directory, original_filename), None]
@@ -319,23 +296,11 @@ def plot_simulated_percentages(genomes_directory: Path, original_filename: str, 
             plotting_dict['Simulated Percentage'].append(float(percent_str))
             jaccard = run_jaccard(genomePair, k)
             plotting_dict['Jaccard Index'].append(jaccard)
-            plotting_dict['K-mer Length'].append(k)
+            plotting_dict['k-mer Length'].append(k)
 
     simPercent_df = pd.DataFrame.from_dict(plotting_dict)
     print(simPercent_df)
-    simPercent_df.to_csv(Path(outputDir)/Path('jaccard_vs_simulated.csv'), sep=',', encoding='utf-8', index=False)
-           
-    #ALTAIR PLOT
-    chart = alt.Chart(simPercent_df).mark_line(point=True).encode(
-        alt.X('Simulated Percentage:Q',
-            scale=alt.Scale(zero=True)
-        ),
-        y='Jaccard Index:Q',
-        color='K-mer Length:N'
-    ).properties(width=700).show()      
-    # filename = outputDir + 'jaccard_vs_simulated_' + str(kmer_max) + '-mer.png'
-    # chart.save(filename)
-    # print(f'Line plot stored in {filename}')   
+    simPercent_df.to_csv(Path(outputDir)/Path('jaccard_vs_simulated.csv'), sep=',', encoding='utf-8', index=False)  
 
 
 def plot_dnadiff_vs_simulated(genomeDict: dict, outputDir: str):
@@ -384,9 +349,8 @@ def measure_kmer_effect(genomePair: list, outputDir,maxKmerSize=30, increment=1)
     '''
     plotting_dict = {'K-mer Length': [], 'Jaccard Index': []}
     for k in range(1, maxKmerSize, increment):
-        #if k != 0:
-            plotting_dict['K-mer Length'].append(k)
-            plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, k))
+        plotting_dict['K-mer Length'].append(k)
+        plotting_dict['Jaccard Index'].append(run_jaccard(genomePair, k))
     
     kmer_df = pd.DataFrame.from_dict(plotting_dict)
     kmer_df.to_csv(Path(outputDir)/Path('kmer_effect.csv'), sep=',', encoding='utf-8', index=False)
@@ -405,19 +369,21 @@ def parseArgs(argv=None) -> argparse.Namespace:
         returns a argparse.Namespace object
     '''
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("-d", "--genome_directory", help="path to the directory of genomes", required=True)
+    parser.add_argument("-i", "--input_dir", help="input path to the directory of genomes", required=True)
     parser.add_argument("-o", "--output_dir", help="the output directory", required=True)
     return parser.parse_args(argv)
 
 def main():
     arguments = parseArgs(argv=sys.argv[1:])
-    #plot_simulated_percentages(arguments.genome_directory, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
-    genomeDict = populate_genome_dict(arguments.genome_directory)
-    #plot_simulated_percentages(arguments.genome_directory, 'Blessica_100ANI.fa', 5, 12, 1, arguments.output_dir)
+    #plot_simulated_percentages(arguments.input_dir, 'genome_100.fa', 7, 10, 1, arguments.output_dir)
+    #genomeDict = populate_genome_dict(arguments.input_dir)
+    plot_simulated_percentages(arguments.input_dir, 'SemperFi_100ANI.fa', 5, 12, 1, arguments.output_dir)
     #plot_method_comparison(genomeDict, 6, arguments.output_dir)
     #plot_dnadiff_vs_simulated(genomeDict, arguments.output_dir)
-    plot_comparison_with_kmers(genomeDict, [5,6,7,8,9,10,11,12], arguments.output_dir)
+    #plot_comparison_with_kmers(genomeDict, [5,6,7,8,9,10,11,12], arguments.output_dir)
     #plot_runtime(genomePair=find_pair(genomeDict, 'Blessica', 'D29'),kmers=[6,7,8,9,10],outputDir=arguments.output_dir)
+    
+    ### Jaccard vs. k-mer length
     #measure_kmer_effect(['database/ref_genomes//GCF_002597525.1_ASM259752v1_genomic.fna','database/ref_genomes//GCF_000924875.1_ViralProj266644_genomic.fna'], arguments.output_dir,26, 1)
     #measure_kmer_effect(['database/ref_genomes//actinodb_Mycobacterium_phage_Blessica.fna','database/ref_genomes//GCF_003366735.1_ASM336673v1_genomic.fna'], arguments.output_dir,26, 1)
 
