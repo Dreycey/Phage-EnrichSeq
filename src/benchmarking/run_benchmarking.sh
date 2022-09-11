@@ -51,8 +51,9 @@ function test_kraken2() {
                basefile="$(basename -- $file)";
                test_dir_name="$(basename "${test_dir##*/}")";
                mkdir -p results/${tool_name}/${test_dir_name}/;
+               mkdir -p results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}/;
                kraken2 --use-names --threads 4 --db tools/${tool_name}/minikraken2_v2_8GB_201904_UPDATE \
-                        --report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report \
+                        --report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}/binning.report \
                         ${file} > kraken2_benchmarking.log
            	                
     	    done
@@ -73,13 +74,11 @@ function test_bracken() {
                basefile="$(basename -- $file)";
                test_dir_name="$(basename "${test_dir##*/}")";
                mkdir -p results/${tool_name}/${test_dir_name}/;
+               mkdir -p results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}/;
                echo "basefile: ${basefile}"
-               echo "-d "; echo "tools/${dependency_tool_name}/minikraken2_v2_8GB_201904_UPDATE";
-               echo "-i "; echo "results/${dependency_tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report";
-               echo "-o "; echo "results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.bracken";
                bracken -d tools/${dependency_tool_name}/minikraken2_v2_8GB_201904_UPDATE \
-                        -i results/${dependency_tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report \
-                        -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.bracken;
+                        -i results/${dependency_tool_name}/${test_dir_name}/${basefile%${file_suffix}}/binning.report \
+                        -o results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}/abundances.bracken;
     	    done
     	fi
     done
