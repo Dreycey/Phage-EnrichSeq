@@ -1,6 +1,4 @@
-import sys
 import os
-import argparse
 import re
 import csv
 from pathlib import Path
@@ -14,9 +12,13 @@ OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
 def parse_directory_trees(truth_path: str, result_path: str, output_path: str):
     '''
     DESCRIPTION:
-
+        Get directory structure metadata from file paths and write to CSV.
+        Handles truth and result directory trees
     
     INPUT:
+        1. Path to truth directory tree
+        2. Path to results directory tree (i.e. the results of the tools that were tested)
+        3. Path to desired place to store CSV file
 
     OUTPUT:
         CSV file containing: <trial #>,<tool>,<test>,<subtest>,<path to final result file>
@@ -32,24 +34,25 @@ def parse_directory_trees(truth_path: str, result_path: str, output_path: str):
 
     # parse truth
     truth_rows = parse_truth_filepaths(truth_path)
-    write_to_csv(truth_rows, output_csv_path)
+    file = write_to_csv(truth_rows, output_csv_path)
 
     # parse results
     result_rows = parse_results_filepaths(result_path)
-    write_to_csv(result_rows, output_csv_path)
+    file = write_to_csv(result_rows, output_csv_path)
     
+    print(f'Metadata saved to:{file}')
+
 
 def parse_truth_filepaths(dir_path: str):
     '''
     DESCRIPTION:
-        Get metadata from file paths and write to CSV
+        Get metadata from truth directory paths and store in list
         
     INPUT:
-        Path to all truth files ('tests' in our case)
-        Output CSV file path
+        Path to all truth files (called "tests" in our case)
     
     OUTPUT:
-        creates CSV file
+        A list of lists. Each row contains the metadata for each "truth" entry
     '''
 
     rows = []
@@ -73,6 +76,16 @@ def parse_truth_filepaths(dir_path: str):
 
 
 def parse_results_filepaths(results_path: str):
+    '''
+    DESCRIPTION:
+        Get metadata from tools' results directory paths and store in list
+        
+    INPUT:
+        Path to all tools' results files
+    
+    OUTPUT:
+        A list of lists. Each row contains the metadata for each tool's results
+    '''
     result_rows = []
     for trial in os.listdir(results_path):
         trial_num = int(''.join(filter(str.isdigit, trial)))
@@ -98,6 +111,17 @@ def parse_results_filepaths(results_path: str):
 
 
 def __tool_selector(tool_name: str, tool_result_path: Path):
+    '''
+    DESCRIPTION:
+        Helper function to add the correct result file path of each tool (as they are all different)
+        
+    INPUT:
+        1. The tool name - to use as a selector for choosing the appropriate path
+        2. Tool result file path - location of result files of the given tool
+    
+    OUTPUT:
+        A list containing the metadata for the given tool's result for that experiment condition ("subtest")
+    '''
     result_row = []
     if re.search('enrichseq', tool_name, re.IGNORECASE):
         full_result_path = Path(tool_result_path) / 'enrichseq/output_files/taxid_abundances.csv'
@@ -119,10 +143,22 @@ def __tool_selector(tool_name: str, tool_result_path: Path):
 
 
 def write_to_csv(rows: list, output_file: str):
+    '''
+    DESCRIPTION:
+        Writes rows to a CSV file
+        
+    INPUT:
+        1. A list of rows to write to the CSV file.
+        2. The file to write to
+    
+    OUTPUT:
+        A list containing the metadata for the given tool's result for that experiment condition ("subtest")
+    '''
     with open(output_file, 'a') as csvfile: 
         writer = csv.writer(csvfile) 
         writer.writerows(rows)
 
+    return output_file
 
 
 def main():
