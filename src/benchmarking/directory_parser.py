@@ -9,7 +9,7 @@ RESULTS_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/results_simulated/'
 OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
 
 
-def parse_directory_trees(truth_path: str, result_path: str, output_path: str):
+def parse_directory_trees(truth_path: str, result_path: str, output_path: str) -> None:
     '''
     DESCRIPTION:
         Get directory structure metadata from file paths and write to CSV.
@@ -43,7 +43,7 @@ def parse_directory_trees(truth_path: str, result_path: str, output_path: str):
     print(f'Metadata saved to:{file}')
 
 
-def parse_truth_filepaths(dir_path: str):
+def parse_truth_filepaths(dir_path: str) -> list:
     '''
     DESCRIPTION:
         Get metadata from truth directory paths and store in list
@@ -75,7 +75,7 @@ def parse_truth_filepaths(dir_path: str):
 
 
 
-def parse_results_filepaths(results_path: str):
+def parse_results_filepaths(results_path: str) -> list:
     '''
     DESCRIPTION:
         Get metadata from tools' results directory paths and store in list
@@ -103,14 +103,14 @@ def parse_results_filepaths(results_path: str):
                                 if os.path.isdir(subtest_path):
                                     # Now in tool's output directory
                                     result_info = [trial_num, test, subtest]
-                                    tool_info = __tool_selector(tool, subtest_path)
+                                    tool_info = _tool_selector(tool, subtest_path)
                                     if tool_info: # if the info does not come back empty, append the row
                                         result_info.extend(tool_info)
                                         result_rows.append(result_info)
     return result_rows
 
 
-def __tool_selector(tool_name: str, tool_result_path: Path):
+def _tool_selector(tool_name: str, tool_result_path: Path) -> list:
     '''
     DESCRIPTION:
         Helper function to add the correct result file path of each tool (as they are all different)
@@ -142,7 +142,7 @@ def __tool_selector(tool_name: str, tool_result_path: Path):
     return result_row
 
 
-def write_to_csv(rows: list, output_file: str):
+def write_to_csv(rows: list, output_file: str) -> str:
     '''
     DESCRIPTION:
         Writes rows to a CSV file
@@ -152,7 +152,7 @@ def write_to_csv(rows: list, output_file: str):
         2. The file to write to
     
     OUTPUT:
-        A list containing the metadata for the given tool's result for that experiment condition ("subtest")
+        Returns the CSV file path (string) in which the metadata was stored
     '''
     with open(output_file, 'a') as csvfile: 
         writer = csv.writer(csvfile) 
