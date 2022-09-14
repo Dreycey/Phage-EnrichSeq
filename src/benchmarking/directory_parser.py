@@ -1,7 +1,7 @@
 import sys
 import os
 import argparse
-import glob
+import re
 import csv
 from pathlib import Path
 
@@ -11,7 +11,7 @@ RESULTS_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/results_simulated/'
 OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
 
 
-def parse_directory_trees(dir_path: str, output_path: str):
+def parse_directory_trees(truth_path: str, result_path: str, output_path: str):
     '''
     DESCRIPTION:
 
@@ -27,13 +27,18 @@ def parse_directory_trees(dir_path: str, output_path: str):
     output_csv_path = Path(output_path) / 'benchmarking_metadata.csv'
     #output_csv = open(Path(output_path) / output_csv_filename, 'a')
 
+    with open(output_csv_path, 'a') as csvfile:
+        writer = csv.writer(csvfile) 
+        writer.writerow(['Trial No.', 'Experiment', 'Condition', 'Tool', 'Path to file'])
+
     # parse truth
-    parse_truth_filepaths(dir_path, output_csv_path)
+    parse_truth_filepaths(truth_path, output_csv_path)
 
     # parse results
+    parse_results_filepaths(result_path, output_csv_path)
     
 
-
+# TODO: add validation for each loop? 
 def parse_truth_filepaths(dir_path: str, output_file: str):
     '''
     DESCRIPTION:
@@ -44,65 +49,88 @@ def parse_truth_filepaths(dir_path: str, output_file: str):
         Output CSV file path
     
     OUTPUT:
-        CSV file
+        creates CSV file
     '''
 
-    ## TODO: figure out what to do with config_files. Exclude from CSV now or later?
-    truth_paths_dict = get_truth_filepaths(dir_path)
+    rows = []
     with open(output_file, 'a') as csvfile: 
         writer = csv.writer(csvfile) 
+
         for trial in os.listdir(dir_path):
-            row = []
+            
             trial_num = int(''.join(filter(str.isdigit, trial)))
-            row.append(trial_num)
             trial_path = Path(dir_path) / trial
             if os.path.isdir(trial_path):
-                row.append('truth')
                 for test in os.listdir(trial_path):
                     test_path = Path(trial_path) / test
                     if os.path.isdir(test_path) and 'config' not in test:
-                        row.append(test)
                         for subtest in os.listdir(test_path):
                             subtest_path = Path(test_path) / subtest
                             if os.path.isfile(subtest_path):
                                 if subtest.endswith('.fa'):
-                                    row.append(truth_paths_dict[subtest])
-            print(row)                    
-            writer.writerow(row)
-    return row
+                                    info = [trial_num, test, subtest, 'truth', os.path.abspath(subtest_path)] # TODO: test this abspath
+                                    rows.append(info)
+                 
+        writer.writerows(rows)
+    return rows
 
 
 
-def get_truth_filepaths(dir_path: str) -> dict:
-    '''
-    DESCRIPTION:
-        Recursively finds the truth files given a parent directory, then
-        stores the path in a dictionary
-    
-    INPUT:
-        Path to truth directory
-    
-    OUTPUT:
-        Dictionary in the format [file name]:[file path]
-    '''
-    truth_dict = {}
+def parse_results_filepaths(results_path: str, output_file: str):
+    # path: results/<trial#>
+    result_rows = []
+    with open(output_file, 'a') as csvfile: 
+        writer = csv.writer(csvfile) 
+        for trial in os.listdir(results_path):
+            trial_num = int(''.join(filter(str.isdigit, trial)))
+            trial_path = Path(results_path) / trial
+            if os.path.isdir(trial_path):
+                for tool in os.listdir(trial_path):
+                    tool_path = Path(trial_path) / tool
+                    if os.path.isdir(tool_path):
+                        #result_rows.append(__parser_selector__(tool_path, trial_num))
+                        for test in os.listdir(tool_path):
+                            test_path = Path(tool_path) / test
+                            if os.path.isdir(test_path) and 'config' not in test:
+                                for subtest in os.listdir(test_path):
+                                    subtest_path = Path(test_path) / subtest
+                                    if os.path.isdir(subtest_path):
+                                        # Now in tool's output directory
+                                        result_info = [trial_num, test, subtest]
+                                        tool_info = __tool_selector(tool, subtest_path)
+                                        if tool_info: # if the info does not come back empty, append the row
+                                            result_info.extend(tool_info)
+                                            result_rows.append(result_info)
 
-    for path in Path(dir_path).rglob('*.fa'):
-        truth_dict[path.name] = str(path)
-
-    return truth_dict
+        writer.writerows(result_rows)
+    return result_rows
 
 
-def parse_enrichSeq_structure():
+def __tool_selector(tool_name: str, tool_result_path: Path):
+    result_row = []
+    if re.search('enrichseq', tool_name, re.IGNORECASE):
+        full_result_path = Path(tool_result_path) / 'enrichseq/output_files/taxid_abundances.csv'
+        if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
+            result_row = ['EnrichSeq', full_result_path]
+
+
+    elif re.search('fastviromeexplorer', tool_name, re.IGNORECASE):
+        full_result_path = Path(tool_result_path) / 'FastViromeExplorer-final-sorted-abundance.tsv'
+        if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
+            result_row = ['FastViromeExplorer', full_result_path]
+
+    elif re.search('bracken', tool_name, re.IGNORECASE):
+        full_result_path = Path(tool_result_path) / 'abundances.bracken'
+        if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
+            result_row = ['FastViromeExplorer', full_result_path]
+
+    return result_row
+
+
+def write_results_to_csv(rows: list):
     pass
 
 
-def parse_fastviromeexplorer_structure():
-    pass
-
-
-def parse_bracken_structure():
-    pass
 
 
 def parse_args(argv=None) -> argparse.Namespace:
@@ -125,7 +153,8 @@ def parse_args(argv=None) -> argparse.Namespace:
 
 def main():
     arguments = parse_args(argv=sys.argv[1:])
-    parse_directory_trees(TRUTH_PATH, OUTPUT_PATH)
+    parse_directory_trees(TRUTH_PATH, RESULTS_PATH, OUTPUT_PATH)
+    #get_truth_filepaths(TRUTH_PATH)
 
 
 if __name__ == "__main__":
