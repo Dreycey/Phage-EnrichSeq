@@ -30,7 +30,7 @@ def parse_directory_trees(truth_path: str, result_path: str, output_path: str) -
 
     with open(output_csv_path, 'a') as csvfile:
         writer = csv.writer(csvfile) 
-        writer.writerow(['Trial No.', 'Experiment', 'Condition', 'Tool', 'Path to file'])
+        writer.writerow(['Trial_Num', 'Experiment', 'Condition', 'Tool', 'File_Path'])
 
     # parse truth
     truth_rows = parse_truth_filepaths(truth_path)
