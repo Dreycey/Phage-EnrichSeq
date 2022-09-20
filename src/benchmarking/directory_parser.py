@@ -68,7 +68,7 @@ def parse_truth_filepaths(dir_path: str) -> list:
                         subtest_path = Path(test_path) / subtest
                         if os.path.isfile(subtest_path):
                             if subtest.endswith('.fa'):
-                                info = [trial_num, test, subtest, 'truth', os.path.abspath(subtest_path)] 
+                                info = [trial_num, test, subtest.strip('.fa'), 'truth', os.path.abspath(subtest_path)] 
                                 rows.append(info)
                  
     return rows
