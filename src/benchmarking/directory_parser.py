@@ -2,11 +2,16 @@ import os
 import re
 import csv
 from pathlib import Path
-
+from enum import Enum
 
 TRUTH_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/tests-ALL/'
 RESULTS_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/results_simulated/'
 OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
+
+class ToolPathFinder(Enum):
+    ENRICHSEQ = 'enrichseq/output_files/taxid_abundances.csv'
+    FASTVIROMEEXPLORER = 'FastViromeExplorer-final-sorted-abundance.tsv'
+    BRACKEN = 'abundances.bracken'
 
 
 def parse_directory_trees(truth_path: str, result_path: str, output_path: str) -> None:
@@ -81,7 +86,12 @@ def parse_results_filepaths(results_path: str) -> list:
         Get metadata from tools' results directory paths and store in list
         
     INPUT:
-        Path to all tools' results files
+        Path to all tools' results files.
+        Expected directory structure for results: 
+            results/<trial num>/<tool name>/<experiment>/<condition>/
+        Example expected structure:
+            results/trial_2/EnrichSeq/num_genomes/200_genomes_500000_reads/...
+        * up to 9 trials
     
     OUTPUT:
         A list of lists. Each row contains the metadata for each tool's results
@@ -97,13 +107,13 @@ def parse_results_filepaths(results_path: str) -> list:
                     #result_rows.append(__parser_selector__(tool_path, trial_num))
                     for test in os.listdir(tool_path):
                         test_path = Path(tool_path) / test
-                        if os.path.isdir(test_path) and 'config' not in test:
-                            for subtest in os.listdir(test_path):
-                                subtest_path = Path(test_path) / subtest
-                                if os.path.isdir(subtest_path):
+                        if os.path.isdir(test_path):
+                            for condition in os.listdir(test_path):
+                                condition_path = Path(test_path) / condition
+                                if os.path.isdir(condition_path):
                                     # Now in tool's output directory
-                                    result_info = [trial_num, test, subtest]
-                                    tool_info = _tool_selector(tool, subtest_path)
+                                    result_info = [trial_num, test, condition]
+                                    tool_info = _tool_selector(tool, condition_path)
                                     if tool_info: # if the info does not come back empty, append the row
                                         result_info.extend(tool_info)
                                         result_rows.append(result_info)
@@ -114,6 +124,7 @@ def _tool_selector(tool_name: str, tool_result_path: Path) -> list:
     '''
     DESCRIPTION:
         Helper function to add the correct result file path of each tool (as they are all different)
+        uses Enum
         
     INPUT:
         1. The tool name - to use as a selector for choosing the appropriate path
@@ -122,24 +133,15 @@ def _tool_selector(tool_name: str, tool_result_path: Path) -> list:
     OUTPUT:
         A list containing the metadata for the given tool's result for that experiment condition ("subtest")
     '''
-    result_row = []
-    if re.search('enrichseq', tool_name, re.IGNORECASE):
-        full_result_path = Path(tool_result_path) / 'enrichseq/output_files/taxid_abundances.csv'
-        if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
-            result_row = ['EnrichSeq', full_result_path]
-
-
-    elif re.search('fastviromeexplorer', tool_name, re.IGNORECASE):
-        full_result_path = Path(tool_result_path) / 'FastViromeExplorer-final-sorted-abundance.tsv'
-        if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
-            result_row = ['FastViromeExplorer', full_result_path]
-
-    elif re.search('bracken', tool_name, re.IGNORECASE):
-        full_result_path = Path(tool_result_path) / 'abundances.bracken'
-        if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
-            result_row = ['FastViromeExplorer', full_result_path]
+    tool_name_uppercase = tool_name.upper()
+    for tool_name_enum in ToolPathFinder:
+        if tool_name_enum.name == tool_name_uppercase:
+            full_result_path = Path(tool_result_path) / tool_name_enum.value
+            if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
+                result_row = [tool_name_uppercase, full_result_path]
 
     return result_row
+
 
 
 def write_to_csv(rows: list, output_file: str) -> str:
@@ -162,7 +164,7 @@ def write_to_csv(rows: list, output_file: str) -> str:
 
 
 def main():
-    parse_directory_trees(TRUTH_PATH, RESULTS_PATH, OUTPUT_PATH)
+    parse_directory_trees(TRUTH_PATH, RESULTS_PATH, OUTPUT_PATH, )
 
 
 if __name__ == "__main__":
