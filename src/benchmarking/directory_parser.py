@@ -22,7 +22,7 @@ def parse_directory_trees(truth_path: str, result_path: str, output_path: str) -
     
     INPUT:
         1. Path to truth directory tree
-        2. Path to results directory tree (i.e. the results of the tools that were tested)
+        2. Path to results directory tree (i.e. the results of the tools that were tested) 
         3. Path to desired place to store CSV file
 
     OUTPUT:
@@ -164,7 +164,7 @@ def write_to_csv(rows: list, output_file: str) -> str:
 
 
 def main():
-    parse_directory_trees(TRUTH_PATH, RESULTS_PATH, OUTPUT_PATH, )
+    parse_directory_trees(TRUTH_PATH, RESULTS_PATH, OUTPUT_PATH)
 
 
 if __name__ == "__main__":
