@@ -1,18 +1,15 @@
-from functools import total_ordering
 import sys
 import csv
-import json
-from importlib.metadata import metadata
-
-#from unittest import result
+import argparse
+from abc import ABC, abstractmethod
 import pandas as pd
 from pathlib import Path
 from typing import Tuple, List, Dict
+from dynaconf import Dynaconf
 
 
-NCBI_TO_TAXID_FILEPATH = '/Users/latifa/GitHub/benchmarking-enrichseq/out_dictionary.txt'
+#NCBI_TO_TAXID_FILEPATH = '/Users/latifa/GitHub/benchmarking-enrichseq/out_dictionary.txt'
 PHAGE_REF_DB_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/tools/Phage-EnrichSeq/database/ref_genomes/'
-KRAKEN_DB_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/tools/Phage-EnrichSeq/database/KrakenDB/'
 BENCHMARKING_OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
 
 class SimulatedTruth:
@@ -25,17 +22,7 @@ class SimulatedTruth:
         self.sequencing_file = sequencing_file    
         self.num_genomes, self.num_reads = self.extract_genomes_and_reads()
         self.abundances_dict = {}
-        
-        # try:
-        #     json_file = open(NCBI_TO_TAXID_FILEPATH)
-        # except OSError as e:
-        #     print(f"Unable to open {NCBI_TO_TAXID_FILEPATH}: {e}", file=sys.stderr)
-        # else:
-        #     self.ncbi2taxid = json.load(json_file)
-        #     json_file.close()
-        #self.abundances_dict = self.parse_simulated_fasta() # taxid -> abundance 
             
-
     
     def extract_genomes_and_reads(self) -> Tuple[int, int]:
         '''
@@ -78,23 +65,27 @@ class SimulatedTruth:
                 if (line[0] == ">"):
                     ncbi_id = line[1:].split("|")[0].split("-")[0]
                     # convert NCBI to taxonomic ID
-                    if ncbi_id in ncbi_to_taxid_dict: # TODO: this part should work
+                    if ncbi_id in ncbi_to_taxid_dict:
                         tax_id = ncbi_to_taxid_dict[ncbi_id]
-                    else: # TODO: this part is not tested
+                    else: 
                         print("NCBI ID not in ncbi2taxid dictionary")
                         file_name = line[1:].split("|")[-1].strip("\n")
-                        path = Path(PHAGE_REF_DB_PATH + file_name)
                         try:
-                            tax_id = open(path).readline().split("kraken:taxid|")[1].strip("\n").replace(" ", "")
-                        except:
-                            not_found.add(path)
-                            new_len = len(not_found)
-                            if new_len != prev_len:
-                                print(f"ERROR (parsing):")
-                                print(f"\tTool: simulated files")
-                                print(f"\t\tnumber of true NOT found (fine if 1): {new_len}")
-                                print(f"\t\tNCBI ID: {ncbi_id}")
-                                prev_len = new_len
+                            path = Path(settings.PHAGE_REF_DB_PATH + file_name)
+                        except AttributeError as e:
+                            print(f"Unable to open 'PHAGE_REF_DB_PATH': {e}", file=sys.stderr)
+                        else:
+                            try:
+                                tax_id = open(path).readline().split("kraken:taxid|")[1].strip("\n").replace(" ", "")
+                            except:
+                                not_found.add(path)
+                                new_len = len(not_found)
+                                if new_len != prev_len:
+                                    print(f"ERROR (parsing):")
+                                    print(f"\tTool: simulated files")
+                                    print(f"\t\tnumber of true NOT found (fine if 1): {new_len}")
+                                    print(f"\t\tNCBI ID: {ncbi_id}")
+                                    prev_len = new_len
                     if tax_id in self.abundances_dict:
                         self.abundances_dict[tax_id] += 1
                     else:
@@ -109,7 +100,7 @@ class SimulatedTruth:
         return self.abundances_dict
 
 
-class Result:
+class Result(ABC):
 
     def __init__(self, trial_num, experiment_name, experiment_condition, tool_name, result_file, truth_obj, ncbi_to_taxid_dict = {}) -> None:
         self.trial_num = trial_num
@@ -124,7 +115,12 @@ class Result:
         self.false_positives = []
         self.false_negatives = []
         self.ncbi_to_taxid_dict = ncbi_to_taxid_dict
-    
+
+        # Run methods for creating data structure (order matters here!)
+        self.truth_obj.parse_simulated_fasta(self.ncbi_to_taxid_dict)
+        self.parse_results()
+        self.calc_classification_outcomes()
+
 
     def extract_genomes_and_reads(self) -> Tuple[int, int]:
         '''
@@ -147,6 +143,24 @@ class Result:
         return num_genomes, num_reads
 
 
+    def _clean_abundances(self):
+        '''
+        DESCRIPTION:
+            Cleans the Result object's abundances dictionary of any negligible 
+            abundances (based on a threshold)
+        '''
+        ids_to_del = []
+        for tax_id in self.abundances_dict:
+            if self.abundances_dict[tax_id] < 0.0001:
+                ids_to_del.append(tax_id)
+
+        # delete 0 value tax ids
+        for val in ids_to_del:
+            del self.abundances_dict[val]
+
+        return self.abundances_dict
+
+
     def calc_classification_outcomes(self) -> Tuple[List, List, List]: 
         '''
         DESCRIPTION:
@@ -161,33 +175,71 @@ class Result:
             Assigns outcomes to the class's member variable lists (also returns the 3 lists)
         
         '''
-        pass
+        if self.truth_obj is None:
+            print(f'{type(self).__name__} object [{self.trial_num}, {self.num_genomes}, {self.num_reads}] does not have a truth object assigned to it.')
+        elif not self.abundances_dict:
+            print(f'{type(self).__name__} object [{self.trial_num}, {self.num_genomes}, {self.num_reads}] does not have TAXID : ABUNDANCE dictionary.')
+        else:
+            for pred_taxid in self.abundances_dict.keys():
+                if pred_taxid in self.truth_obj.abundances_dict.keys():
+                    self.true_positives.append(pred_taxid)
+            
+            for pred_taxid in  self.abundances_dict.keys():
+                if (pred_taxid not in self.truth_obj.abundances_dict.keys()) and (pred_taxid != "UNK"):
+                    self.false_positives.append(pred_taxid)
+
+            for pred_taxid in self.truth_obj.abundances_dict.keys():
+                if pred_taxid not in self.abundances_dict.keys():
+                    self.false_negatives.append(pred_taxid)
+
+            print(f'{len(self.true_positives)}, {len(self.false_positives)}, {len(self.false_negatives)}')
+            return self.true_positives, self.false_positives, self.false_negatives
 
 
     def calc_precision(self) -> float:
-        if self.true_positives and self.false_positives and self.false_negatives:
-            return len(self.true_positives) / (len(self.true_positives + len(self.false_positives)))
-        else: # if outcomes lists are empty
+        try:
+            precision = len(self.true_positives) / (len(self.true_positives) + len(self.false_positives))
+        except ZeroDivisionError:
+            print('Division by zero caught for "precision" metric.')
             return 0.0
+        else:
+            return precision
 
 
     def calc_recall(self) -> float:
-        if self.true_positives and self.false_positives and self.false_negatives:
-            return len(self.true_positives) / (len(self.true_positives + len(self.false_negatives)))
-        else: # if outcomes lists are empty
+        try:
+            recall = len(self.true_positives) / (len(self.true_positives) + len(self.false_negatives))
+        except ZeroDivisionError:
+            print('Division by zero caught for "recall" metric.')
             return 0.0
+        else:
+            return recall
 
 
     def calc_f1score(self) -> float:
         precision = self.calc_precision()
         recall = self.calc_recall()
-        return (precision * recall) / (precision + recall)
+        #print(f'Precision = {precision}, Recall = {recall}')
+        try:
+            f1 = 2 * (precision * recall) / (precision + recall)
+        except ZeroDivisionError:
+            print(f'Zero division in f1 score calculation for {self.tool_name}.')
+            return 0.0
+        else:
+            return f1 
 
 
     def calc_l2distance(self) -> float:
         l2_distance = 0.0
         return l2_distance
 
+
+    @abstractmethod
+    def parse_results(self):
+        """
+        parses the file of a particular type
+        """
+        pass
 
 
 class EnrichSeqResult(Result):
@@ -204,7 +256,7 @@ class EnrichSeqResult(Result):
             enrichseq_file_lines = enrichseq_file_opened.readlines()
             for line in enrichseq_file_lines:
                 tax_id, abundance_val = line.strip('\n').split(self.delim)
-                self.abundances_dict[tax_id] = abundance_val
+                self.abundances_dict[tax_id] = float(abundance_val)
             enrichseq_file_opened.close()
 
         return self.abundances_dict
@@ -214,10 +266,9 @@ class FVEResult(Result):
     delim = '\t'
     ncbi_id_column = 0
     count_column = 3
-    #ncbi_to_taxid_dict = {}
 
 
-    def parse_results(self) -> Dict:
+    def parse_results(self, threshold=0.0) -> Dict:
         try:
             fve_file_opened = open(self.result_file, 'r')
         except OSError as e:
@@ -232,11 +283,11 @@ class FVEResult(Result):
                 # Taxon ID lookup
                 if ncbi_id in self.ncbi_to_taxid_dict:
                     tax_id = self.ncbi_to_taxid_dict[ncbi_id]
-                elif ncbi_id.split(".")[0] in self.ncbi_to_taxid_dict: # TODO: check if this is needed @Dreycey
+                elif ncbi_id.split(".")[0] in self.ncbi_to_taxid_dict: 
                     tax_id = self.ncbi_to_taxid_dict[ncbi_id.split(".")[0]]
                 else:
-                    tax_id = 'unk'
-                    if float(counts_val) > 0.01:
+                    tax_id = 'UNK'
+                    if float(counts_val) > threshold :
                         print(f"ERROR (parsing):")
                         print(f"\tTool: FVE")
                         print(f"\t\tFVE: {ncbi_id} NOT CONVERTED")
@@ -246,28 +297,11 @@ class FVEResult(Result):
                 total_abundance += float(counts_val)
             fve_file_opened.close()
 
-        #self._clean_abundances(total_abundance)
+        for tax_id in self.abundances_dict:
+            self.abundances_dict[tax_id] /= total_abundance # Normalize
+        self._clean_abundances()
         return self.abundances_dict
 
-    # TODO: May not need this, reading from a different FVE file
-    def _clean_abundances(self, total_abundance):
-        '''
-        DESCRIPTION:
-            Cleans the FVEResult object's abundances dictionary of any negligible 
-            abundances (based on a threshold)
-        '''
-        ids_to_del = []
-        for tax_id, abundance in self.abundances_dict.items():
-            if total_abundance > 0:
-                self.abundances_dict[tax_id] /= total_abundance # Normalize
-            if self.abundances_dict[tax_id] < 0.001:
-                ids_to_del.append(tax_id)
-
-        # delete 0 value tax ids
-        for val in ids_to_del:
-            del self.abundances_dict[val]
-
-        return self.abundances_dict
 
 class BrackenResult(Result):
     delim = '\t'
@@ -284,9 +318,10 @@ class BrackenResult(Result):
             for line in bracken_file_lines:
                 tax_id = line.strip('\n').split(self.delim)[self.tax_id_column]
                 abundance_val = line.strip('\n').split(self.delim)[self.abundance_column]
-                self.abundances_dict[tax_id] = abundance_val
+                self.abundances_dict[tax_id] = float(abundance_val)
             bracken_file_opened.close()
         
+        self._clean_abundances()
         return self.abundances_dict
 
 
@@ -295,10 +330,13 @@ class Benchmarking:
     def __init__(self, metadata_csv = None) -> None:
         self.metadata_csv = metadata_csv
         self.result_objs = []
-
+        self.ncbi_to_taxid_dict: dict = self.ncbi_to_taxid_mapping()
         # init metadata
         self.metadata_df = self.parse_metadata_csv()
+        print(f"DF: {self.metadata_df}")
+        self.assign_objs()
     
+
     def parse_metadata_csv(self) -> pd.DataFrame:
         """
         Description:
@@ -307,7 +345,7 @@ class Benchmarking:
             returns empty dataframe
         """
         try:
-            metadata_df = pd.read_csv(self.metadata_csv)
+            metadata_df = pd.read_csv(self.metadata_csv, skipinitialspace=True)
         except OSError as e:
             print(f"Unable to open {self.metadata_csv}: {e}", file=sys.stderr)
             return pd.DataFrame()
@@ -326,30 +364,38 @@ class Benchmarking:
         if self.metadata_df.empty:
             print("No metadata to parse results with!")
             return []
-        unique_tests = self.metadata_df[["Trial_Num", "Experiment", "Condition"]].drop_duplicates()
+        
+        # filter matching rows
+        # filtered_data = self.metadata_df.loc[(self.metadata_df["Trial_Num"] == trial_num_temp) &
+        #                                          (self.metadata_df["Experiment"] == experiment_temp) &
+        #                                          (self.metadata_df["Condition"] == condition_num_temp)]
+
+        # grab unique triplicates for truth-only rows
+        truth_rows = self.metadata_df.loc[self.metadata_df["Tool"] == "truth"]
+        unique_tests = truth_rows[["Trial_Num", "Experiment", "Condition"]].drop_duplicates()
+        print(f"unique: {unique_tests}")
         for index, unique_test_set in unique_tests.iterrows():
             trial_num_temp, experiment_temp, condition_num_temp = (unique_test_set.Trial_Num, 
                                                                    unique_test_set.Experiment, 
                                                                    unique_test_set.Condition)
-            # filter matching rows (TODO: do in 1 step)
+            # filter matching rows
             filtered_data = self.metadata_df.loc[(self.metadata_df["Trial_Num"] == trial_num_temp) &
                                                  (self.metadata_df["Experiment"] == experiment_temp) &
                                                  (self.metadata_df["Condition"] == condition_num_temp)]
+            print(f"filtered data: {filtered_data}")
             # create a truth object
             truth_row_temp = filtered_data.loc[filtered_data["Tool"] == "truth"].drop(columns=['Tool']).values.tolist()
             # if not truth_row_temp:
             #     print("TRUTH IS EMPTY!")
             #     exit()
-            #print(truth_row_temp)
+            print(f"\n {truth_row_temp}")
             truth_obj = SimulatedTruth(*truth_row_temp[0]) 
             for index2, sub_row in filtered_data.iterrows():
                 tool_name = sub_row["Tool"]
                 if (tool_name != "truth"):
-                    result_obj = self._return_tool_obj(tool_name, sub_row.values.tolist(), truth_obj, self.ncbi_to_taxid_mapping())
+                    result_obj = self._return_tool_obj(tool_name, sub_row.values.tolist(), truth_obj, self.ncbi_to_taxid_dict)
                     self.result_objs.append(result_obj)
-            break
 
-        #print(unique_tests)
 
     def _return_tool_obj(self, tool_name: str, result_array, truth_obj: SimulatedTruth, ncbi_to_taxid_mapping: Dict = {}):
         """
@@ -376,8 +422,9 @@ class Benchmarking:
         OUTPUT:
             Mapping dictionary where key is NCBI ID and value is taxon ID.
         '''
-        ncbi_map_filepath = Path(BENCHMARKING_OUTPUT_PATH + 'ncbi_map.tab')
-        
+        #ncbi_map_filepath = Path(BENCHMARKING_OUTPUT_PATH + 'ncbi_map.tab')
+        ncbi_map_filepath = Path(settings.NCBI_TO_TAXID_PATH)
+
         ncbi_to_taxid_dict = {}
         try:
             lookup_file_opened = open(ncbi_map_filepath)
@@ -395,25 +442,15 @@ class Benchmarking:
 
         return ncbi_to_taxid_dict
 
-
-    # TODO: complete this. @Latifa: what was this for?? Results already has a similar method
-    def calculate_outcomes(self):
-        '''
-        DESCRIPTION:
-            Finds true positives, false positives, and false negatives
-        '''
-        for result_obj in self.result_objs:
-            break
-
     
-    def write_intermediate_csv(self, output_file) -> str:
+    def write_to_csv(self, output_file) -> str:
         '''
         DESCRIPTION:
             Writes all data of the result objects to a CSV file
             i.e. [trial_num, experiment, condition, tool, true_positives, true_positives, false_negatives, precision, recall, f1, l2]
         
         INPUT:
-            1. The file to write to
+            The file to write to
         
         OUTPUT:
             Returns the CSV file path (string) in which the data was stored
@@ -421,58 +458,72 @@ class Benchmarking:
 
         all_result_metrics = [[]]
 
-        with open(BENCHMARKING_OUTPUT_PATH + output_file, 'w') as csvfile: 
+        if self.result_objs:
+            for res_obj in self.result_objs:
+                row = [res_obj.tool_name, res_obj.trial_num, res_obj.experiment_name, res_obj.experiment_condition]
+                row.extend([len(res_obj.true_positives), len(res_obj.false_positives), len(res_obj.false_negatives),
+                                            res_obj.calc_precision(), res_obj.calc_recall(), res_obj.calc_f1score(), res_obj.calc_l2distance()])
+
+
+                all_result_metrics.append(row)
+        try:
+            csvfile = open(settings.OUTPUT_DIRECTORY + output_file, 'w')
+        except AttributeError as e:
+            print(f"Unable to find 'OUTPUT_DIRECTORY' in settings: {e}", file=sys.stderr)
+        else:
             writer = csv.writer(csvfile) 
             writer.writerows(all_result_metrics)
-
-        return BENCHMARKING_OUTPUT_PATH + output_file
-
-
-    def write_to_csv(self, output_file):
-        """
-        creates an output csv file
-        """
-        for result_object in self.result_objs:
-            print(result_object.calc_f1score())
+            csvfile.close()
+            return settings.OUTPUT_DIRECTORY + output_file
 
 
+def metadata_passes(metadata_csv, output_file):
+    """
+    validates the metadata file and creates a log
 
-    
-    def validate_metrics():
-        '''
-        DESCRIPTION:
-            Checks if there are any anomolies in terms of exactly equal precision and recall.
+    Checks:
+        1. Number of unique tripicate columns are equal to 1+#tools_tested
+            i.e. 4 (truth, enrichseq, bracken, FVE)
+            Note: adds missing files to log. 
+        2. 
+    """
+    return True
 
-        INPUT:
 
 
-        OUTPUT:
-            Returns the experiment conditions that were flagged as exactly equal.
-            Dict of table key = occurrence #, value = table of 'result' data that share these numbers 
-                (List of lists, each row in the list is a list of result info)
-                or Dict of pandas.DataFrame?
 
-        '''
-        pass
 
+def parseArgs(argv=None) -> argparse.Namespace:
+    '''
+    DESCRIPTION:
+        This method takes in the arguments from the command and performs
+        parsing.
+    INPUT: 
+        Array of input arguments
+    OUTPUT:
+        returns a argparse.Namespace object
+    '''
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group()
+    #parser.add_argument("-d", "--directory_path", help="directory path for input and output files", required=True) # how to exclude this?
+    parser.add_argument("-m", "--metadata", help="metadata CSV file path containing experiment information", required=True)
+    parser.add_argument("-o", "--output_prefix", help="prefix for final csv file", required=True)
+    #parser.add_argument("-r", "--reference_genomes", help="directory containing reference genomes", required=True)
+    return parser.parse_args(argv)
 
 
 if __name__ == "__main__":
-    benchmark_obj = Benchmarking('/Users/latifa/GitHub/benchmarking-enrichseq/benchmarking_metadata.csv')
-    ncbi2taxid_dict = benchmark_obj.ncbi_to_taxid_mapping()
-    
-    truth_obj = SimulatedTruth(2, 'num_reads_200genomes', '200_genomes_400000_reads', '/Users/latifa/GitHub/benchmarking-enrichseq/tests-ALL/test_2/num_reads_200genomes/200_genomes_200000_reads.fa')
-    truth_obj.parse_simulated_fasta(ncbi2taxid_dict)
+    settings = Dynaconf(settings_files="settings.toml")
+    arguments = parseArgs(argv=sys.argv[1:])
+    # if len(sys.argv) < 3:
+    #     print(f"USAGE:")
+    #     print(f"python3 benchmark.py <metadata CSV> <output PREFIX>")
+    if metadata_passes(arguments.metadata, arguments.output_prefix + ".log"):
+        benchmark_obj3 = Benchmarking(arguments.metadata)
+        benchmark_obj3.write_to_csv(arguments.output_prefix + ".csv")
 
-    #benchmark_obj.assign_objs() # assign truth objects to result objects
-    
-    fve_obj = FVEResult(2, 'num_reads_200genomes', '200_genomes_400000_reads', 'FastViromeExplorer', '/Users/latifa/GitHub/benchmarking-enrichseq/results_simulated/test_2/FastViromeExplorer/num_reads_200genomes/200_genomes_200000_reads/FastViromeExplorer-final-sorted-abundance.tsv', truth_obj,ncbi2taxid_dict)
-    print(fve_obj.parse_results()) # works
 
-    # validate with less number of genomes
-    truth_obj2 = SimulatedTruth(1, 'num_genomes', '10_genomes_500000_reads', '/Users/latifa/GitHub/benchmarking-enrichseq/tests-ALL/test_1/num_genomes/10_genomes_500000_reads.fa')
-    fve_obj2 = FVEResult(1, 'num_genomes', '10_genomes_500000_reads', 'FastViromeExplorer', '/Users/latifa/GitHub/benchmarking-enrichseq/results_simulated/test_1/FastViromeExplorer/num_genomes/10_genomes_500000_reads/FastViromeExplorer-final-sorted-abundance.tsv', truth_obj2,ncbi2taxid_dict)
-    print(truth_obj2.abundances_dict)
+
 
 
 
