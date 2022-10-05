@@ -68,7 +68,8 @@ class SimulatedTruth:
                     if ncbi_id in ncbi_to_taxid_dict:
                         tax_id = ncbi_to_taxid_dict[ncbi_id]
                     else: 
-                        print("NCBI ID not in ncbi2taxid dictionary")
+                        # TODO: write to log
+                        print(f"NCBI ID {ncbi_id} not in ncbi2taxid dictionary")
                         file_name = line[1:].split("|")[-1].strip("\n")
                         try:
                             path = Path(settings.PHAGE_REF_DB_PATH + file_name)
@@ -333,7 +334,6 @@ class Benchmarking:
         self.ncbi_to_taxid_dict: dict = self.ncbi_to_taxid_mapping()
         # init metadata
         self.metadata_df = self.parse_metadata_csv()
-        print(f"DF: {self.metadata_df}")
         self.assign_objs()
     
 
@@ -373,7 +373,7 @@ class Benchmarking:
         # grab unique triplicates for truth-only rows
         truth_rows = self.metadata_df.loc[self.metadata_df["Tool"] == "truth"]
         unique_tests = truth_rows[["Trial_Num", "Experiment", "Condition"]].drop_duplicates()
-        print(f"unique: {unique_tests}")
+        #print(f"unique: {unique_tests}")
         for index, unique_test_set in unique_tests.iterrows():
             trial_num_temp, experiment_temp, condition_num_temp = (unique_test_set.Trial_Num, 
                                                                    unique_test_set.Experiment, 
@@ -388,7 +388,7 @@ class Benchmarking:
             # if not truth_row_temp:
             #     print("TRUTH IS EMPTY!")
             #     exit()
-            print(f"\n {truth_row_temp}")
+            #print(f"\n {truth_row_temp}")
             truth_obj = SimulatedTruth(*truth_row_temp[0]) 
             for index2, sub_row in filtered_data.iterrows():
                 tool_name = sub_row["Tool"]
@@ -505,10 +505,8 @@ def parseArgs(argv=None) -> argparse.Namespace:
     '''
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
-    #parser.add_argument("-d", "--directory_path", help="directory path for input and output files", required=True) # how to exclude this?
-    parser.add_argument("-m", "--metadata", help="metadata CSV file path containing experiment information", required=True)
+    parser.add_argument("-f", "--metadata_file", help="metadata CSV file path containing experiment information", required=True)
     parser.add_argument("-o", "--output_prefix", help="prefix for final csv file", required=True)
-    #parser.add_argument("-r", "--reference_genomes", help="directory containing reference genomes", required=True)
     return parser.parse_args(argv)
 
 
@@ -518,9 +516,9 @@ if __name__ == "__main__":
     # if len(sys.argv) < 3:
     #     print(f"USAGE:")
     #     print(f"python3 benchmark.py <metadata CSV> <output PREFIX>")
-    if metadata_passes(arguments.metadata, arguments.output_prefix + ".log"):
-        benchmark_obj3 = Benchmarking(arguments.metadata)
-        benchmark_obj3.write_to_csv(arguments.output_prefix + ".csv")
+    if metadata_passes(arguments.metadata_file, arguments.output_prefix + ".log"):
+        benchmark_obj = Benchmarking(arguments.metadata_file)
+        benchmark_obj.write_to_csv(arguments.output_prefix + ".csv")
 
 
 

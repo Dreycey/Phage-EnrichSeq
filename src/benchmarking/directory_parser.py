@@ -1,8 +1,10 @@
 import os
-import re
+import sys
+import argparse
 import csv
 from pathlib import Path
 from enum import Enum
+from dynaconf import Dynaconf
 
 TRUTH_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/tests-ALL/'
 RESULTS_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/results_simulated/'
@@ -14,7 +16,7 @@ class ToolPathFinder(Enum):
     BRACKEN = 'abundances.bracken'
 
 
-def parse_directory_trees(truth_path: str, result_path: str, output_path: str) -> None:
+def parse_directory_trees(truth_path: str, result_path: str, output_prefix: str) -> None:
     '''
     DESCRIPTION:
         Get directory structure metadata from file paths and write to CSV.
@@ -31,7 +33,7 @@ def parse_directory_trees(truth_path: str, result_path: str, output_path: str) -
     '''
     
     # create CSV file to append to
-    output_csv_path = Path(output_path) / 'benchmarking_metadata.csv'
+    output_csv_path = Path(settings.OUTPUT_DIRECTORY) / Path(output_prefix + '.csv')
 
     with open(output_csv_path, 'a') as csvfile:
         writer = csv.writer(csvfile) 
@@ -63,18 +65,23 @@ def parse_truth_filepaths(dir_path: str) -> list:
     rows = []
 
     for trial in os.listdir(dir_path):
-        trial_num = int(''.join(filter(str.isdigit, trial)))
-        trial_path = Path(dir_path) / trial
-        if os.path.isdir(trial_path):
-            for test in os.listdir(trial_path):
-                test_path = Path(trial_path) / test
-                if os.path.isdir(test_path) and 'config' not in test:
-                    for subtest in os.listdir(test_path):
-                        subtest_path = Path(test_path) / subtest
-                        if os.path.isfile(subtest_path):
-                            if subtest.endswith('.fa'):
-                                info = [trial_num, test, subtest.strip('.fa'), 'truth', os.path.abspath(subtest_path)] 
-                                rows.append(info)
+        try:
+            trial_num = int(''.join(filter(str.isdigit, trial)))
+        except ValueError as e:
+            trial_num = 0
+            print(f"Directory does not have an integer, causing error: {e}", file=sys.stderr)
+        finally:
+            trial_path = Path(dir_path) / trial
+            if os.path.isdir(trial_path):
+                for test in os.listdir(trial_path):
+                    test_path = Path(trial_path) / test
+                    if os.path.isdir(test_path) and 'config' not in test:
+                        for subtest in os.listdir(test_path):
+                            subtest_path = Path(test_path) / subtest
+                            if os.path.isfile(subtest_path):
+                                if subtest.endswith('.fa'):
+                                    info = [trial_num, test, subtest.strip('.fa'), 'truth', os.path.abspath(subtest_path)] 
+                                    rows.append(info)
                  
     return rows
 
@@ -98,25 +105,30 @@ def parse_results_filepaths(results_path: str) -> list:
     '''
     result_rows = []
     for trial in os.listdir(results_path):
-        trial_num = int(''.join(filter(str.isdigit, trial)))
-        trial_path = Path(results_path) / trial
-        if os.path.isdir(trial_path):
-            for tool in os.listdir(trial_path):
-                tool_path = Path(trial_path) / tool
-                if os.path.isdir(tool_path):
-                    #result_rows.append(__parser_selector__(tool_path, trial_num))
-                    for test in os.listdir(tool_path):
-                        test_path = Path(tool_path) / test
-                        if os.path.isdir(test_path):
-                            for condition in os.listdir(test_path):
-                                condition_path = Path(test_path) / condition
-                                if os.path.isdir(condition_path):
-                                    # Now in tool's output directory
-                                    result_info = [trial_num, test, condition]
-                                    tool_info = _tool_selector(tool, condition_path)
-                                    if tool_info: # if the info does not come back empty, append the row
-                                        result_info.extend(tool_info)
-                                        result_rows.append(result_info)
+        try:
+            trial_num = int(''.join(filter(str.isdigit, trial)))
+        except ValueError as e:
+            trial_num = 0
+            print(f"Directory does not have an integer, causing error: {e}", file=sys.stderr)
+        finally:
+            trial_path = Path(results_path) / trial
+            if os.path.isdir(trial_path):
+                for tool in os.listdir(trial_path):
+                    tool_path = Path(trial_path) / tool
+                    if os.path.isdir(tool_path):
+                        #result_rows.append(__parser_selector__(tool_path, trial_num))
+                        for test in os.listdir(tool_path):
+                            test_path = Path(tool_path) / test
+                            if os.path.isdir(test_path):
+                                for condition in os.listdir(test_path):
+                                    condition_path = Path(test_path) / condition
+                                    if os.path.isdir(condition_path):
+                                        # Now in tool's output directory
+                                        result_info = [trial_num, test, condition]
+                                        tool_info = _tool_selector(tool, condition_path)
+                                        if tool_info: # if the info does not come back empty, append the row
+                                            result_info.extend(tool_info)
+                                            result_rows.append(result_info)
     return result_rows
 
 
@@ -163,9 +175,25 @@ def write_to_csv(rows: list, output_file: str) -> str:
     return output_file
 
 
-def main():
-    parse_directory_trees(TRUTH_PATH, RESULTS_PATH, OUTPUT_PATH)
+def parseArgs(argv=None) -> argparse.Namespace:
+    '''
+    DESCRIPTION:
+        This method takes in the arguments from the command and performs
+        parsing.
+    INPUT: 
+        Array of input arguments
+    OUTPUT:
+        returns a argparse.Namespace object
+    '''
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group()
+    parser.add_argument("-t", "--truths_path", help="directory path containing all truth files", required=True)
+    parser.add_argument("-r", "--results_path", help="directory path containing tool result files", required=True)
+    parser.add_argument("-o", "--output_prefix", help="prefix for metadata csv file", required=True)
+    return parser.parse_args(argv)
 
 
 if __name__ == "__main__":
-    main()
+    settings = Dynaconf(settings_files="settings.toml")
+    arguments = parseArgs(argv=sys.argv[1:])
+    parse_directory_trees(arguments.truths_path, arguments.results_path, arguments.output_prefix)
