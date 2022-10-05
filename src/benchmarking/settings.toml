@@ -1,0 +1,4 @@
+PHAGE_REF_DB_PATH = "/Users/latifa/GitHub/benchmarking-enrichseq/tools/Phage-EnrichSeq/database/ref_genomes/"
+NCBI_TO_TAXID_PATH = "/Users/latifa/GitHub/benchmarking-enrichseq/ncbi_map.tab"
+
+OUTPUT_DIRECTORY = "/Users/latifa/GitHub/benchmarking-enrichseq/"
