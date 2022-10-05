@@ -193,7 +193,6 @@ class Result(ABC):
                 if pred_taxid not in self.abundances_dict.keys():
                     self.false_negatives.append(pred_taxid)
 
-            print(f'{len(self.true_positives)}, {len(self.false_positives)}, {len(self.false_negatives)}')
             return self.true_positives, self.false_positives, self.false_negatives
 
 
@@ -382,7 +381,7 @@ class Benchmarking:
             filtered_data = self.metadata_df.loc[(self.metadata_df["Trial_Num"] == trial_num_temp) &
                                                  (self.metadata_df["Experiment"] == experiment_temp) &
                                                  (self.metadata_df["Condition"] == condition_num_temp)]
-            print(f"filtered data: {filtered_data}")
+            #print(f"filtered data: {filtered_data}")
             # create a truth object
             truth_row_temp = filtered_data.loc[filtered_data["Tool"] == "truth"].drop(columns=['Tool']).values.tolist()
             # if not truth_row_temp:
@@ -513,17 +512,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
 if __name__ == "__main__":
     settings = Dynaconf(settings_files="settings.toml")
     arguments = parseArgs(argv=sys.argv[1:])
-    # if len(sys.argv) < 3:
-    #     print(f"USAGE:")
-    #     print(f"python3 benchmark.py <metadata CSV> <output PREFIX>")
+
     if metadata_passes(arguments.metadata_file, arguments.output_prefix + ".log"):
         benchmark_obj = Benchmarking(arguments.metadata_file)
         benchmark_obj.write_to_csv(arguments.output_prefix + ".csv")
-
-
-
-
-
-
-
-
