@@ -6,9 +6,6 @@ from pathlib import Path
 from enum import Enum
 from dynaconf import Dynaconf
 
-TRUTH_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/tests-ALL/'
-RESULTS_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/results_simulated/'
-OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
 
 class ToolPathFinder(Enum):
     ENRICHSEQ = 'enrichseq/output_files/taxid_abundances.csv'
@@ -34,6 +31,9 @@ def parse_directory_trees(truth_path: str, result_path: str, output_prefix: str)
     
     # create CSV file to append to
     output_csv_path = Path(settings.OUTPUT_DIRECTORY) / Path(output_prefix + '.csv')
+
+    if os.path.exists(output_csv_path):
+        os.remove(output_csv_path)
 
     with open(output_csv_path, 'a') as csvfile:
         writer = csv.writer(csvfile) 
