@@ -65,11 +65,13 @@ def parse_truth_filepaths(dir_path: str) -> list:
     rows = []
 
     for trial in os.listdir(dir_path):
+        if trial.startswith('.'):
+            continue
         try:
             trial_num = int(''.join(filter(str.isdigit, trial)))
         except ValueError as e:
             trial_num = 0
-            print(f"Directory does not have an integer, causing error: {e}", file=sys.stderr)
+            print(f"Directory {trial} does not have an integer, causing error: {e}", file=sys.stderr)
         finally:
             trial_path = Path(dir_path) / trial
             if os.path.isdir(trial_path):
@@ -105,6 +107,8 @@ def parse_results_filepaths(results_path: str) -> list:
     '''
     result_rows = []
     for trial in os.listdir(results_path):
+        if trial.startswith('.'):
+            continue
         try:
             trial_num = int(''.join(filter(str.isdigit, trial)))
         except ValueError as e:
@@ -145,6 +149,7 @@ def _tool_selector(tool_name: str, tool_result_path: Path) -> list:
     OUTPUT:
         A list containing the metadata for the given tool's result for that experiment condition ("subtest")
     '''
+    result_row = []
     tool_name_uppercase = tool_name.upper()
     for tool_name_enum in ToolPathFinder:
         if tool_name_enum.name == tool_name_uppercase:
