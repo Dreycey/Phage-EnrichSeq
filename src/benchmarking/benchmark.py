@@ -237,6 +237,8 @@ class Result(ABC):
 
     def calc_l2distance(self) -> float:
         l2_distance = 0.0
+        sum = 0
+        # TODO: numpy vector, "relative change" 
         return l2_distance
 
 
