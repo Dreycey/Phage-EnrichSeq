@@ -1,16 +1,17 @@
+from cmath import log
 import sys
 import csv
 import argparse
 from abc import ABC, abstractmethod
 import pandas as pd
 from pathlib import Path
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Set
 from dynaconf import Dynaconf
 
 
 #NCBI_TO_TAXID_FILEPATH = '/Users/latifa/GitHub/benchmarking-enrichseq/out_dictionary.txt'
-PHAGE_REF_DB_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/tools/Phage-EnrichSeq/database/ref_genomes/'
-BENCHMARKING_OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
+#PHAGE_REF_DB_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/tools/Phage-EnrichSeq/database/ref_genomes/'
+#BENCHMARKING_OUTPUT_PATH = '/Users/latifa/GitHub/benchmarking-enrichseq/'
 
 class SimulatedTruth:
 
@@ -34,9 +35,9 @@ class SimulatedTruth:
         '''
         num_genomes, num_reads = 0, 0
         if 'genomes' in self.experiment_condition and 'reads' in self.experiment_condition:
-            values = self.experiment_condition.strip('genomes').strip('reads').split('_')
+            values = self.experiment_condition.split('_')
             try:
-                num_genomes, num_reads = values[0], values[1]
+                num_genomes, num_reads = values[0], values[2]
             except IndexError as ex:
                 print(f'Index out of bounds. Possibly caused by incorrect format.')
         else:
@@ -53,13 +54,18 @@ class SimulatedTruth:
         INPUT:
             -
         OUTPUT:
-            Dictionary where <key : value> pair is taxid : abundance
+            Assigns and returns taxid<>abundance key-value pair in self.abundances_dict
         '''
 
         total_counts = 0
         not_found = set()
         prev_len = 0
-        with open(self.sequencing_file, "r") as fasta_opened:
+        try:
+            fasta_opened = open(self.sequencing_file, "r")
+        except OSError as e:
+            print(f'Problem opening {self.sequencing_file}')
+            return self.abundances_dict # return empty dictionary
+        else:
             line = fasta_opened.readline()
             while (line):
                 if (line[0] == ">"):
@@ -68,8 +74,7 @@ class SimulatedTruth:
                     if ncbi_id in ncbi_to_taxid_dict:
                         tax_id = ncbi_to_taxid_dict[ncbi_id]
                     else: 
-                        # TODO: write to log
-                        print(f"NCBI ID {ncbi_id} not in ncbi2taxid dictionary")
+                        #print(f"NCBI ID {ncbi_id} not in ncbi2taxid dictionary")
                         file_name = line[1:].split("|")[-1].strip("\n")
                         try:
                             path = Path(settings.PHAGE_REF_DB_PATH + file_name)
@@ -93,6 +98,7 @@ class SimulatedTruth:
                         self.abundances_dict[tax_id] = 1
                     total_counts += 1
                 line = fasta_opened.readline()
+            fasta_opened.close()
             
         #turn counts into abundances - normalize
         for tax_id in self.abundances_dict.keys():
@@ -133,9 +139,9 @@ class Result(ABC):
         '''
         num_genomes, num_reads = 0, 0
         if 'genomes' in self.experiment_condition and 'reads' in self.experiment_condition:
-            values = self.experiment_condition.strip('genomes').strip('reads').split('_')
+            values = self.experiment_condition.split('_')
             try:
-                num_genomes, num_reads = values[0], values[1]
+                num_genomes, num_reads = values[0], values[2]
             except IndexError as ex:
                 print(f'Index out of bounds. Possibly caused by incorrect format.')
         else:
@@ -370,9 +376,9 @@ class Benchmarking:
         #                                          (self.metadata_df["Condition"] == condition_num_temp)]
 
         # grab unique triplicates for truth-only rows
-        truth_rows = self.metadata_df.loc[self.metadata_df["Tool"] == "truth"]
+        truth_rows = self.metadata_df.loc[self.metadata_df["Tool"] == "TRUTH"]
         unique_tests = truth_rows[["Trial_Num", "Experiment", "Condition"]].drop_duplicates()
-        #print(f"unique: {unique_tests}")
+
         for index, unique_test_set in unique_tests.iterrows():
             trial_num_temp, experiment_temp, condition_num_temp = (unique_test_set.Trial_Num, 
                                                                    unique_test_set.Experiment, 
@@ -381,17 +387,18 @@ class Benchmarking:
             filtered_data = self.metadata_df.loc[(self.metadata_df["Trial_Num"] == trial_num_temp) &
                                                  (self.metadata_df["Experiment"] == experiment_temp) &
                                                  (self.metadata_df["Condition"] == condition_num_temp)]
-            #print(f"filtered data: {filtered_data}")
+
             # create a truth object
-            truth_row_temp = filtered_data.loc[filtered_data["Tool"] == "truth"].drop(columns=['Tool']).values.tolist()
+            truth_row_temp = filtered_data.loc[filtered_data["Tool"] == "TRUTH"].drop(columns=['Tool']).values.tolist()
             # if not truth_row_temp:
             #     print("TRUTH IS EMPTY!")
             #     exit()
             #print(f"\n {truth_row_temp}")
+ 
             truth_obj = SimulatedTruth(*truth_row_temp[0]) 
             for index2, sub_row in filtered_data.iterrows():
                 tool_name = sub_row["Tool"]
-                if (tool_name != "truth"):
+                if (tool_name != "TRUTH"):
                     result_obj = self._return_tool_obj(tool_name, sub_row.values.tolist(), truth_obj, self.ncbi_to_taxid_dict)
                     self.result_objs.append(result_obj)
 
@@ -454,12 +461,14 @@ class Benchmarking:
         OUTPUT:
             Returns the CSV file path (string) in which the data was stored
         '''
-
+        header = ['tool','trial_num','experiment', 'condition','num_genomes','num_reads','true_pos', \
+            'false_pos', 'false_neg','precision','recall','f1_score','l2_abundance']
         all_result_metrics = [[]]
 
         if self.result_objs:
             for res_obj in self.result_objs:
                 row = [res_obj.tool_name, res_obj.trial_num, res_obj.experiment_name, res_obj.experiment_condition]
+                row.extend([res_obj.num_genomes, res_obj.num_reads])
                 row.extend([len(res_obj.true_positives), len(res_obj.false_positives), len(res_obj.false_negatives),
                                             res_obj.calc_precision(), res_obj.calc_recall(), res_obj.calc_f1score(), res_obj.calc_l2distance()])
 
@@ -471,6 +480,7 @@ class Benchmarking:
             print(f"Unable to find 'OUTPUT_DIRECTORY' in settings: {e}", file=sys.stderr)
         else:
             writer = csv.writer(csvfile) 
+            writer.writerow(header)
             writer.writerows(all_result_metrics)
             csvfile.close()
             return settings.OUTPUT_DIRECTORY + output_file
@@ -512,7 +522,7 @@ def parseArgs(argv=None) -> argparse.Namespace:
 if __name__ == "__main__":
     settings = Dynaconf(settings_files="settings.toml")
     arguments = parseArgs(argv=sys.argv[1:])
-
+    metadata_fullpath = settings.OUTPUT_DIRECTORY + arguments.metadata_file
     if metadata_passes(arguments.metadata_file, arguments.output_prefix + ".log"):
-        benchmark_obj = Benchmarking(arguments.metadata_file)
+        benchmark_obj = Benchmarking(metadata_fullpath)
         benchmark_obj.write_to_csv(arguments.output_prefix + ".csv")
