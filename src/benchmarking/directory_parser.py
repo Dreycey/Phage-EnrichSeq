@@ -32,10 +32,10 @@ def parse_directory_trees(truth_path: str, result_path: str, output_prefix: str)
     # create CSV file to append to
     output_csv_path = Path(settings.OUTPUT_DIRECTORY) / Path(output_prefix + '.csv')
 
-    if os.path.exists(output_csv_path):
-        os.remove(output_csv_path)
+    # if os.path.exists(output_csv_path):
+    #     os.remove(output_csv_path)
 
-    with open(output_csv_path, 'a') as csvfile:
+    with open(output_csv_path, 'w') as csvfile:
         writer = csv.writer(csvfile) 
         writer.writerow(['Trial_Num', 'Experiment', 'Condition', 'Tool', 'File_Path'])
 
@@ -82,7 +82,7 @@ def parse_truth_filepaths(dir_path: str) -> list:
                             subtest_path = Path(test_path) / subtest
                             if os.path.isfile(subtest_path):
                                 if subtest.endswith('.fa'):
-                                    info = [trial_num, test, subtest.strip('.fa'), 'truth', os.path.abspath(subtest_path)] 
+                                    info = [trial_num, test, subtest.strip('.fa'), 'TRUTH', os.path.abspath(subtest_path)] 
                                     rows.append(info)
                  
     return rows
