@@ -4,6 +4,7 @@ import csv
 import argparse
 from abc import ABC, abstractmethod
 import pandas as pd
+import numpy as np
 from pathlib import Path
 from typing import Tuple, List, Dict, Set
 from dynaconf import Dynaconf
@@ -37,7 +38,7 @@ class SimulatedTruth:
         if 'genomes' in self.experiment_condition and 'reads' in self.experiment_condition:
             values = self.experiment_condition.split('_')
             try:
-                num_genomes, num_reads = values[0], values[2]
+                num_genomes, num_reads = int(values[0]), int(values[2])
             except IndexError as ex:
                 print(f'Index out of bounds. Possibly caused by incorrect format.')
         else:
@@ -132,16 +133,20 @@ class Result(ABC):
     def extract_genomes_and_reads(self) -> Tuple[int, int]:
         '''
         DESCRIPTION:
+            Parses the number of genomes and number of reads from the experiment
+            condition string. Must follow this format: 10_genomes_1000000_reads
 
         INPUT:
+            Self. Needs this object's experiment condition member attribute
 
         OUTPUT:
+            Returns the number of genomes and number of reads as integers
         '''
         num_genomes, num_reads = 0, 0
         if 'genomes' in self.experiment_condition and 'reads' in self.experiment_condition:
             values = self.experiment_condition.split('_')
             try:
-                num_genomes, num_reads = values[0], values[2]
+                num_genomes, num_reads = int(values[0]), int(values[2])
             except IndexError as ex:
                 print(f'Index out of bounds. Possibly caused by incorrect format.')
         else:
@@ -236,9 +241,22 @@ class Result(ABC):
 
 
     def calc_l2distance(self) -> float:
+        '''
+        DESCRIPTION:
+
+        INPUT:
+
+        OUTPUT:
+            Returns the relative change
+        '''
         l2_distance = 0.0
-        sum = 0
-        # TODO: numpy vector, "relative change" 
+        # CASES: 1) taxid in both pred and truth, 2) taxid only in pred (false pos), 3) taxid only in truth (false neg)
+        for taxid, predicted_abundance in self.abundances_dict.items():
+            if taxid in self.truth_obj.abundances_dict:
+                l2_distance += abs(self.truth_obj.abundances_dict[taxid] - predicted_abundance) / self.truth_obj.abundances_dict[taxid]
+            # else:
+            #     l2_distance += predicted_abundance #TODO: figure out what relative change is in this case 
+        l2_distance /= self.num_genomes
         return l2_distance
 
 
@@ -487,19 +505,73 @@ class Benchmarking:
             csvfile.close()
             return settings.OUTPUT_DIRECTORY + output_file
 
+class MetaValidator:
 
-def metadata_passes(metadata_csv, output_file):
-    """
-    validates the metadata file and creates a log
+    def __init__(self, metadata_path):
+        self.metadata_csv = metadata_path
+        self.metadata_df = self.parse_metadata_csv()
 
-    Checks:
-        1. Number of unique tripicate columns are equal to 1+#tools_tested
-            i.e. 4 (truth, enrichseq, bracken, FVE)
-            Note: adds missing files to log. 
-        2. 
-    """
-    return True
+    def directory_check(self,output_file):
+        """
+        validates the metadata file and creates a log
 
+        Checks:
+            1. Number of unique tripicate columns are equal to 1+#tools_tested
+                i.e. 4 (truth, enrichseq, bracken, FVE)
+                Note: adds missing results to log. 
+            2. 
+        """
+        missing_tools = []
+        unique_tools = self.metadata_df["Tool"].drop_duplicates()
+        unique_tests = self.metadata_df[["Trial_Num", "Experiment", "Condition"]].drop_duplicates()
+        # find missing files
+        for index, unique_test_set in unique_tests.iterrows():
+            trial_num_temp, experiment_temp, condition_num_temp = (unique_test_set.Trial_Num, 
+                                                                   unique_test_set.Experiment, 
+                                                                   unique_test_set.Condition)
+            # filter matching rows
+            filtered_data = self.metadata_df.loc[(self.metadata_df["Trial_Num"] == trial_num_temp) &
+                                                 (self.metadata_df["Experiment"] == experiment_temp) &
+                                                 (self.metadata_df["Condition"] == condition_num_temp)]
+            # obtain directories found for triplicate match
+            tools_w_data = set()
+            for index2, sub_row in filtered_data.iterrows():
+                tools_w_data.add(sub_row["Tool"])
+            # check for missing directories
+            for index2, tool_name in unique_tools.iteritems():
+                if tool_name not in tools_w_data:
+                    missing_tools.append([tool_name, trial_num_temp, experiment_temp, condition_num_temp])
+        
+        try:
+            csvfile = open(settings.OUTPUT_DIRECTORY + output_file, 'w')
+        except AttributeError as e:
+            print(f"Unable to find 'OUTPUT_DIRECTORY' in settings: {e}", file=sys.stderr)
+        else:
+            writer = csv.writer(csvfile) 
+            writer.writerows(missing_tools)
+            csvfile.close()
+        
+        return missing_tools
+
+
+    def parse_metadata_csv(self) -> pd.DataFrame:
+        """
+        Description:
+            This parses the input csv into a pandas Dataframe.
+        Errors:
+            returns empty dataframe
+        """
+        try:
+            metadata_df = pd.read_csv(self.metadata_csv, skipinitialspace=True)
+        except OSError as e:
+            print(f"Unable to open {self.metadata_csv}: {e}", file=sys.stderr)
+            return pd.DataFrame()
+        else:
+            return metadata_df
+    
+
+    def metadata_passes(self, outputfile) -> bool:
+        return True
 
 
 
@@ -525,6 +597,12 @@ if __name__ == "__main__":
     settings = Dynaconf(settings_files="settings.toml")
     arguments = parseArgs(argv=sys.argv[1:])
     metadata_fullpath = settings.OUTPUT_DIRECTORY + arguments.metadata_file
-    if metadata_passes(arguments.metadata_file, arguments.output_prefix + ".log"):
+    
+    # validate metadata
+    metavalidator = MetaValidator(metadata_fullpath)
+    missing_directories = metavalidator.directory_check(arguments.output_prefix + ".log")
+    print(missing_directories)
+
+    if metavalidator.metadata_passes(arguments.output_prefix + ".log"):
         benchmark_obj = Benchmarking(metadata_fullpath)
         benchmark_obj.write_to_csv(arguments.output_prefix + ".csv")
