@@ -3,7 +3,7 @@ METADATA="metadata";
 
 function run_directory_parser() {
     truth_dir="../../../../tests/";
-    result_dir="../../../../results_simulated/";
+    result_dir="../../../../results/";
     echo "Running directory parser.";
     echo ${truth_dir};
 
