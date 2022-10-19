@@ -8,8 +8,11 @@ from dynaconf import Dynaconf
 
 
 class ToolPathFinder(Enum):
+    # ENRICHSEQ = 'enrichseq/merge_overlap_filter/merge_overlap_out_refined.csv'
     ENRICHSEQ = 'enrichseq/output_files/taxid_abundances.csv'
     FASTVIROMEEXPLORER = 'FastViromeExplorer-final-sorted-abundance.tsv'
+    # BRACKEN_ASSEMBLED = 'abundances.bracken'
+    # BRACKEN_WO_ASSEMBLY = 'abundances.bracken'
     BRACKEN = 'abundances.bracken'
 
 
