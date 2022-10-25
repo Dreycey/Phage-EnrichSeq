@@ -1,60 +1,70 @@
-bash ${params.toolpath}/megahit_module/megahitRun.sh --read=${params.read} \
-        		  --input1=${fastafile} \
-                  --input2=${fastafile_2} \
-    			  --threads=${THREADS} \
-    			  --out=${megahitDir}
+
 
 usage() {
-    echo; echo "Usage: bash $0 --input=simulatedgenomes_illumina.fa --refdir=database/ref_genomes/ --kmer_length=35 --min_length=31 --seed=7"
-    echo "  --input_dir     Path to simulated test files"
-    echo "  --tools_path    Path to tools (megahit, kraken, bracken)"
-    echo "  --kraken_db     Path to the kraken2 database created using the config and kraken2Build.sh"
-    echo "  --output_path   Desired location to generate output files"
+    echo; echo "Usage: bash $0 -i -t -o -d"
+    echo "  -i      Path to simulated test files"
+    echo "  -t      Path to tools (megahit, kraken, bracken)"
+    echo "  -d      Path to the kraken2 database created using kraken2Build.sh"
+    echo "  -o      Desired location to generate output files"
     echo "  -h, --help      Print this help message out"; echo;
     exit 1;
 }
 
 
-function initialize_files() {
-    local outputPath=$1;
+while getopts ":i:t:d:o:" flag; do
+    case "${flag}" in
+        i)
+            truth_dir=${OPTARG}
+            ;;
+        t)
+            tools_path=${OPTARG}
+            ;;
+        d)
+            db_dir=${OPTARG}
+            ;;
+        o)
+            output_dir=${OPTARG}
+            ;;
+    esac
+done
 
-    if [[ -d ${outputPath} ]]; then
-        if [[ -d ${outputPath}/Bracken_Results/ ]]; then
-            rm -rf ${outputPath}/Bracken_Results/;
-        mkdir ${outputPath}/Bracken_Results/;
+# if [ -z "${truth_dir}" ] || [ -z "${tools_path}" ] || [ -z "${db_dir}" ]; then
+#     usage
+# fi
+
+
+function initialize_files() {
+    local output_path=$1;
+
+    if [[ -d ${output_path} ]]; then
+        if [[ -d ${output_path}/Bracken_Results/ ]]; then
+            rm -rf ${output_path}/Bracken_Results/;
+        fi
+        mkdir ${output_path}/Bracken_Results/;
     else 
-        outputPath=$(pwd);
+        output_path=$(pwd);
     fi
 
-    mkdir ${outputPath}/Bracken_Results/;
-
-    return "${outputPath}/Bracken_Results/"
+    mkdir ${output_path}/Bracken_Results/;
 }
 
 
 function run_megahit() {
-    local toolPath=$1;
-    local testDir=$2;
-    local file_suffix=".fa"
+    local tool_path=$1;
+    local input_file=$2;
+    local output_dir=$3;
+
     echo "-- RUNNING MegaHIT --";
 
-    if [[ -d ${testDir} ]]; then
-        for dir in ${testDir}/*; do
-            if [[ -d $dir ]]; then
-                for file in $test_dir/*${file_suffix}; do
-                echo; echo $file; echo;
-                basefile="$(basename -- $file)";
-                test_dir_name="$(basename "${test_dir##*/}")";
-                mkdir -p results/${tool_name}/${test_dir_name}/;
-                kraken2 --use-names --threads 4 --db tools/${tool_name}/minikraken2_v2_8GB_201904_UPDATE \
-                            --report results/${tool_name}/${test_dir_name}/${basefile%${file_suffix}}.report \
-                            ${file} > kraken2_benchmarking.log
-                                
-                done
-            fi
-        done
+    if [[ -d ${truth_dir} ]]; then
+        #echo ${input_file};
+        # bash ${tool_path}/megahit_module/megahitRun.sh --read="single" \
+        # 		  --input1=${input_file} \
+    	# 		  --threads="4" \
+    	# 		  --out=${output_dir};
+        megahit -r ${input_file} -t 4 -m 1e9 -o ${output_dir} --out-prefix megahit_out 
     else
-        echo "Test directory ${testDir} does not exist."
+        echo "Test directory ${truth_dir} does not exist."
     fi
 
 }
@@ -64,9 +74,7 @@ function run_kraken2() {
     local assembled=$1;
     local dbDir=$2;
     local inFasta=$3;
-    local kmerLength=$4;
-    local minimizerLength=$5;
-    local seed=$6;
+
     
     if [[ -d ./kraken_output ]]; then
         mkdir "./kraken_output"
@@ -74,7 +82,7 @@ function run_kraken2() {
     local krakenOutFile='.kraken_out/K${kmerLength}L${minimizerLength}S${seed}.kraken'
 
     if [[ -f ${dbDir}/taxo.k2d ]]; then
-        kraken2 --use-names --threads 4 --db ${dbDir} --report kraken.report ${inFasta} > ${krakenOutFile}
+        kraken2 --use-names --threads 4 --db ${dbDir} --report kraken.report ${inFasta} > ${krakenOutFile};
     else
         echo "Kraken database must be built first"
     fi
@@ -86,12 +94,34 @@ function run_bracken() {
 }
 
 
-function main() {
-    local dbDir='krakenDB';
+function run_pipeline() {
+    local truth_dir=$1;
+    local result_dir=$2;
+    local assembled=$3;
 
-    buildDatabase ${dbDir}; ## Which params to pass?
-    runMegahit ${};
-    runKraken2 ${dbDir} ${inFasta} ${kmerLength} ${minimizerLength} ${seed};
+    for trial_dir in $truth_dir/*; do
+        trial=$(basename -- ${trial_dir});
+        for test_dir in $trial_dir/*; do
+            test=$(basename -- ${test_dir});
+            for fasta_file in $test_dir/*.fa; do
+                # 1. Run MegaHIT
+                test_condition="$(basename -- $fasta_file)";
+                output_dir="${result_dir}/${trial}/Bracken_Assembled/${test}";
+                mkdir -p ${output_dir};
+                megahit_output_dir="${output_dir}/${test_condition%.fa}";
+                run_megahit ${tools_path} ${fasta_file} ${megahit_output_dir};
+            done
+        done
+    done
+}
+
+
+function main() {
+    
+    initialize_files ${output_dir};
+    run_pipeline ${truth_dir} "${output_dir}/Bracken_Results/" 1;
+    #run_pipeline ${truth_dir} ${output_dir}Bracken_Results/ 0 &;
+    
 }
 
 echo "Running Bracken pipeline";
