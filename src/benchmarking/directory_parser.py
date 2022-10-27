@@ -14,7 +14,7 @@ class ToolPathFinder(Enum):
     BRACKEN = 'abundances.bracken'
     BRACKEN_ASSEMBLED = 'bracken/assembled_abundances.bracken'
     BRACKEN_NO_ASSEMBLY = 'bracken/nonassembled_abundances.bracken'
-    #BRACKEN_SPECIAL = 'bracken/abundances.bracken'
+
 
 def parse_directory_trees(truth_path: str, result_path: str, output_prefix: str) -> None:
     '''
