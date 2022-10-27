@@ -430,7 +430,9 @@ class Benchmarking:
         name2obj = {
             "ENRICHSEQ" : EnrichSeqResult,
             "FASTVIROMEEXPLORER" : FVEResult,
-            "BRACKEN" : BrackenResult
+            "BRACKEN" : BrackenResult,
+            "BRACKEN_ASSEMBLED": BrackenResult,
+            "BRACKEN_NO_ASSEMBLY": BrackenResult
         }
         ToolClass = name2obj[tool_name.upper()]
         return ToolClass(*result_array, truth_obj, ncbi_to_taxid_mapping)
@@ -565,12 +567,15 @@ class MetaValidator:
             metadata_df = pd.read_csv(self.metadata_csv, skipinitialspace=True)
         except OSError as e:
             print(f"Unable to open {self.metadata_csv}: {e}", file=sys.stderr)
-            return pd.DataFrame()
+            self.metadata_df = pd.DataFrame()
+            return self.metadata_df
         else:
             return metadata_df
     
 
     def metadata_passes(self, outputfile) -> bool:
+        if self.metadata_df.empty:
+            return False
         return True
 
 
@@ -606,3 +611,7 @@ if __name__ == "__main__":
     if metavalidator.metadata_passes(arguments.output_prefix + ".log"):
         benchmark_obj = Benchmarking(metadata_fullpath)
         benchmark_obj.write_to_csv(arguments.output_prefix + ".csv")
+    else:
+        print("Failed")
+        sys.exit()
+

@@ -11,10 +11,10 @@ class ToolPathFinder(Enum):
     # ENRICHSEQ = 'enrichseq/merge_overlap_filter/merge_overlap_out_refined.csv'
     ENRICHSEQ = 'enrichseq/output_files/taxid_abundances.csv'
     FASTVIROMEEXPLORER = 'FastViromeExplorer-final-sorted-abundance.tsv'
-    # BRACKEN_ASSEMBLED = 'abundances.bracken'
-    # BRACKEN_WO_ASSEMBLY = 'abundances.bracken'
     BRACKEN = 'abundances.bracken'
-
+    BRACKEN_ASSEMBLED = 'bracken/assembled_abundances.bracken'
+    BRACKEN_NO_ASSEMBLY = 'bracken/nonassembled_abundances.bracken'
+    #BRACKEN_SPECIAL = 'bracken/abundances.bracken'
 
 def parse_directory_trees(truth_path: str, result_path: str, output_prefix: str) -> None:
     '''
@@ -159,7 +159,7 @@ def _tool_selector(tool_name: str, tool_result_path: Path) -> list:
             full_result_path = Path(tool_result_path) / tool_name_enum.value
             if os.path.exists(full_result_path) and os.path.isfile(full_result_path):
                 result_row = [tool_name_uppercase, full_result_path]
-
+            
     return result_row
 
 
